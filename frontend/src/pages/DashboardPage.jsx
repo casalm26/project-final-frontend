@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
+import { GlobalFilters } from '../components/filters';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
@@ -32,9 +34,16 @@ const MainContent = styled.main`
 
 export const DashboardPage = () => {
   const { user, logout, isAdmin } = useAuth();
+  const [filters, setFilters] = useState({});
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+    // TODO: Update charts and data based on filters
+    console.log('Filters changed:', newFilters);
   };
 
   return (
@@ -126,6 +135,9 @@ export const DashboardPage = () => {
               Monitor your forests and track tree growth with real-time insights.
             </p>
           </div>
+
+          {/* Global Filters */}
+          <GlobalFilters onFiltersChange={handleFiltersChange} />
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
