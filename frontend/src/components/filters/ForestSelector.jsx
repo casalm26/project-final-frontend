@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const FilterContainer = styled.div`
@@ -124,18 +124,20 @@ const ResetButton = styled.button`
   }
 `;
 
+// Default forests array moved outside component to make it stable
+const DEFAULT_FORESTS = [
+  { id: 1, name: 'Forest A', region: 'North Region', treeCount: 2500, area: '150 ha' },
+  { id: 2, name: 'Forest B', region: 'South Region', treeCount: 3200, area: '200 ha' },
+  { id: 3, name: 'Forest C', region: 'East Region', treeCount: 1800, area: '120 ha' },
+  { id: 4, name: 'Forest D', region: 'West Region', treeCount: 2750, area: '180 ha' },
+  { id: 5, name: 'Forest E', region: 'Central Region', treeCount: 4100, area: '250 ha' }
+];
+
 export const ForestSelector = ({ 
-  onForestChange, 
-  forests = [
-    { id: 1, name: 'Forest A', region: 'North Region', treeCount: 2500, area: '150 ha' },
-    { id: 2, name: 'Forest B', region: 'South Region', treeCount: 3200, area: '200 ha' },
-    { id: 3, name: 'Forest C', region: 'East Region', treeCount: 1800, area: '120 ha' },
-    { id: 4, name: 'Forest D', region: 'West Region', treeCount: 2750, area: '180 ha' },
-    { id: 5, name: 'Forest E', region: 'Central Region', treeCount: 4100, area: '250 ha' }
-  ],
-  initialSelected = []
+  selectedForests = [],
+  onChange,
+  forests = DEFAULT_FORESTS
 }) => {
-  const [selectedForests, setSelectedForests] = useState(initialSelected);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredForests, setFilteredForests] = useState(forests);
 
@@ -148,37 +150,32 @@ export const ForestSelector = ({
     setFilteredForests(filtered);
   }, [searchTerm, forests]);
 
-  // Debounced update effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (onForestChange) {
-        onForestChange(selectedForests);
-      }
-    }, 1000); // 1 second debounce
-
-    return () => clearTimeout(timer);
-  }, [selectedForests, onForestChange]);
-
   const handleForestToggle = (forestId) => {
-    setSelectedForests(prev => {
-      if (prev.includes(forestId)) {
-        return prev.filter(id => id !== forestId);
+    if (onChange) {
+      if (selectedForests.includes(forestId)) {
+        onChange(selectedForests.filter(id => id !== forestId));
       } else {
-        return [...prev, forestId];
+        onChange([...selectedForests, forestId]);
       }
-    });
+    }
   };
 
   const handleSelectAll = () => {
-    setSelectedForests(forests.map(forest => forest.id));
+    if (onChange) {
+      onChange(forests.map(forest => forest.id));
+    }
   };
 
   const handleSelectNone = () => {
-    setSelectedForests([]);
+    if (onChange) {
+      onChange([]);
+    }
   };
 
   const handleReset = () => {
-    setSelectedForests(initialSelected);
+    if (onChange) {
+      onChange([]);
+    }
     setSearchTerm('');
   };
 

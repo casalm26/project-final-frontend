@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import styled from 'styled-components';
@@ -94,20 +94,22 @@ const createTreeIcon = (type = 'healthy') => {
   });
 };
 
-// Map controller component
+// Map controller component - FIXED: removed function dependency from useEffect
 const MapController = ({ onZoomChange }) => {
   const map = useMap();
   
   useEffect(() => {
     const handleZoomEnd = () => {
-      onZoomChange(map.getZoom());
+      if (onZoomChange) {
+        onZoomChange(map.getZoom());
+      }
     };
     
     map.on('zoomend', handleZoomEnd);
     return () => {
       map.off('zoomend', handleZoomEnd);
     };
-  }, [map, onZoomChange]);
+  }, [map]); // Only depend on map, not the callback function
   
   return null;
 };
@@ -135,24 +137,24 @@ export const ForestMap = ({
     return true;
   });
 
-  const handleTreeClick = (tree) => {
+  const handleTreeClick = useCallback((tree) => {
     setSelectedTree(tree);
     if (onTreeSelect) {
       onTreeSelect(tree);
     }
-  };
+  }, [onTreeSelect]);
 
-  const handleZoomChange = (newZoom) => {
+  const handleZoomChange = useCallback((newZoom) => {
     setZoom(newZoom);
-  };
+  }, []);
 
-  const centerMap = () => {
+  const centerMap = useCallback(() => {
     // TODO: Center map on selected forest or all trees
-  };
+  }, []);
 
-  const fitBounds = () => {
+  const fitBounds = useCallback(() => {
     // TODO: Fit map to show all trees
-  };
+  }, []);
 
   return (
     <div>

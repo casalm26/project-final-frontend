@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { DateRangePicker } from './DateRangePicker';
 import { ForestSelector } from './ForestSelector';
@@ -86,56 +86,79 @@ const ClearAllButton = styled.button`
 `;
 
 export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
-  const [filters, setFilters] = useState({
+  // Only use initialFilters on mount
+  const didInit = useRef(false);
+  const onFiltersChangeRef = useRef(onFiltersChange);
+  const hasMounted = useRef(false);
+  
+  // Keep the ref up to date
+  useEffect(() => {
+    onFiltersChangeRef.current = onFiltersChange;
+  }, [onFiltersChange]);
+
+  const [filters, setFilters] = useState(() => ({
     dateRange: {
       startDate: new Date(new Date().getFullYear(), 0, 1),
       endDate: new Date()
     },
     selectedForests: [],
     ...initialFilters
-  });
+  }));
+
+  useEffect(() => {
+    if (!didInit.current && Object.keys(initialFilters).length > 0) {
+      setFilters(prev => ({ ...prev, ...initialFilters }));
+      didInit.current = true;
+    }
+  }, []); // Only run on mount
 
   const [activeFilters, setActiveFilters] = useState([]);
 
   // Update active filters display
   useEffect(() => {
     const active = [];
-    
     if (filters.dateRange.startDate && filters.dateRange.endDate) {
       const startDate = filters.dateRange.startDate.toLocaleDateString();
       const endDate = filters.dateRange.endDate.toLocaleDateString();
       active.push(`Date: ${startDate} - ${endDate}`);
     }
-    
     if (filters.selectedForests.length > 0) {
       active.push(`${filters.selectedForests.length} forests selected`);
     }
-    
     setActiveFilters(active);
   }, [filters]);
 
-  // Notify parent component of filter changes
+  // Debounced notify parent of filter changes - FIXED: removed onFiltersChange from dependencies and prevent initial call
   useEffect(() => {
-    if (onFiltersChange) {
-      onFiltersChange(filters);
+    // Don't call callback on initial mount
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
     }
-  }, [filters, onFiltersChange]);
 
-  const handleDateChange = (dateRange) => {
+    const timer = setTimeout(() => {
+      if (onFiltersChangeRef.current) {
+        onFiltersChangeRef.current(filters);
+      }
+    }, 1000); // 1 second debounce
+    return () => clearTimeout(timer);
+  }, [filters]); // Only depend on filters, not the callback function
+
+  const handleDateChange = useCallback((dateRange) => {
     setFilters(prev => ({
       ...prev,
       dateRange
     }));
-  };
+  }, []);
 
-  const handleForestChange = (selectedForests) => {
+  const handleForestChange = useCallback((selectedForests) => {
     setFilters(prev => ({
       ...prev,
       selectedForests
     }));
-  };
+  }, []);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setFilters({
       dateRange: {
         startDate: new Date(new Date().getFullYear(), 0, 1),
@@ -143,7 +166,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
       },
       selectedForests: []
     });
-  };
+  }, []);
 
   return (
     <FiltersContainer>
@@ -168,8 +191,8 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
           initialEndDate={filters.dateRange.endDate}
         />
         <ForestSelector
-          onForestChange={handleForestChange}
-          initialSelected={filters.selectedForests}
+          selectedForests={filters.selectedForests}
+          onChange={handleForestChange}
         />
       </FiltersGrid>
 

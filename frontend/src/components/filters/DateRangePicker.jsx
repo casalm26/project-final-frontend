@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -91,17 +91,30 @@ export const DateRangePicker = ({ onDateChange, initialStartDate, initialEndDate
   const [startDate, setStartDate] = useState(initialStartDate || new Date(new Date().getFullYear(), 0, 1)); // Start of current year
   const [endDate, setEndDate] = useState(initialEndDate || new Date()); // Today
   const [isUpdating, setIsUpdating] = useState(false);
+  const onDateChangeRef = useRef(onDateChange);
+  const hasMounted = useRef(false);
 
-  // Debounced update effect
+  // Keep the ref up to date
   useEffect(() => {
+    onDateChangeRef.current = onDateChange;
+  }, [onDateChange]);
+
+  // Debounced update effect - FIXED: removed onDateChange from dependencies and prevent initial call
+  useEffect(() => {
+    // Don't call callback on initial mount
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
     const timer = setTimeout(() => {
-      if (onDateChange && startDate && endDate) {
-        onDateChange({ startDate, endDate });
+      if (onDateChangeRef.current && startDate && endDate) {
+        onDateChangeRef.current({ startDate, endDate });
       }
     }, 1000); // 1 second debounce
 
     return () => clearTimeout(timer);
-  }, [startDate, endDate, onDateChange]);
+  }, [startDate, endDate]); // Only depend on the date values, not the callback function
 
   const handleStartDateChange = (date) => {
     setStartDate(date);
@@ -122,8 +135,8 @@ export const DateRangePicker = ({ onDateChange, initialStartDate, initialEndDate
     const defaultEndDate = new Date();
     setStartDate(defaultStartDate);
     setEndDate(defaultEndDate);
-    if (onDateChange) {
-      onDateChange({ startDate: defaultStartDate, endDate: defaultEndDate });
+    if (onDateChangeRef.current) {
+      onDateChangeRef.current({ startDate: defaultStartDate, endDate: defaultEndDate });
     }
   };
 

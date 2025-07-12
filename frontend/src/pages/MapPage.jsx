@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import { ForestMap } from '../components/map/ForestMap';
@@ -77,11 +77,11 @@ export const MapPage = () => {
     logout();
   };
 
-  const handleFiltersChange = (newFilters) => {
+  const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
     // TODO: Update map data based on filters
     console.log('Map filters changed:', newFilters);
-  };
+  }, []);
 
   const handleTreeSelect = (tree) => {
     setSelectedTree(tree);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
@@ -40,11 +40,11 @@ export const DashboardPage = () => {
     logout();
   };
 
-  const handleFiltersChange = (newFilters) => {
+  const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
     // TODO: Update charts and data based on filters
     console.log('Filters changed:', newFilters);
-  };
+  }, []);
 
   return (
     <DashboardContainer>
