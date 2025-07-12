@@ -1,5 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
+import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
@@ -185,38 +186,61 @@ export const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Placeholder Content */}
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-1">
+              <SurvivalRateChart />
+            </div>
+            <div className="lg:col-span-1 xl:col-span-2">
+              <AverageHeightChart />
+            </div>
+            <div className="lg:col-span-2 xl:col-span-3">
+              <CO2AbsorptionChart />
+            </div>
+          </div>
+
+          {/* Additional Dashboard Content */}
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Coming Soon</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Forest Overview</h3>
             <p className="text-gray-600 mb-4">
-              The dashboard is currently being developed. Soon you'll be able to:
+              Your forests are performing excellently with strong growth indicators and high survival rates.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                View real-time charts and analytics
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Explore interactive maps with tree locations
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Export data in CSV or XLSX format
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Filter and search through tree data
-              </li>
-            </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Recent Activity</h4>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                    New measurements recorded for Forest A
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    Survival rate improved by 2.3%
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    CO₂ absorption increased by 15%
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Next Actions</h4>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+                    Schedule maintenance for Forest B
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                    Review growth data for Q4 report
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                    Address low-performing areas in Forest C
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </MainContent>
