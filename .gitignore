@@ -13,3 +13,20 @@ yarn-debug.log*
 yarn-error.log*
 
 package-lock.json
+
+.AI_context
+Frontend_prd
+frontend_tasklist.txt
+.cursor
+.claude
+
+.env.example
+.eslintrc.json
+.prettierrc.json
+.prettierignore
+.prettierignore
+CLAUDE.md
+.cursor/rules/frontend-assumptions.mdc
+.cursor/rules/frontend-assumptions.md
+.cursor/rules/frontend-assumptions.txt
+.cursor/rules/frontend-assumptions.txt
