@@ -7,6 +7,12 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import forestRoutes from "./routes/forests.js";
 import treeRoutes from "./routes/trees.js";
+import userRoutes from "./routes/users.js";
+import exportRoutes from "./routes/exports.js";
+import auditRoutes from "./routes/audit.js";
+
+// Import middleware
+import { generalLimiter } from "./middleware/rateLimiter.js";
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +46,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Rate limiting middleware
+app.use('/api/', generalLimiter);
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -70,6 +79,9 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/forests", forestRoutes);
 app.use("/api/trees", treeRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/exports", exportRoutes);
+app.use("/api/audit", auditRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

@@ -4,7 +4,9 @@ import {
   login,
   getProfile,
   updateProfile,
-  logout
+  logout,
+  refreshToken,
+  logoutAll
 } from '../controllers/authController.js';
 import {
   validateRegister,
@@ -12,16 +14,19 @@ import {
   validateProfileUpdate
 } from '../middleware/validation.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// Public routes
-router.post('/register', validateRegister, register);
-router.post('/login', validateLogin, login);
+// Public routes (with stricter rate limiting for auth)
+router.post('/register', authLimiter, validateRegister, register);
+router.post('/login', authLimiter, validateLogin, login);
 router.post('/logout', logout);
+router.post('/refresh', authLimiter, refreshToken);
 
 // Protected routes
 router.get('/profile', authenticateToken, getProfile);
 router.put('/profile', authenticateToken, validateProfileUpdate, updateProfile);
+router.post('/logout-all', authenticateToken, logoutAll);
 
 export default router;

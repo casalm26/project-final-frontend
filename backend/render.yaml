@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: nanwa-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: MONGODB_URI
+        fromDatabase:
+          name: nanwa-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RATE_LIMIT
+        value: 100
+      - key: FRONTEND_URL
+        value: https://nanwa-frontend.onrender.com
+
+databases:
+  - name: nanwa-db
+    databaseName: nanwa
+    region: oregon
+    plan: free
