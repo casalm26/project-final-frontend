@@ -10,6 +10,8 @@ import treeRoutes from "./routes/trees.js";
 import userRoutes from "./routes/users.js";
 import exportRoutes from "./routes/exports.js";
 import auditRoutes from "./routes/audit.js";
+import dashboardRoutes from "./routes/dashboard.js";
+import chartRoutes from "./routes/charts.js";
 
 // Import middleware
 import { generalLimiter } from "./middleware/rateLimiter.js";
@@ -82,6 +84,8 @@ app.use("/api/trees", treeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/exports", exportRoutes);
 app.use("/api/audit", auditRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/charts", chartRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
