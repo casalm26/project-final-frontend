@@ -1,10 +1,43 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef(null);
 
-  const toggleMenu = () => setOpen(!open);
+  const { containerRef, focusFirst } = useKeyboardNavigation({
+    onEscape: () => setOpen(false),
+    trapFocus: open,
+    autoFocus: false,
+  });
+
+  const toggleMenu = () => {
+    setOpen(!open);
+  };
+
+  // Focus management when menu opens/closes
+  useEffect(() => {
+    if (open) {
+      // Focus first menu item when menu opens
+      setTimeout(() => {
+        focusFirst();
+      }, 100);
+    } else {
+      // Focus menu button when menu closes
+      setTimeout(() => {
+        menuButtonRef.current?.focus();
+      }, 100);
+    }
+  }, [open, focusFirst]);
+
+  // Handle keyboard navigation for menu button
+  const handleMenuKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMenu();
+    }
+  };
 
   const linkBase =
     'text-gray-700 hover:text-green-600 transition-colors px-4 py-2 text-base font-medium';

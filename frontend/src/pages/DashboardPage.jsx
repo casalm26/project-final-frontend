@@ -4,33 +4,118 @@ import styled from 'styled-components';
 import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
 import { GlobalFilters } from '../components/filters';
 import { ExportButtonComponent } from '../components/ui/ExportButton';
+import { mediaQueries, spacing, touchTarget } from '../utils/responsive';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
   background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  
+  ${mediaQueries.desktop} {
+    flex-direction: row;
+  }
 `;
 
 const Header = styled.header`
   background: white;
   border-bottom: 1px solid #e5e7eb;
-  padding: 1rem 0;
+  padding: ${spacing.md};
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  ${mediaQueries.desktop} {
+    display: none;
+  }
+`;
+
+const MobileMenuButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${touchTarget.comfortable};
+  height: ${touchTarget.comfortable};
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f3f4f6;
+  }
+  
+  &:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+  
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: #374151;
+  }
+  
+  ${mediaQueries.desktop} {
+    display: none;
+  }
 `;
 
 const Sidebar = styled.aside`
   background: white;
   border-right: 1px solid #e5e7eb;
-  width: 250px;
+  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  
+  ${({ isOpen }) => isOpen && `
+    transform: translateX(0);
+  `}
+  
+  ${mediaQueries.desktop} {
+    width: 250px;
+    position: sticky;
+    top: 0;
+    transform: translateX(0);
+    z-index: 10;
+  }
+`;
+
+const SidebarOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: ${({ isOpen }) => isOpen ? 1 : 0};
+  visibility: ${({ isOpen }) => isOpen ? 'visible' : 'hidden'};
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  
+  ${mediaQueries.desktop} {
+    display: none;
+  }
 `;
 
 const MainContent = styled.main`
-  margin-left: 250px;
-  padding: 2rem;
+  flex: 1;
+  padding: ${spacing.md};
+  
+  ${mediaQueries.tablet} {
+    padding: ${spacing.lg};
+  }
+  
+  ${mediaQueries.desktop} {
+    padding: ${spacing.xl};
+  }
 `;
 
 // Mock data for export
@@ -48,9 +133,18 @@ const mockTreeData = [
 export const DashboardPage = () => {
   const { user, logout, isAdmin } = useAuth();
   const [filters, setFilters] = useState({});
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
   };
 
   const handleFiltersChange = useCallback((newFilters) => {
@@ -73,37 +167,63 @@ export const DashboardPage = () => {
 
   return (
     <DashboardContainer>
-      {/* Header */}
+      {/* Mobile Header */}
       <Header>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-green-600">Nanwa Dashboard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-700">
-                Welcome, <span className="font-medium">{user?.name}</span>
-                {isAdmin() && (
-                  <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                    Admin
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="text-gray-700 hover:text-green-600 transition-colors"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </button>
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <MobileMenuButton onClick={toggleSidebar} aria-label="Toggle menu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </MobileMenuButton>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#16a34a', margin: 0 }}>
+              Nanwa Dashboard
+            </h1>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem' }}>
+            <span style={{ color: '#374151' }}>
+              Welcome, <strong>{user?.name}</strong>
+              {isAdmin() && (
+                <span style={{ 
+                  marginLeft: '0.5rem', 
+                  padding: '0.25rem 0.5rem', 
+                  backgroundColor: '#fef2f2', 
+                  color: '#dc2626', 
+                  fontSize: '0.75rem', 
+                  borderRadius: '9999px',
+                  fontWeight: 'bold'
+                }}>
+                  Admin
+                </span>
+              )}
+            </span>
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#374151',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                transition: 'color 0.2s ease'
+              }}
+              onMouseOver={(e) => e.target.style.color = '#16a34a'}
+              onMouseOut={(e) => e.target.style.color = '#374151'}
+            >
+              <svg style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </Header>
 
+      {/* Sidebar Overlay */}
+      <SidebarOverlay isOpen={sidebarOpen} onClick={closeSidebar} />
+
       {/* Sidebar */}
-      <Sidebar>
+      <Sidebar isOpen={sidebarOpen}>
         <div className="p-6">
           <nav className="space-y-2">
             <a

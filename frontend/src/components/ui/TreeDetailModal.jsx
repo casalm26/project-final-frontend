@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -270,6 +271,12 @@ const mockMeasurementHistory = [
 export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
   const [measurementHistory, setMeasurementHistory] = useState([]);
 
+  const { containerRef, focusFirst } = useKeyboardNavigation({
+    onEscape: onClose,
+    trapFocus: true,
+    autoFocus: true,
+  });
+
   useEffect(() => {
     if (tree && isOpen) {
       // In a real application, this would fetch from an API
@@ -301,10 +308,10 @@ export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
 
   return (
     <ModalOverlay onClick={handleOverlayClick}>
-      <ModalContent>
+      <ModalContent ref={containerRef} role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <ModalHeader>
-          <ModalTitle>{tree.name}</ModalTitle>
-          <CloseButton onClick={onClose}>
+          <ModalTitle id="modal-title">{tree.name}</ModalTitle>
+          <CloseButton onClick={onClose} aria-label="Close modal">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
