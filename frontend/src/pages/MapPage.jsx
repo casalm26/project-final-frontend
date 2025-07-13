@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import { ForestMap } from '../components/map/ForestMap';
 import { GlobalFilters } from '../components/filters';
+import { TreeDetailModal } from '../components/ui/TreeDetailModal';
 
 const MapPageContainer = styled.div`
   min-height: 100vh;
@@ -32,46 +33,13 @@ const MainContent = styled.main`
   padding: 2rem;
 `;
 
-const TreeDetailPanel = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-`;
 
-const TreeDetailHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const TreeDetailTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  padding: 0.5rem;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
 
 export const MapPage = () => {
   const { user, logout, isAdmin } = useAuth();
   const [filters, setFilters] = useState({});
   const [selectedTree, setSelectedTree] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -85,10 +53,12 @@ export const MapPage = () => {
 
   const handleTreeSelect = (tree) => {
     setSelectedTree(tree);
+    setIsModalOpen(true);
   };
 
   const handleCloseTreeDetail = () => {
     setSelectedTree(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -184,69 +154,12 @@ export const MapPage = () => {
           {/* Global Filters */}
           <GlobalFilters onFiltersChange={handleFiltersChange} />
 
-          {/* Selected Tree Detail */}
-          {selectedTree && (
-            <TreeDetailPanel>
-              <TreeDetailHeader>
-                <TreeDetailTitle>Tree Details</TreeDetailTitle>
-                <CloseButton onClick={handleCloseTreeDetail}>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </CloseButton>
-              </TreeDetailHeader>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Basic Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Name:</span>
-                      <span className="font-medium">{selectedTree.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Species:</span>
-                      <span className="font-medium">{selectedTree.species}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Height:</span>
-                      <span className="font-medium">{selectedTree.height}m</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Health:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        selectedTree.health === 'healthy' ? 'bg-green-100 text-green-800' :
-                        selectedTree.health === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {selectedTree.health}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Location</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Latitude:</span>
-                      <span className="font-medium">{selectedTree.lat}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Longitude:</span>
-                      <span className="font-medium">{selectedTree.lng}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
-                      View Full Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </TreeDetailPanel>
-          )}
+          {/* Tree Detail Modal */}
+          <TreeDetailModal
+            tree={selectedTree}
+            isOpen={isModalOpen}
+            onClose={handleCloseTreeDetail}
+          />
 
           {/* Map */}
           <ForestMap 
