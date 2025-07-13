@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
@@ -12,9 +14,22 @@ import exportRoutes from "./routes/exports.js";
 import auditRoutes from "./routes/audit.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import chartRoutes from "./routes/charts.js";
+import docsRoutes from "./routes/docs.js";
+import uploadRoutes from "./routes/uploads.js";
+import realtimeRoutes from "./routes/realtime.js";
+import bulkRoutes from "./routes/bulk.js";
 
 // Import middleware
 import { generalLimiter } from "./middleware/rateLimiter.js";
+
+// Import real-time components
+import { RealtimeController } from "./controllers/realtimeController.js";
+import { 
+  authenticateSocket, 
+  joinUserRoom, 
+  joinForestRooms, 
+  joinAdminRooms 
+} from "./utils/socketAuth.js";
 
 // Load environment variables
 dotenv.config();
@@ -39,6 +54,44 @@ mongoose.connection.on('disconnected', () => {
 
 const port = process.env.PORT || 8080;
 const app = express();
+const server = createServer(app);
+
+// Socket.IO setup
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000
+});
+
+// Initialize real-time controller
+const realtimeController = new RealtimeController(io);
+
+// Socket authentication middleware
+io.use(authenticateSocket);
+
+// Handle socket connections
+io.on('connection', (socket) => {
+  // Join user to appropriate rooms
+  joinUserRoom(socket);
+  joinForestRooms(socket);
+  joinAdminRooms(socket);
+
+  // Handle connection
+  realtimeController.handleConnection(socket);
+
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    realtimeController.handleDisconnection(socket);
+  });
+});
+
+// Make io available globally for other controllers
+global.io = io;
+global.realtimeController = realtimeController;
 
 // Middleware
 app.use(cors({
@@ -77,6 +130,12 @@ app.get("/health", (req, res) => {
   });
 });
 
+// API Documentation
+app.use("/docs", docsRoutes);
+
+// Serve static uploads
+app.use("/uploads", express.static("uploads"));
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/forests", forestRoutes);
@@ -86,6 +145,9 @@ app.use("/api/exports", exportRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/charts", chartRoutes);
+app.use("/api/uploads", uploadRoutes);
+app.use("/api/realtime", realtimeRoutes);
+app.use("/api/bulk", bulkRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
@@ -125,8 +187,9 @@ process.on('SIGINT', () => {
 });
 
 // Start the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`🚀 Server running on http://localhost:${port}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 API Documentation available at http://localhost:${port}/`);
+  console.log(`🌐 API Documentation available at http://localhost:${port}/docs`);
+  console.log(`⚡ WebSocket server ready for real-time connections`);
 });
