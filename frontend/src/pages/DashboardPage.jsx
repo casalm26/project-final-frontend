@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
 import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
 import { GlobalFilters } from '../components/filters';
+import { ExportButtonComponent } from '../components/ui/ExportButton';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
@@ -32,6 +33,18 @@ const MainContent = styled.main`
   padding: 2rem;
 `;
 
+// Mock data for export
+const mockTreeData = [
+  { id: 1, name: 'Tree A-001', species: 'Pine', height: 2.4, health: 'healthy', lat: 59.3293, lng: 18.0686 },
+  { id: 2, name: 'Tree A-002', species: 'Oak', height: 2.1, health: 'healthy', lat: 59.3300, lng: 18.0690 },
+  { id: 3, name: 'Tree A-003', species: 'Birch', height: 1.8, health: 'warning', lat: 59.3285, lng: 18.0675 },
+  { id: 4, name: 'Tree A-004', species: 'Spruce', height: 1.5, health: 'critical', lat: 59.3310, lng: 18.0700 },
+  { id: 5, name: 'Tree A-005', species: 'Pine', height: 2.7, health: 'healthy', lat: 59.3275, lng: 18.0660 },
+  { id: 6, name: 'Tree A-006', species: 'Oak', height: 2.3, health: 'healthy', lat: 59.3320, lng: 18.0710 },
+  { id: 7, name: 'Tree A-007', species: 'Birch', height: 1.9, health: 'warning', lat: 59.3265, lng: 18.0650 },
+  { id: 8, name: 'Tree A-008', species: 'Spruce', height: 2.5, health: 'healthy', lat: 59.3330, lng: 18.0720 },
+];
+
 export const DashboardPage = () => {
   const { user, logout, isAdmin } = useAuth();
   const [filters, setFilters] = useState({});
@@ -45,6 +58,18 @@ export const DashboardPage = () => {
     // TODO: Update charts and data based on filters
     console.log('Filters changed:', newFilters);
   }, []);
+
+  const handleExportStart = () => {
+    console.log('Export started');
+  };
+
+  const handleExportComplete = (format, recordCount) => {
+    console.log(`Export completed: ${format} with ${recordCount} records`);
+  };
+
+  const handleExportError = (error) => {
+    console.error('Export error:', error);
+  };
 
   return (
     <DashboardContainer>
@@ -130,10 +155,24 @@ export const DashboardPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Nanwa</h2>
-            <p className="text-gray-600">
-              Monitor your forests and track tree growth with real-time insights.
-            </p>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Nanwa</h2>
+                <p className="text-gray-600">
+                  Monitor your forests and track tree growth with real-time insights.
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <ExportButtonComponent
+                  data={mockTreeData}
+                  fileName="dashboard_data"
+                  filters={filters}
+                  onExportStart={handleExportStart}
+                  onExportComplete={handleExportComplete}
+                  onExportError={handleExportError}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Global Filters */}

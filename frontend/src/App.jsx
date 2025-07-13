@@ -4,6 +4,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { MapPage } from './pages/MapPage';
+import { TreeDetailPage } from './pages/TreeDetailPage';
+import { AdminPage } from './pages/AdminPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -33,6 +35,22 @@ export const App = () => {
             element={
               <ProtectedRoute>
                 <MapPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tree/:id" 
+            element={
+              <ProtectedRoute>
+                <TreeDetailPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminPage />
               </ProtectedRoute>
             } 
           />
