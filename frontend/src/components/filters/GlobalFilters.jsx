@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { DateRangePicker } from './DateRangePicker';
 import { ForestSelector } from './ForestSelector';
@@ -86,7 +87,7 @@ const ClearAllButton = styled.button`
 `;
 
 export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
-  // Only use initialFilters on mount
+  const [searchParams, setSearchParams] = useSearchParams();
   const didInit = useRef(false);
   const onFiltersChangeRef = useRef(onFiltersChange);
   const hasMounted = useRef(false);
@@ -96,14 +97,111 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
     onFiltersChangeRef.current = onFiltersChange;
   }, [onFiltersChange]);
 
-  const [filters, setFilters] = useState(() => ({
-    dateRange: {
-      startDate: new Date(new Date().getFullYear(), 0, 1),
-      endDate: new Date()
-    },
-    selectedForests: [],
-    ...initialFilters
-  }));
+  // Parse filters from URL on initial load
+  const getFiltersFromURL = useCallback(() => {
+    const startDateParam = searchParams.get('startDate');
+    const endDateParam = searchParams.get('endDate');
+    const forestsParam = searchParams.get('forests');
+
+    const urlFilters = {};
+
+    // Parse date range from URL
+    if (startDateParam && endDateParam) {
+      try {
+        const startDate = new Date(startDateParam);
+        const endDate = new Date(endDateParam);
+        
+        // Validate dates
+        if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && startDate <= endDate) {
+          urlFilters.dateRange = { startDate, endDate };
+        }
+      } catch (error) {
+        console.warn('Invalid date parameters in URL:', error);
+      }
+    }
+
+    // Parse selected forests from URL
+    if (forestsParam) {
+      try {
+        const forestIds = forestsParam.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+        if (forestIds.length > 0) {
+          urlFilters.selectedForests = forestIds;
+        }
+      } catch (error) {
+        console.warn('Invalid forest parameters in URL:', error);
+      }
+    }
+
+    return urlFilters;
+  }, [searchParams]);
+
+  const [filters, setFilters] = useState(() => {
+    const urlFilters = getFiltersFromURL();
+    return {
+      dateRange: {
+        startDate: new Date(new Date().getFullYear(), 0, 1),
+        endDate: new Date()
+      },
+      selectedForests: [],
+      ...initialFilters,
+      ...urlFilters // URL parameters take precedence
+    };
+  });
+
+  const [filterErrors, setFilterErrors] = useState({});
+
+  // Validate filters
+  const validateFilters = useCallback((filtersToValidate) => {
+    const errors = {};
+
+    // Validate date range
+    if (filtersToValidate.dateRange) {
+      const { startDate, endDate } = filtersToValidate.dateRange;
+      
+      if (startDate && endDate) {
+        if (startDate > endDate) {
+          errors.dateRange = 'Start date must be before or equal to end date';
+        }
+        
+        if (endDate > new Date()) {
+          errors.dateRange = 'End date cannot be in the future';
+        }
+        
+        // Check if date range is too large (more than 5 years)
+        const diffYears = (endDate - startDate) / (1000 * 60 * 60 * 24 * 365);
+        if (diffYears > 5) {
+          errors.dateRange = 'Date range cannot exceed 5 years';
+        }
+      }
+    }
+
+    // Validate selected forests (optional - could check against available forests)
+    if (filtersToValidate.selectedForests && filtersToValidate.selectedForests.length > 10) {
+      errors.selectedForests = 'Cannot select more than 10 forests at once';
+    }
+
+    setFilterErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, []);
+
+  // Update URL parameters when filters change
+  const updateURLParams = useCallback((newFilters) => {
+    const params = new URLSearchParams();
+
+    // Add date range to URL
+    if (newFilters.dateRange?.startDate && newFilters.dateRange?.endDate) {
+      params.set('startDate', newFilters.dateRange.startDate.toISOString().split('T')[0]);
+      params.set('endDate', newFilters.dateRange.endDate.toISOString().split('T')[0]);
+    }
+
+    // Add selected forests to URL
+    if (newFilters.selectedForests && newFilters.selectedForests.length > 0) {
+      params.set('forests', newFilters.selectedForests.join(','));
+    }
+
+    // Update URL without triggering navigation
+    setSearchParams(params, { replace: true });
+  }, [setSearchParams]);
 
   useEffect(() => {
     if (!didInit.current && Object.keys(initialFilters).length > 0) {
@@ -128,7 +226,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
     setActiveFilters(active);
   }, [filters]);
 
-  // Debounced notify parent of filter changes - FIXED: removed onFiltersChange from dependencies and prevent initial call
+  // Debounced notify parent of filter changes with validation and URL persistence
   useEffect(() => {
     // Don't call callback on initial mount
     if (!hasMounted.current) {
@@ -137,12 +235,22 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
     }
 
     const timer = setTimeout(() => {
-      if (onFiltersChangeRef.current) {
-        onFiltersChangeRef.current(filters);
+      // Validate filters before applying
+      const isValid = validateFilters(filters);
+      
+      if (isValid) {
+        // Update URL parameters
+        updateURLParams(filters);
+        
+        // Notify parent component
+        if (onFiltersChangeRef.current) {
+          onFiltersChangeRef.current(filters);
+        }
       }
     }, 1000); // 1 second debounce
+    
     return () => clearTimeout(timer);
-  }, [filters]); // Only depend on filters, not the callback function
+  }, [filters, validateFilters, updateURLParams]);
 
   const handleDateChange = useCallback((dateRange) => {
     setFilters(prev => ({
@@ -159,14 +267,19 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
   }, []);
 
   const handleClearAll = useCallback(() => {
-    setFilters({
+    const clearedFilters = {
       dateRange: {
         startDate: new Date(new Date().getFullYear(), 0, 1),
         endDate: new Date()
       },
       selectedForests: []
-    });
-  }, []);
+    };
+    setFilters(clearedFilters);
+    setFilterErrors({});
+    
+    // Clear URL parameters
+    setSearchParams({}, { replace: true });
+  }, [setSearchParams]);
 
   return (
     <FiltersContainer>
@@ -183,6 +296,23 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
           </ClearAllButton>
         )}
       </FiltersHeader>
+
+      {/* Display filter errors */}
+      {Object.keys(filterErrors).length > 0 && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center mb-2">
+            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium text-red-800">Filter Validation Errors</span>
+          </div>
+          <ul className="text-sm text-red-700 space-y-1">
+            {Object.entries(filterErrors).map(([field, error]) => (
+              <li key={field}>• {error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <FiltersGrid>
         <DateRangePicker
