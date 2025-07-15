@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
       // Make actual API call to backend with retry support
       const response = await authAPI.login({ email, password }, { onRetry });
       
-      const { token, user: userData } = response;
+      const { token, user: userData } = response.data;
       
       // Store token and user data securely
       localStorage.setItem('authToken', token);
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
       // Make actual API call to backend
       const response = await authAPI.register({ email, password });
       
-      const { token, user: userData } = response;
+      const { token, user: userData } = response.data;
       
       localStorage.setItem('authToken', token);
       localStorage.setItem('userData', JSON.stringify(userData));
