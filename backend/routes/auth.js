@@ -86,7 +86,7 @@ const router = express.Router();
  *       429:
  *         description: Too many requests
  */
-router.post('/register', validateRegister, register); // Temporarily removed authLimiter
+router.post('/register', authLimiter, validateRegister, register);
 
 /**
  * @swagger
@@ -135,57 +135,8 @@ router.post('/register', validateRegister, register); // Temporarily removed aut
  *       429:
  *         description: Too many requests
  */
-router.post('/login', validateLogin, login); // Temporarily removed authLimiter
+router.post('/login', authLimiter, validateLogin, login);
 
-// Temporary bypass endpoint for testing
-router.post('/test-login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Hardcoded test credentials
-    if (email === 'admin@nanwa.com' && password === 'admin123') {
-      const token = 'test-jwt-token-admin';
-      return res.json({
-        success: true,
-        message: 'Login successful',
-        token,
-        user: {
-          _id: 'test-id',
-          email: 'admin@nanwa.com',
-          firstName: 'Admin',
-          lastName: 'User',
-          role: 'admin'
-        }
-      });
-    }
-    
-    if (email === 'user@nanwa.com' && password === 'user123') {
-      const token = 'test-jwt-token-user';
-      return res.json({
-        success: true,
-        message: 'Login successful',
-        token,
-        user: {
-          _id: 'test-id-2',
-          email: 'user@nanwa.com',
-          firstName: 'Regular',
-          lastName: 'User',
-          role: 'user'
-        }
-      });
-    }
-    
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid credentials'
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
 
 /**
  * @swagger
@@ -337,5 +288,76 @@ router.put('/profile', authenticateToken, validateProfileUpdate, updateProfile);
  *         description: Authentication required
  */
 router.post('/logout-all', authenticateToken, logoutAll);
+
+// Debug endpoint to check user existence (remove in production)
+router.get('/debug-users', async (req, res) => {
+  try {
+    const { User } = await import('../models/index.js');
+    const users = await User.find({}, { email: 1, firstName: 1, lastName: 1, role: 1, password: 1 });
+    res.json({
+      success: true,
+      users: users.map(user => ({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        passwordHash: user.password.substring(0, 20) + '...'
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching users',
+      error: error.message
+    });
+  }
+});
+
+// Seed users endpoint (remove in production)
+router.post('/seed-users', async (req, res) => {
+  try {
+    const { User } = await import('../models/index.js');
+    
+    // Delete existing users
+    await User.deleteMany({});
+    
+    // Create test users
+    const sampleUsers = [
+      {
+        email: 'admin@nanwa.com',
+        password: 'admin123',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'admin'
+      },
+      {
+        email: 'user@nanwa.com',
+        password: 'user123',
+        firstName: 'Regular',
+        lastName: 'User',
+        role: 'user'
+      }
+    ];
+    
+    const users = await User.create(sampleUsers);
+    
+    res.json({
+      success: true,
+      message: 'Users seeded successfully',
+      users: users.map(user => ({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error seeding users',
+      error: error.message
+    });
+  }
+});
 
 export default router;

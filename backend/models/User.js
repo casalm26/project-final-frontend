@@ -72,7 +72,11 @@ userSchema.pre('save', function(next) {
 
 // Instance method to check password
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  console.log('🔐 comparePassword called with:', candidatePassword);
+  console.log('🔐 Comparing against hash:', this.password);
+  const result = await bcrypt.compare(candidatePassword, this.password);
+  console.log('🔐 bcrypt.compare result:', result);
+  return result;
 };
 
 // Instance method to get user info without password
