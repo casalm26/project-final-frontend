@@ -34,10 +34,24 @@ import {
 // Load environment variables
 dotenv.config();
 
+// Debug environment variables
+console.log('🔧 Environment check:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT:', process.env.PORT);
+console.log('- MONGO_URL:', process.env.MONGO_URL ? 'Set' : 'Missing');
+console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Missing');
+
 // MongoDB connection
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/nanwa-forestry";
-console.log('🔗 Connecting to MongoDB:', mongoUrl ? 'URL provided' : 'Using default localhost');
-mongoose.connect(mongoUrl);
+console.log('🔗 Connecting to MongoDB:', mongoUrl.includes('mongodb+srv') ? 'Atlas connection' : 'Local connection');
+
+mongoose.connect(mongoUrl)
+  .then(() => console.log('✅ MongoDB connected successfully'))
+  .catch((err) => {
+    console.error('❌ MongoDB connection failed:', err.message);
+    process.exit(1); // Exit if MongoDB connection fails
+  });
+
 mongoose.Promise = Promise;
 
 // MongoDB connection events
@@ -138,6 +152,24 @@ app.get("/health", (req, res) => {
     database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
+  });
+});
+
+// Health check endpoints
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'Server is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+  });
+});
+
+app.get('/api', (req, res) => {
+  res.json({ 
+    status: 'API is running',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
   });
 });
 
