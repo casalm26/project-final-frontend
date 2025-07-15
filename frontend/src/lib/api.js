@@ -99,7 +99,10 @@ class ApiClient {
       return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') {
-        error.message = 'Request timeout';
+        const timeoutError = new Error('Request timeout');
+        timeoutError.name = 'AbortError';
+        timeoutError.status = 408;
+        error = timeoutError;
       }
 
       // Check if this is a cold start error and if we should retry
