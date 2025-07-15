@@ -56,10 +56,20 @@ const port = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
 
+// Define allowed origins for CORS
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173", // Vite dev server
+  "https://entitree.netlify.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+console.log('🔗 Allowed CORS origins:', allowedOrigins);
+
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -95,7 +105,16 @@ global.realtimeController = realtimeController;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
