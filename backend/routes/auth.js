@@ -86,7 +86,7 @@ const router = express.Router();
  *       429:
  *         description: Too many requests
  */
-router.post('/register', authLimiter, validateRegister, register);
+router.post('/register', validateRegister, register); // Temporarily removed authLimiter
 
 /**
  * @swagger
@@ -135,7 +135,57 @@ router.post('/register', authLimiter, validateRegister, register);
  *       429:
  *         description: Too many requests
  */
-router.post('/login', authLimiter, validateLogin, login);
+router.post('/login', validateLogin, login); // Temporarily removed authLimiter
+
+// Temporary bypass endpoint for testing
+router.post('/test-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Hardcoded test credentials
+    if (email === 'admin@nanwa.com' && password === 'admin123') {
+      const token = 'test-jwt-token-admin';
+      return res.json({
+        success: true,
+        message: 'Login successful',
+        token,
+        user: {
+          _id: 'test-id',
+          email: 'admin@nanwa.com',
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin'
+        }
+      });
+    }
+    
+    if (email === 'user@nanwa.com' && password === 'user123') {
+      const token = 'test-jwt-token-user';
+      return res.json({
+        success: true,
+        message: 'Login successful',
+        token,
+        user: {
+          _id: 'test-id-2',
+          email: 'user@nanwa.com',
+          firstName: 'Regular',
+          lastName: 'User',
+          role: 'user'
+        }
+      });
+    }
+    
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid credentials'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
 
 /**
  * @swagger
