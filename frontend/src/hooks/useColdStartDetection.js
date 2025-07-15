@@ -51,10 +51,11 @@ export const useColdStartDetection = () => {
   }, []);
 
   const connectionFailed = useCallback((error) => {
+    const errorMessage = error && typeof error === 'object' ? error.message || String(error) : String(error || 'Connection failed');
     setConnectionState(prev => ({
       ...prev,
       isConnecting: false,
-      error: error.message || 'Connection failed',
+      error: errorMessage,
       message: 'Connection failed. Please try again.'
     }));
   }, []);
