@@ -121,13 +121,6 @@ global.io = io;
 global.realtimeController = realtimeController;
 
 // CORS configuration for production
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173", // Vite dev server
-  "https://entitree.netlify.app",
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
