@@ -45,11 +45,13 @@ console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Missing');
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/nanwa-forestry";
 console.log('🔗 Connecting to MongoDB:', mongoUrl.includes('mongodb+srv') ? 'Atlas connection' : 'Local connection');
 
+// Don't crash the app if MongoDB fails initially - let it retry
 mongoose.connect(mongoUrl)
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch((err) => {
     console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1); // Exit if MongoDB connection fails
+    console.log('⚠️  Server will continue running but database operations will fail');
+    // Don't exit - let the app start and show the error in health check
   });
 
 mongoose.Promise = Promise;
@@ -169,7 +171,13 @@ app.get('/api', (req, res) => {
   res.json({ 
     status: 'API is running',
     timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+    mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    environment: {
+      NODE_ENV: process.env.NODE_ENV,
+      MONGO_URL: process.env.MONGO_URL ? 'Set' : 'Missing',
+      JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Missing',
+      PORT: process.env.PORT
+    }
   });
 });
 

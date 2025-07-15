@@ -84,10 +84,14 @@ export const login = async (req, res) => {
     }
 
     const { email, password } = req.body;
+    console.log('🔐 Login attempt:', { email, password: '***' });
 
     // Find user by email
     const user = await User.findByEmail(email);
+    console.log('👤 User found:', user ? 'Yes' : 'No');
+    
     if (!user) {
+      console.log('❌ User not found in database');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -96,6 +100,7 @@ export const login = async (req, res) => {
 
     // Check if account is active
     if (!user.isActive) {
+      console.log('❌ User account is deactivated');
       return res.status(401).json({
         success: false,
         message: 'Account is deactivated'
@@ -103,8 +108,12 @@ export const login = async (req, res) => {
     }
 
     // Check password
+    console.log('🔒 Comparing password...');
     const isPasswordValid = await user.comparePassword(password);
+    console.log('🔒 Password valid:', isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log('❌ Password comparison failed');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
