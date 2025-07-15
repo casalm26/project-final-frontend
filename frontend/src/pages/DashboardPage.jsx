@@ -53,15 +53,15 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row">
-      {/* Mobile Header */}
-      <header className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* Top Header - Always visible */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSidebar}
               aria-label="Toggle menu"
-              className="flex items-center justify-center w-10 h-10 bg-none border-none cursor-pointer rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2"
+              className="lg:hidden flex items-center justify-center w-10 h-10 bg-none border-none cursor-pointer rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2"
             >
               <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -73,7 +73,7 @@ export const DashboardPage = () => {
           </div>
           <div className="flex items-center gap-4 text-sm">
             <span className="text-gray-700 dark:text-gray-300">
-              Welcome, <strong>{user?.name}</strong>
+              Welcome, <strong>{user?.firstName || user?.name}</strong>
               {isAdmin() && (
                 <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded-full font-bold">
                   Admin
@@ -83,29 +83,34 @@ export const DashboardPage = () => {
             <DarkModeToggle size="sm" />
             <button
               onClick={handleLogout}
-              className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+              title="Logout"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
+              Logout
             </button>
           </div>
         </div>
       </header>
 
-      {/* Sidebar Overlay */}
-      <div 
-        className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-        onClick={closeSidebar}
-      />
+      {/* Content Area with Sidebar */}
+      <div className="flex flex-1 lg:flex-row">
 
-      {/* Sidebar */}
-      <aside className={`
-        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full lg:w-64 fixed lg:sticky top-0 h-screen overflow-y-auto z-50 lg:z-10 transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+        {/* Sidebar Overlay */}
+        <div 
+          className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+            sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+          onClick={closeSidebar}
+        />
+
+        {/* Sidebar */}
+        <aside className={`
+          bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full lg:w-64 fixed lg:sticky top-0 h-full overflow-y-auto z-50 lg:z-10 transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
         <div className="p-6">
           <nav className="space-y-2">
             <a
@@ -163,39 +168,7 @@ export const DashboardPage = () => {
             </div>
           </nav>
         </div>
-      </aside>
-
-      {/* Desktop Header */}
-      <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-green-600 dark:text-green-400">
-              Nanwa Dashboard
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-700 dark:text-gray-300 text-sm">
-              Welcome, <strong>{user?.firstName || user?.name}</strong>
-              {isAdmin() && (
-                <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded-full font-bold">
-                  Admin
-                </span>
-              )}
-            </span>
-            <DarkModeToggle size="sm" />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-              title="Logout"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+        </aside>
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:p-8">
@@ -342,7 +315,8 @@ export const DashboardPage = () => {
             </div>
           </div>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }; 
