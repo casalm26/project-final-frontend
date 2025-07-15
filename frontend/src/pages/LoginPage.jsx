@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Navbar } from '../components/ui/Navbar';
+import { useColdStartDetection } from '../hooks/useColdStartDetection';
+import { ColdStartLoader } from '../components/ui/ColdStartLoader';
 
 export const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,15 @@ export const LoginPage = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  
+  const {
+    connectionState,
+    handleRetry,
+    startConnection,
+    connectionSuccess,
+    connectionFailed,
+    resetConnection
+  } = useColdStartDetection();
 
   const validateForm = () => {
     const newErrors = {};
@@ -58,23 +69,38 @@ export const LoginPage = () => {
     }
 
     setIsSubmitting(true);
+    startConnection();
     
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password, handleRetry);
       
-      if (!result.success) {
+      if (result.success) {
+        connectionSuccess();
+      } else {
+        connectionFailed(new Error(result.error));
         setErrors({ general: result.error });
       }
     } catch (error) {
-      setErrors({ general: 'An unexpected error occurred. Please try again.' });
+      connectionFailed(error);
+      setErrors({ general: 'Connection failed. Please check your internet connection and try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleCancelConnection = () => {
+    resetConnection();
+    setIsSubmitting(false);
+  };
+
   return (
     <>
       <Navbar />
+      <ColdStartLoader 
+        connectionState={connectionState}
+        onCancel={handleCancelConnection}
+        showCancel={true}
+      />
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">

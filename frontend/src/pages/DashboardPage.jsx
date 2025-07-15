@@ -148,9 +148,54 @@ export const DashboardPage = () => {
                 Audit Log
               </a>
             )}
+            
+            {/* Logout Button */}
+            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
           </nav>
         </div>
       </aside>
+
+      {/* Desktop Header */}
+      <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-green-600 dark:text-green-400">
+              Nanwa Dashboard
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-700 dark:text-gray-300 text-sm">
+              Welcome, <strong>{user?.firstName || user?.name}</strong>
+              {isAdmin() && (
+                <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded-full font-bold">
+                  Admin
+                </span>
+              )}
+            </span>
+            <DarkModeToggle size="sm" />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:p-8">

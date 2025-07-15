@@ -7,6 +7,7 @@ import { DarkModeProvider } from './contexts/DarkModeContext';
 import { ToastNotifications } from './components/ui/Toast';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import { KeepAliveProvider } from './components/KeepAliveProvider';
 
 // Lazy load components
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
@@ -30,7 +31,8 @@ export const App = () => {
         <DarkModeProvider>
           <ToastProvider>
             <AuthProvider>
-              <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
+              <KeepAliveProvider>
+                <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<LoginPage />} />
@@ -69,8 +71,9 @@ export const App = () => {
                   />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
-              </Suspense>
-              <ToastNotifications />
+                </Suspense>
+                <ToastNotifications />
+              </KeepAliveProvider>
             </AuthProvider>
           </ToastProvider>
         </DarkModeProvider>

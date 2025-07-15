@@ -34,11 +34,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, onRetry) => {
     try {
       setLoading(true);
-      // Make actual API call to backend
-      const response = await authAPI.login({ email, password });
+      // Make actual API call to backend with retry support
+      const response = await authAPI.login({ email, password }, { onRetry });
       
       const { token, user: userData } = response;
       

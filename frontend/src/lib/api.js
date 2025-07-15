@@ -2,6 +2,25 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000;
 
+// Cold start detection and retry configuration
+const COLD_START_INDICATORS = [
+  'failed to fetch',
+  'network request failed',
+  'timeout',
+  'connection refused',
+  'service unavailable',
+  'internal server error'
+];
+
+const RETRY_CONFIG = {
+  maxAttempts: 4,
+  baseDelay: 5000, // Start with 5 seconds
+  maxDelay: 20000, // Max 20 seconds between retries
+  backoffMultiplier: 1.5, // Gentler backoff
+  coldStartTimeouts: [15000, 20000, 25000, 30000], // Progressive timeouts for cold starts
+  retryDelays: [5000, 10000, 15000, 20000], // Fixed delays: 5s, 10s, 15s, 20s (total: 50s + initial attempt)
+};
+
 // API client with authentication and error handling
 class ApiClient {
   constructor() {
@@ -29,18 +48,39 @@ class ApiClient {
     return headers;
   }
 
-  // Generic fetch wrapper with error handling
+  // Helper method to detect cold start conditions
+  isColdStartError(error) {
+    const errorMessage = error.message.toLowerCase();
+    return COLD_START_INDICATORS.some(indicator => 
+      errorMessage.includes(indicator)
+    );
+  }
+
+  // Helper method to calculate retry delay with fixed delays for predictable timing
+  calculateRetryDelay(attempt) {
+    // Use fixed delays instead of exponential backoff for predictable 1-minute span
+    return RETRY_CONFIG.retryDelays[attempt - 1] || RETRY_CONFIG.maxDelay;
+  }
+
+  // Generic fetch wrapper with error handling and retry logic
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    const { retryAttempts = 0, onRetry } = options;
+    
+    // Use progressive timeout for cold starts
+    const timeoutDuration = retryAttempts < RETRY_CONFIG.coldStartTimeouts.length 
+      ? RETRY_CONFIG.coldStartTimeouts[retryAttempts]
+      : RETRY_CONFIG.coldStartTimeouts[RETRY_CONFIG.coldStartTimeouts.length - 1];
+
     const config = {
-      timeout: this.timeout,
+      timeout: timeoutDuration,
       headers: this.getHeaders(options.headers),
       ...options,
     };
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
       const response = await fetch(url, {
         ...config,
@@ -51,14 +91,46 @@ class ApiClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') {
-        throw new Error('Request timeout');
+        error.message = 'Request timeout';
       }
+
+      // Check if this is a cold start error and if we should retry
+      const shouldRetry = this.isColdStartError(error) && retryAttempts < RETRY_CONFIG.maxAttempts - 1;
+      
+      if (shouldRetry) {
+        const nextAttempt = retryAttempts + 1;
+        const delay = this.calculateRetryDelay(nextAttempt);
+        
+        // Notify about retry attempt
+        if (onRetry) {
+          onRetry({
+            attempt: nextAttempt,
+            totalAttempts: RETRY_CONFIG.maxAttempts,
+            delay,
+            error: error.message,
+            isColdStart: true
+          });
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        // Retry with incremented attempt count
+        return this.request(endpoint, {
+          ...options,
+          retryAttempts: nextAttempt,
+          onRetry
+        });
+      }
+
       console.error('API request failed:', error);
       throw error;
     }
@@ -71,10 +143,11 @@ class ApiClient {
     return this.request(url, { method: 'GET' });
   }
 
-  async post(endpoint, data = {}) {
+  async post(endpoint, data = {}, options = {}) {
     return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
+      ...options,
     });
   }
 
@@ -115,8 +188,8 @@ const apiClient = new ApiClient();
 
 // Authentication API methods
 export const authAPI = {
-  register: (userData) => apiClient.post('/auth/register', userData),
-  login: (credentials) => apiClient.post('/auth/login', credentials),
+  register: (userData, options = {}) => apiClient.post('/auth/register', userData, options),
+  login: (credentials, options = {}) => apiClient.post('/auth/login', credentials, options),
   logout: () => apiClient.post('/auth/logout'),
   logoutAll: () => apiClient.post('/auth/logout-all'),
   refreshToken: () => apiClient.post('/auth/refresh'),
