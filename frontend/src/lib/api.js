@@ -189,7 +189,7 @@ const apiClient = new ApiClient();
 // Authentication API methods
 export const authAPI = {
   register: (userData, options = {}) => apiClient.post('/auth/register', userData, options),
-  login: (credentials, options = {}) => apiClient.post('/auth/test-login', credentials, options), // Temporarily use test endpoint
+  login: (credentials, options = {}) => apiClient.post('/auth/login', credentials, options),
   logout: () => apiClient.post('/auth/logout'),
   logoutAll: () => apiClient.post('/auth/logout-all'),
   refreshToken: () => apiClient.post('/auth/refresh'),
