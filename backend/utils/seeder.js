@@ -9,10 +9,17 @@ const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/nanwa-forestry";
 const sampleUsers = [
   {
     email: 'admin@nanwa.com',
-    password: 'Admin123!',
+    password: 'admin123',
     firstName: 'Admin',
     lastName: 'User',
     role: 'admin'
+  },
+  {
+    email: 'user@nanwa.com',
+    password: 'user123',
+    firstName: 'Regular',
+    lastName: 'User',
+    role: 'user'
   },
   {
     email: 'john@example.com',
@@ -206,12 +213,12 @@ const seedDatabase = async () => {
     console.log(`   - Users: ${users.length}`);
     console.log(`   - Forests: ${forests.length}`);
     console.log(`   - Trees: ${totalTrees}`);
-    console.log(`\n🔐 Admin credentials:`);
-    console.log(`   Email: admin@nanwa.com`);
-    console.log(`   Password: Admin123!`);
-    console.log(`\n👤 User credentials:`);
-    console.log(`   Email: john@example.com`);
-    console.log(`   Password: User123!`);
+    console.log(`\n🔐 Mock Credentials (Frontend Compatible):`);
+    console.log(`   Admin: admin@nanwa.com / admin123`);
+    console.log(`   User:  user@nanwa.com / user123`);
+    console.log(`\n👤 Additional User Credentials:`);
+    console.log(`   John:  john@example.com / User123!`);
+    console.log(`   Jane:  jane@example.com / User123!`);
     
   } catch (error) {
     console.error('❌ Error seeding database:', error);
