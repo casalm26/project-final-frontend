@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../lib/api';
 
 const AuthContext = createContext();
 
@@ -36,9 +37,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call when backend is ready
-      // For now, simulate API call
-      const response = await simulateLoginAPI(email, password);
+      // Make actual API call to backend
+      const response = await authAPI.login({ email, password });
       
       const { token, user: userData } = response;
       
@@ -65,8 +65,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Passwords do not match');
       }
       
-      // TODO: Replace with actual API call when backend is ready
-      const response = await simulateRegisterAPI(email, password);
+      // Make actual API call to backend
+      const response = await authAPI.register({ email, password });
       
       const { token, user: userData } = response;
       
@@ -84,11 +84,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    setUser(null);
-    navigate('/');
+  const logout = async () => {
+    try {
+      // Call logout API to invalidate token
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+    } finally {
+      // Always clear local storage and redirect
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      setUser(null);
+      navigate('/');
+    }
   };
 
   const isAdmin = () => {
@@ -111,64 +119,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Temporary mock API functions - replace with real API calls when backend is ready
-const simulateLoginAPI = async (email, password) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Basic validation
-  if (!email || !password) {
-    throw new Error('Email and password are required');
-  }
-  
-  if (email === 'admin@nanwa.com' && password === 'admin123') {
-    return {
-      token: 'mock-jwt-token-admin',
-      user: {
-        id: 1,
-        email: 'admin@nanwa.com',
-        role: 'admin',
-        name: 'Admin User'
-      }
-    };
-  }
-  
-  if (email === 'user@nanwa.com' && password === 'user123') {
-    return {
-      token: 'mock-jwt-token-user',
-      user: {
-        id: 2,
-        email: 'user@nanwa.com',
-        role: 'user',
-        name: 'Regular User'
-      }
-    };
-  }
-  
-  throw new Error('Invalid email or password');
-};
-
-const simulateRegisterAPI = async (email, password) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Basic validation
-  if (!email || !password) {
-    throw new Error('Email and password are required');
-  }
-  
-  if (password.length < 6) {
-    throw new Error('Password must be at least 6 characters long');
-  }
-  
-  // Simulate successful registration
-  return {
-    token: 'mock-jwt-token-new-user',
-    user: {
-      id: Math.floor(Math.random() * 1000),
-      email,
-      role: 'user',
-      name: email.split('@')[0]
-    }
-  };
-}; 
+// Note: Mock API functions removed - now using real API calls via authAPI 

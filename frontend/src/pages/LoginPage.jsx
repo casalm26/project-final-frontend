@@ -1,26 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import styled from 'styled-components';
 import { Navbar } from '../components/ui/Navbar';
-
-const LoginContainer = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-`;
-
-const LoginCard = styled.div`
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-`;
 
 export const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -94,25 +75,25 @@ export const LoginPage = () => {
   return (
     <>
       <Navbar />
-      <LoginContainer>
-        <LoginCard>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
-              <h1 className="text-3xl font-bold text-green-600">Nanwa</h1>
+              <h1 className="text-3xl font-bold text-green-600 dark:text-green-400">Nanwa</h1>
             </Link>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-            <p className="text-gray-600">Sign in to your account to continue</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h2>
+            <p className="text-gray-600 dark:text-gray-300">Sign in to your account to continue</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {errors.general && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
                 {errors.general}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email address
               </label>
               <input
@@ -121,22 +102,22 @@ export const LoginPage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  errors.email ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="Enter your email"
                 disabled={isSubmitting}
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
               {errors.email && (
-                <p id="email-error" className="mt-1 text-sm text-red-600">
+                <p id="email-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
                   {errors.email}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -146,8 +127,8 @@ export const LoginPage = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                    errors.password ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Enter your password"
                   disabled={isSubmitting}
@@ -172,7 +153,7 @@ export const LoginPage = () => {
                 </button>
               </div>
               {errors.password && (
-                <p id="password-error" className="mt-1 text-sm text-red-600">
+                <p id="password-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
                   {errors.password}
                 </p>
               )}
@@ -184,14 +165,14 @@ export const LoginPage = () => {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Remember me
                 </label>
               </div>
               <div className="text-sm">
-                <a href="#" className="font-medium text-green-600 hover:text-green-500">
+                <a href="#" className="font-medium text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300">
                   Forgot your password?
                 </a>
               </div>
@@ -200,7 +181,7 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <div className="flex items-center">
@@ -217,24 +198,24 @@ export const LoginPage = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-green-600 hover:text-green-500">
+              <Link to="/register" className="font-medium text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300">
                 Sign up
               </Link>
             </p>
           </div>
 
           {/* Demo credentials */}
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2">Demo credentials:</p>
-            <div className="text-xs text-gray-500 space-y-1">
+          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Demo credentials:</p>
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
               <p><strong>Admin:</strong> admin@nanwa.com / admin123</p>
               <p><strong>User:</strong> user@nanwa.com / user123</p>
             </div>
           </div>
-        </LoginCard>
-      </LoginContainer>
+        </div>
+      </div>
     </>
   );
 }; 

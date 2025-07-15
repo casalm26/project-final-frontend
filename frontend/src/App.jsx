@@ -3,6 +3,7 @@ import { Suspense, lazy } from 'react';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { DarkModeProvider } from './contexts/DarkModeContext';
 import { ToastNotifications } from './components/ui/Toast';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import LoadingSpinner from './components/ui/LoadingSpinner';
@@ -26,51 +27,53 @@ export const App = () => {
           v7_relativeSplatPath: true,
         }}
       >
-        <ToastProvider>
-          <AuthProvider>
-            <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute>
-                      <DashboardPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/map" 
-                  element={
-                    <ProtectedRoute>
-                      <MapPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/tree/:id" 
-                  element={
-                    <ProtectedRoute>
-                      <TreeDetailPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ProtectedRoute>
-                      <AdminPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Suspense>
-            <ToastNotifications />
-          </AuthProvider>
-        </ToastProvider>
+        <DarkModeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <ProtectedRoute>
+                        <DashboardPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/map" 
+                    element={
+                      <ProtectedRoute>
+                        <MapPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/tree/:id" 
+                    element={
+                      <ProtectedRoute>
+                        <TreeDetailPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <ProtectedRoute>
+                        <AdminPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+              <ToastNotifications />
+            </AuthProvider>
+          </ToastProvider>
+        </DarkModeProvider>
       </Router>
     </ErrorBoundary>
   );

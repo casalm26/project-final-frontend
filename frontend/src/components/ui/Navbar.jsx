@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
+import { DarkModeToggle } from './DarkModeToggle';
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ export const Navbar = () => {
   };
 
   const linkBase =
-    'text-gray-700 hover:text-green-600 transition-colors px-4 py-2 text-base font-medium';
+    'text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors px-4 py-2 text-base font-medium';
 
   const menuItems = (
     <>
@@ -55,7 +56,7 @@ export const Navbar = () => {
       </Link>
       <Link
         to="/register"
-        className="ml-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-base font-medium"
+        className="ml-2 bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors text-base font-medium"
       >
         Get Started
       </Link>
@@ -63,38 +64,48 @@ export const Navbar = () => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-extrabold text-green-600 tracking-tight">
+          <Link to="/" className="text-2xl font-extrabold text-green-600 dark:text-green-400 tracking-tight">
             Nanwa
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-4">{menuItems}</div>
+          <div className="hidden md:flex items-center gap-4">
+            {menuItems}
+            <DarkModeToggle size="sm" />
+          </div>
 
           {/* Mobile Toggle */}
-          <button
-            aria-label="Toggle menu"
-            className="md:hidden text-gray-700 hover:text-green-600 focus:outline-none"
-            onClick={toggleMenu}
-          >
-            {open ? (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <DarkModeToggle size="sm" />
+            <button
+              aria-label="Toggle menu"
+              className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 focus:outline-none"
+              onClick={toggleMenu}
+            >
+              {open ? (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
-      {open && <div className="md:hidden border-t border-gray-200 bg-white px-4 pb-4 space-y-1">{menuItems}</div>}
+      {open && (
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pb-4 space-y-1">
+          {menuItems}
+        </div>
+      )}
     </nav>
   );
 }; 
