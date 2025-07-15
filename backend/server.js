@@ -120,9 +120,16 @@ io.on('connection', (socket) => {
 global.io = io;
 global.realtimeController = realtimeController;
 
-// Middleware - Temporarily allow all origins for testing
+// CORS configuration for production
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173", // Vite dev server
+  "https://entitree.netlify.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: true, // Allow all origins temporarily
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
