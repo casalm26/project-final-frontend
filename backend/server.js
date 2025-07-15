@@ -36,6 +36,7 @@ dotenv.config();
 
 // MongoDB connection
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/nanwa-forestry";
+console.log('🔗 Connecting to MongoDB:', mongoUrl ? 'URL provided' : 'Using default localhost');
 mongoose.connect(mongoUrl);
 mongoose.Promise = Promise;
 
@@ -69,7 +70,7 @@ console.log('🔗 Allowed CORS origins:', allowedOrigins);
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: true, // Allow all origins temporarily
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -103,18 +104,9 @@ io.on('connection', (socket) => {
 global.io = io;
 global.realtimeController = realtimeController;
 
-// Middleware
+// Middleware - Temporarily allow all origins for testing
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins temporarily
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
