@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Forest, Tree, User } from '../models/index.js';
 // TODO: Consider caching frequently accessed dashboard data to reduce database queries
 import { 
@@ -32,9 +33,25 @@ export const getDashboardStats = async (req, res) => {
       species: req.query.species
     };
 
+    console.log('🔍 Dashboard stats request with filters:', filters);
+
     // Build query conditions using utility functions
     const treeQuery = buildTreeQuery(filters);
     const forestQuery = buildForestQuery(filters);
+    
+    console.log('🔍 Built tree query:', treeQuery);
+    console.log('🔍 Built forest query:', forestQuery);
+
+    // Check total documents in collection (for debugging)
+    const totalTreesInDB = await Tree.countDocuments({});
+    const totalForestsInDB = await Forest.countDocuments({});
+    console.log('🔍 Total documents in DB - Trees:', totalTreesInDB, 'Forests:', totalForestsInDB);
+    console.log('🔍 Database connection info:', {
+      readyState: mongoose.connection.readyState,
+      name: mongoose.connection.name,
+      host: mongoose.connection.host,
+      collection: Tree.collection.collectionName
+    });
 
     // Get basic counts
     const [
@@ -48,6 +65,13 @@ export const getDashboardStats = async (req, res) => {
       Forest.countDocuments(forestQuery),
       User.countDocuments({ isActive: true })
     ]);
+
+    console.log('📊 Basic counts:', {
+      totalTrees,
+      aliveTrees,
+      totalForests,
+      totalUsers
+    });
 
     // Get recent activity (trees planted in last 30 days)
     const thirtyDaysAgo = getRecentDateFilter(30);
