@@ -7,7 +7,7 @@ import {
   getBulkOperationStatus
 } from '../controllers/bulkController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-import { dataLimiter } from '../middleware/rateLimiter.js';
+// import { dataLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
 import { emitUserActivity } from '../middleware/realtimeEvents.js';
 
 const router = express.Router();
@@ -15,8 +15,8 @@ const router = express.Router();
 // All bulk routes require authentication
 router.use(authenticateToken);
 
-// Apply rate limiting
-router.use(dataLimiter);
+// Apply rate limiting - TEMPORARILY DISABLED FOR DEVELOPMENT
+// router.use(dataLimiter);
 
 // Apply user activity tracking
 router.use(emitUserActivity);

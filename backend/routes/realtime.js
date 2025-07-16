@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import { setupSSE } from '../middleware/realtimeEvents.js';
-import { dataLimiter } from '../middleware/rateLimiter.js';
+// import { dataLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
 
 const router = express.Router();
 
@@ -49,7 +49,7 @@ router.use(authenticateToken);
  *                           rooms:
  *                             type: integer
  */
-router.get('/connection-stats', dataLimiter, (req, res) => {
+router.get('/connection-stats', /* dataLimiter, */ (req, res) => {
   try {
     if (!global.realtimeController) {
       return res.status(503).json({
@@ -118,7 +118,7 @@ router.get('/connection-stats', dataLimiter, (req, res) => {
  *       403:
  *         description: Admin privileges required
  */
-router.post('/broadcast', dataLimiter, (req, res) => {
+router.post('/broadcast', /* dataLimiter, */ (req, res) => {
   try {
     // Only admin users can broadcast system notifications
     if (req.user.role !== 'admin') {
@@ -306,7 +306,7 @@ router.get('/events', setupSSE, (req, res) => {
  *       200:
  *         description: Test event sent successfully
  */
-router.post('/test-event', dataLimiter, (req, res) => {
+router.post('/test-event', /* dataLimiter, */ (req, res) => {
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({

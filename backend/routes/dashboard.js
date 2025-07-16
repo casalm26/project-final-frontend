@@ -5,15 +5,15 @@ import {
   getForestComparison
 } from '../controllers/dashboardController.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { dataLimiter } from '../middleware/rateLimiter.js';
+// import { dataLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
 
 const router = express.Router();
 
 // All dashboard routes require authentication
 router.use(authenticateToken);
 
-// Apply data rate limiting to prevent abuse
-router.use(dataLimiter);
+// Apply data rate limiting to prevent abuse - TEMPORARILY DISABLED FOR DEVELOPMENT
+// router.use(dataLimiter);
 
 /**
  * @swagger
