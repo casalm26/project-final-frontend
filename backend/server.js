@@ -20,7 +20,7 @@ import realtimeRoutes from "./routes/realtime.js";
 import bulkRoutes from "./routes/bulk.js";
 
 // Import middleware
-import { generalLimiter } from "./middleware/rateLimiter.js";
+// import { generalLimiter } from "./middleware/rateLimiter.js"; // TEMPORARILY DISABLED FOR DEVELOPMENT
 
 // Import real-time components
 import { RealtimeController } from "./controllers/realtimeController.js";
@@ -128,8 +128,8 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting middleware
-app.use('/api/', generalLimiter);
+// Rate limiting middleware - TEMPORARILY DISABLED FOR DEVELOPMENT
+// app.use('/api/', generalLimiter); // TODO: RE-ENABLE IN PRODUCTION FOR SECURITY
 
 // Request logging middleware
 app.use((req, res, next) => {

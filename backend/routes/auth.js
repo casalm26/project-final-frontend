@@ -14,7 +14,7 @@ import {
   validateProfileUpdate
 } from '../middleware/validation.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { authLimiter } from '../middleware/rateLimiter.js';
+// import { authLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
 
 const router = express.Router();
 
@@ -86,7 +86,7 @@ const router = express.Router();
  *       429:
  *         description: Too many requests
  */
-router.post('/register', authLimiter, validateRegister, register);
+router.post('/register', /* authLimiter, */ validateRegister, register); // Rate limiting temporarily disabled
 
 /**
  * @swagger
@@ -135,7 +135,7 @@ router.post('/register', authLimiter, validateRegister, register);
  *       429:
  *         description: Too many requests
  */
-router.post('/login', authLimiter, validateLogin, login);
+router.post('/login', /* authLimiter, */ validateLogin, login); // Rate limiting temporarily disabled
 
 
 /**
@@ -203,7 +203,7 @@ router.post('/logout', logout);
  *       401:
  *         description: Invalid refresh token
  */
-router.post('/refresh', authLimiter, refreshToken);
+router.post('/refresh', /* authLimiter, */ refreshToken); // Rate limiting temporarily disabled
 
 /**
  * @swagger
