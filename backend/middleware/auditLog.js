@@ -1,4 +1,14 @@
 import { AuditLog } from '../models/index.js';
+import {
+  getActionFromRequest,
+  getResourceId,
+  createBaseLogData,
+  addActionSpecificMetadata,
+  addUpdateChanges,
+  addRequestBody,
+  addErrorInfo,
+  shouldCreateAuditLog
+} from '../utils/auditHelpers.js';
 
 // Middleware to capture the original document before modification
 export const captureOriginalDoc = (model) => {
@@ -66,48 +76,6 @@ export const auditLog = (options = {}) => {
   };
 };
 
-// Function to determine action based on HTTP method and response
-const getActionFromRequest = (method, statusCode, path) => {
-  switch (method) {
-    case 'POST':
-      if (path.includes('/login')) return 'LOGIN';
-      if (path.includes('/register')) return 'REGISTER';
-      if (path.includes('/logout')) return 'LOGOUT';
-      if (path.includes('/export')) return 'EXPORT';
-      return 'CREATE';
-    case 'PUT':
-    case 'PATCH':
-      return 'UPDATE';
-    case 'DELETE':
-      return 'DELETE';
-    default:
-      return null; // Don't log GET requests by default
-  }
-};
-
-// Function to extract resource ID from request
-const getResourceId = (req, responseData) => {
-  // Try to get ID from URL params
-  if (req.params.id) {
-    return req.params.id;
-  }
-
-  // Try to get ID from response data
-  if (responseData?.data?.id) {
-    return responseData.data.id;
-  }
-
-  if (responseData?.data?._id) {
-    return responseData.data._id;
-  }
-
-  // For custom IDs like treeId
-  if (responseData?.data?.treeId) {
-    return responseData.data.treeId;
-  }
-
-  return null;
-};
 
 // Main audit trail logging function
 const logAuditTrail = async ({
@@ -122,7 +90,7 @@ const logAuditTrail = async ({
   const action = getActionFromRequest(req.method, statusCode, req.path);
   
   // Skip logging if no action determined or if it's a failed request
-  if (!action || statusCode >= 400) {
+  if (!shouldCreateAuditLog(action, statusCode)) {
     return;
   }
 
@@ -130,63 +98,29 @@ const logAuditTrail = async ({
     customExtractor(req, responseData) : 
     getResourceId(req, responseData);
 
-  const logData = {
+  // Create base log data
+  let logData = createBaseLogData({
     action,
     resource,
     resourceId,
-    userId: req.user._id,
-    userEmail: req.user.email,
-    userRole: req.user.role,
-    metadata: {
-      ipAddress: req.ip || req.connection.remoteAddress,
-      userAgent: req.headers['user-agent'],
-      endpoint: req.originalUrl,
-      method: req.method,
-      statusCode
-    }
-  };
+    user: req.user,
+    req,
+    statusCode
+  });
+
+  // Add action-specific metadata
+  logData = addActionSpecificMetadata(logData, action, req, statusCode);
 
   // Capture changes for UPDATE actions
-  if (action === 'UPDATE' && req.originalDoc) {
-    logData.changes = {
-      before: req.originalDoc,
-      after: responseData?.data
-    };
+  if (action === 'UPDATE') {
+    logData = addUpdateChanges(logData, req.originalDoc, responseData);
   }
 
   // Capture request body if specified
-  if (captureBody && req.body) {
-    logData.metadata.requestBody = req.body;
-  }
-
-  // Handle specific actions
-  switch (action) {
-    case 'LOGIN':
-      logData.metadata.additionalInfo = {
-        loginMethod: 'password',
-        success: statusCode < 400
-      };
-      break;
-    
-    case 'REGISTER':
-      logData.metadata.additionalInfo = {
-        newUserEmail: req.body.email,
-        newUserRole: req.body.role || 'user'
-      };
-      break;
-    
-    case 'EXPORT':
-      logData.metadata.additionalInfo = {
-        exportType: req.path.includes('csv') ? 'CSV' : 'XLSX',
-        filters: req.query
-      };
-      break;
-  }
+  logData = addRequestBody(logData, req, captureBody);
 
   // Add error information for failed requests
-  if (statusCode >= 400) {
-    logData.metadata.errorMessage = responseData?.message || 'Unknown error';
-  }
+  logData = addErrorInfo(logData, statusCode, responseData);
 
   await AuditLog.createLog(logData);
 };
@@ -198,27 +132,23 @@ export const auditAuth = async (req, res, next) => {
   res.json = function(data) {
     // Log authentication events
     if (req.user) {
-      const action = req.path.includes('/login') ? 'LOGIN' : 
-                    req.path.includes('/register') ? 'REGISTER' : 
-                    req.path.includes('/logout') ? 'LOGOUT' : null;
+      const action = getActionFromRequest(req.method, res.statusCode, req.path);
       
-      if (action) {
-        AuditLog.createLog({
+      if (action && ['LOGIN', 'REGISTER', 'LOGOUT'].includes(action)) {
+        // Create base log data
+        let logData = createBaseLogData({
           action,
           resource: 'User',
           resourceId: req.user._id,
-          userId: req.user._id,
-          userEmail: req.user.email,
-          userRole: req.user.role,
-          metadata: {
-            ipAddress: req.ip || req.connection.remoteAddress,
-            userAgent: req.headers['user-agent'],
-            endpoint: req.originalUrl,
-            method: req.method,
-            statusCode: res.statusCode,
-            additionalInfo: action === 'LOGIN' ? { loginMethod: 'password' } : {}
-          }
-        }).catch(err => console.error('Auth audit log error:', err));
+          user: req.user,
+          req,
+          statusCode: res.statusCode
+        });
+
+        // Add action-specific metadata
+        logData = addActionSpecificMetadata(logData, action, req, res.statusCode);
+
+        AuditLog.createLog(logData).catch(err => console.error('Auth audit log error:', err));
       }
     }
     

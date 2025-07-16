@@ -1,13 +1,19 @@
-import path from 'path';
-import fs from 'fs/promises';
-import { Tree } from '../models/index.js';
 import TreeImage from '../models/TreeImage.js';
-import { 
-  processImage, 
-  generateThumbnail, 
-  cleanupTempFile, 
-  validateImageFile 
-} from '../middleware/upload.js';
+import {
+  validateTreeExists,
+  validateImageOwnership,
+  cleanupUploadedFiles,
+  processSingleImageUpload,
+  buildPaginationOptions,
+  buildPaginationResponse
+} from '../utils/uploadHelpers.js';
+import {
+  sendSuccessResponse,
+  sendErrorResponse,
+  sendNotFoundResponse,
+  sendUnauthorizedResponse,
+  sendBadRequestResponse
+} from '../utils/responseHelpers.js';
 
 // Upload images for a tree
 export const uploadTreeImages = async (req, res) => {
@@ -16,127 +22,51 @@ export const uploadTreeImages = async (req, res) => {
     const { description, imageType = 'tree_photo', tags } = req.body;
     
     // Validate tree exists
-    const tree = await Tree.findById(treeId);
+    const tree = await validateTreeExists(treeId);
     if (!tree) {
-      // Clean up uploaded files
-      if (req.files) {
-        for (const file of req.files) {
-          await cleanupTempFile(file.path);
-        }
-      }
-      
-      return res.status(404).json({
-        success: false,
-        message: 'Tree not found'
-      });
+      await cleanupUploadedFiles(req.files);
+      return sendNotFoundResponse(res, 'Tree');
     }
 
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No files uploaded'
-      });
+      return sendBadRequestResponse(res, 'No files uploaded');
     }
 
     const uploadedImages = [];
-    const uploadDir = path.join(process.cwd(), 'uploads', 'trees');
-    const thumbnailDir = path.join(process.cwd(), 'uploads', 'thumbnails');
-
-    // Ensure upload directories exist
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.mkdir(thumbnailDir, { recursive: true });
+    const uploadOptions = {
+      description,
+      imageType,
+      tags,
+      uploadedBy: req.user._id
+    };
 
     for (const file of req.files) {
       try {
-        // Validate image
-        const imageMetadata = await validateImageFile(file.path);
-        
-        // Generate unique filename
-        const timestamp = Date.now();
-        const random = Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname).toLowerCase();
-        const filename = `tree-${treeId}-${timestamp}-${random}${ext}`;
-        const thumbnailFilename = `thumb-${filename}`;
-        
-        const finalPath = path.join(uploadDir, filename);
-        const thumbnailPath = path.join(thumbnailDir, thumbnailFilename);
-
-        // Process and save main image
-        await processImage(file.path, finalPath, {
-          width: 1200,
-          height: 800,
-          quality: 85
-        });
-
-        // Generate thumbnail
-        await generateThumbnail(file.path, thumbnailPath);
-
-        // Save to database
-        const treeImage = new TreeImage({
-          treeId,
-          filename,
-          originalName: file.originalname,
-          mimeType: file.mimetype,
-          size: file.size,
-          path: finalPath,
-          thumbnailPath,
-          metadata: imageMetadata,
-          imageType,
-          description,
-          tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-          uploadedBy: req.user._id,
-          capturedAt: new Date()
-        });
-
-        await treeImage.save();
-        uploadedImages.push(treeImage.toPublicJSON());
-
-        // Clean up temp file
-        await cleanupTempFile(file.path);
-
+        const processedImage = await processSingleImageUpload(file, treeId, uploadOptions);
+        uploadedImages.push(processedImage);
       } catch (error) {
         console.error(`Error processing file ${file.originalname}:`, error);
-        
-        // Clean up temp file
-        await cleanupTempFile(file.path);
-        
         // Continue with other files
         continue;
       }
     }
 
     if (uploadedImages.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No images were successfully processed'
-      });
+      return sendBadRequestResponse(res, 'No images were successfully processed');
     }
 
-    res.status(201).json({
-      success: true,
-      message: `Successfully uploaded ${uploadedImages.length} image(s)`,
-      data: {
-        images: uploadedImages,
-        treeId,
-        uploadCount: uploadedImages.length
-      }
-    });
+    const responseData = {
+      images: uploadedImages,
+      treeId,
+      uploadCount: uploadedImages.length
+    };
+
+    sendSuccessResponse(res, responseData, `Successfully uploaded ${uploadedImages.length} image(s)`, 201);
 
   } catch (error) {
     console.error('Upload error:', error);
-    
-    // Clean up any uploaded files on error
-    if (req.files) {
-      for (const file of req.files) {
-        await cleanupTempFile(file.path);
-      }
-    }
-
-    res.status(500).json({
-      success: false,
-      message: 'Image upload failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    await cleanupUploadedFiles(req.files);
+    sendErrorResponse(res, 'Image upload failed', 500, error.message);
   }
 };
 
@@ -144,28 +74,15 @@ export const uploadTreeImages = async (req, res) => {
 export const getTreeImages = async (req, res) => {
   try {
     const { treeId } = req.params;
-    const { 
-      imageType, 
-      page = 1, 
-      limit = 20,
-      sortBy = '-capturedAt'
-    } = req.query;
 
     // Validate tree exists
-    const tree = await Tree.findById(treeId);
+    const tree = await validateTreeExists(treeId);
     if (!tree) {
-      return res.status(404).json({
-        success: false,
-        message: 'Tree not found'
-      });
+      return sendNotFoundResponse(res, 'Tree');
     }
 
-    const options = {
-      imageType,
-      limit: parseInt(limit),
-      skip: (parseInt(page) - 1) * parseInt(limit),
-      sortBy
-    };
+    const options = buildPaginationOptions(req.query);
+    const { imageType, page = 1, limit = 20 } = req.query;
 
     const images = await TreeImage.findByTree(treeId, options);
     const totalImages = await TreeImage.countDocuments({ 
@@ -174,26 +91,16 @@ export const getTreeImages = async (req, res) => {
       ...(imageType && { imageType })
     });
 
-    res.json({
-      success: true,
-      data: {
-        images: images.map(img => img.toPublicJSON()),
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: totalImages,
-          pages: Math.ceil(totalImages / parseInt(limit))
-        }
-      }
-    });
+    const responseData = {
+      images: images.map(img => img.toPublicJSON()),
+      pagination: buildPaginationResponse(page, limit, totalImages)
+    };
+
+    sendSuccessResponse(res, responseData);
 
   } catch (error) {
     console.error('Get tree images error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve tree images',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to retrieve tree images', 500, error.message);
   }
 };
 
@@ -207,24 +114,14 @@ export const getImageDetails = async (req, res) => {
       .populate('uploadedBy', 'firstName lastName email');
 
     if (!image) {
-      return res.status(404).json({
-        success: false,
-        message: 'Image not found'
-      });
+      return sendNotFoundResponse(res, 'Image');
     }
 
-    res.json({
-      success: true,
-      data: image.toPublicJSON()
-    });
+    sendSuccessResponse(res, image.toPublicJSON());
 
   } catch (error) {
     console.error('Get image details error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve image details',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to retrieve image details', 500, error.message);
   }
 };
 
@@ -236,18 +133,12 @@ export const updateImageMetadata = async (req, res) => {
 
     const image = await TreeImage.findById(imageId);
     if (!image) {
-      return res.status(404).json({
-        success: false,
-        message: 'Image not found'
-      });
+      return sendNotFoundResponse(res, 'Image');
     }
 
     // Check if user owns the image or is admin
-    if (image.uploadedBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to update this image'
-      });
+    if (!validateImageOwnership(image, req.user)) {
+      return sendUnauthorizedResponse(res, 'Not authorized to update this image');
     }
 
     // Update fields
@@ -257,19 +148,11 @@ export const updateImageMetadata = async (req, res) => {
 
     await image.save();
 
-    res.json({
-      success: true,
-      message: 'Image metadata updated successfully',
-      data: image.toPublicJSON()
-    });
+    sendSuccessResponse(res, image.toPublicJSON(), 'Image metadata updated successfully');
 
   } catch (error) {
     console.error('Update image metadata error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update image metadata',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to update image metadata', 500, error.message);
   }
 };
 
@@ -280,36 +163,23 @@ export const deleteImage = async (req, res) => {
 
     const image = await TreeImage.findById(imageId);
     if (!image) {
-      return res.status(404).json({
-        success: false,
-        message: 'Image not found'
-      });
+      return sendNotFoundResponse(res, 'Image');
     }
 
     // Check if user owns the image or is admin
-    if (image.uploadedBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this image'
-      });
+    if (!validateImageOwnership(image, req.user)) {
+      return sendUnauthorizedResponse(res, 'Not authorized to delete this image');
     }
 
     // Soft delete - mark as inactive
     image.isActive = false;
     await image.save();
 
-    res.json({
-      success: true,
-      message: 'Image deleted successfully'
-    });
+    sendSuccessResponse(res, null, 'Image deleted successfully');
 
   } catch (error) {
     console.error('Delete image error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete image',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to delete image', 500, error.message);
   }
 };
 
@@ -319,28 +189,18 @@ export const getTreeImageStats = async (req, res) => {
     const { treeId } = req.params;
 
     // Validate tree exists
-    const tree = await Tree.findById(treeId);
+    const tree = await validateTreeExists(treeId);
     if (!tree) {
-      return res.status(404).json({
-        success: false,
-        message: 'Tree not found'
-      });
+      return sendNotFoundResponse(res, 'Tree');
     }
 
     const stats = await TreeImage.getImageStats(treeId);
 
-    res.json({
-      success: true,
-      data: stats
-    });
+    sendSuccessResponse(res, stats);
 
   } catch (error) {
     console.error('Get tree image stats error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve image statistics',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to retrieve image statistics', 500, error.message);
   }
 };
 
@@ -351,20 +211,15 @@ export const getRecentImages = async (req, res) => {
 
     const images = await TreeImage.findRecent(parseInt(limit));
 
-    res.json({
-      success: true,
-      data: {
-        images: images.map(img => img.toPublicJSON()),
-        count: images.length
-      }
-    });
+    const responseData = {
+      images: images.map(img => img.toPublicJSON()),
+      count: images.length
+    };
+
+    sendSuccessResponse(res, responseData);
 
   } catch (error) {
     console.error('Get recent images error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve recent images',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    sendErrorResponse(res, 'Failed to retrieve recent images', 500, error.message);
   }
 };

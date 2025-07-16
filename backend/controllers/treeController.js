@@ -1,5 +1,17 @@
-import { validationResult } from 'express-validator';
-import { Tree, Forest } from '../models/index.js';
+import { Tree } from '../models/index.js';
+import { buildTreeQuery, buildPaginationOptions } from '../utils/dashboardUtils.js';
+import {
+  handleValidationErrors,
+  verifyForestExists,
+  transformTreesForMapping,
+  createMeasurementData,
+  handleTreeError,
+  sendTreeListResponse,
+  sendTreeResponse,
+  sendTreeMappingResponse,
+  sendMeasurementResponse,
+  sendMeasurementsHistoryResponse
+} from '../utils/treeHelpers.js';
 
 // Get all trees with optional filtering
 export const getTrees = async (req, res) => {
@@ -16,53 +28,25 @@ export const getTrees = async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
-    // Build query conditions
-    const queryConditions = {};
-
-    if (forestId) queryConditions.forestId = forestId;
-    if (species) queryConditions.species = new RegExp(species, 'i');
-    if (isAlive !== undefined) queryConditions.isAlive = isAlive === 'true';
-
-    if (startDate || endDate) {
-      queryConditions.plantedDate = {};
-      if (startDate) queryConditions.plantedDate.$gte = new Date(startDate);
-      if (endDate) queryConditions.plantedDate.$lte = new Date(endDate);
-    }
-
-    // Calculate pagination
-    const skip = (page - 1) * limit;
-    const sortDirection = sortOrder === 'desc' ? -1 : 1;
+    // Build query conditions using utility
+    const queryConditions = buildTreeQuery({ forestId, species, isAlive, startDate, endDate });
+    
+    // Build pagination options using utility
+    const { skip, sort } = buildPaginationOptions({ page, limit, sortBy, sortOrder });
 
     // Execute query with pagination
     const trees = await Tree.find(queryConditions)
       .populate('forestId', 'name region')
-      .sort({ [sortBy]: sortDirection })
+      .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
 
     // Get total count for pagination
     const totalCount = await Tree.countDocuments(queryConditions);
 
-    res.json({
-      success: true,
-      data: {
-        trees,
-        pagination: {
-          currentPage: parseInt(page),
-          totalPages: Math.ceil(totalCount / limit),
-          totalCount,
-          hasNextPage: page * limit < totalCount,
-          hasPrevPage: page > 1
-        }
-      }
-    });
+    sendTreeListResponse(res, trees, totalCount, page, limit);
   } catch (error) {
-    console.error('Get trees error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Get trees');
   }
 };
 
@@ -82,17 +66,9 @@ export const getTreeById = async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: { tree }
-    });
+    sendTreeResponse(res, tree);
   } catch (error) {
-    console.error('Get tree by ID error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Get tree by ID');
   }
 };
 
@@ -100,18 +76,11 @@ export const getTreeById = async (req, res) => {
 export const createTree = async (req, res) => {
   try {
     // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
+    if (handleValidationErrors(req, res)) return;
 
     // Verify forest exists
-    const forest = await Forest.findById(req.body.forestId);
-    if (!forest || !forest.isActive) {
+    const forest = await verifyForestExists(req.body.forestId);
+    if (!forest) {
       return res.status(404).json({
         success: false,
         message: 'Forest not found'
@@ -133,18 +102,9 @@ export const createTree = async (req, res) => {
     // Populate forest information
     await tree.populate('forestId', 'name region');
 
-    res.status(201).json({
-      success: true,
-      message: 'Tree created successfully',
-      data: { tree }
-    });
+    sendTreeResponse(res, tree, 'Tree created successfully', 201);
   } catch (error) {
-    console.error('Create tree error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Create tree');
   }
 };
 
@@ -166,18 +126,9 @@ export const updateTree = async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Tree updated successfully',
-      data: { tree }
-    });
+    sendTreeResponse(res, tree, 'Tree updated successfully');
   } catch (error) {
-    console.error('Update tree error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Update tree');
   }
 };
 
@@ -199,12 +150,7 @@ export const deleteTree = async (req, res) => {
       message: 'Tree deleted successfully'
     });
   } catch (error) {
-    console.error('Delete tree error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Delete tree');
   }
 };
 
@@ -212,21 +158,10 @@ export const deleteTree = async (req, res) => {
 export const addMeasurement = async (req, res) => {
   try {
     // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
+    if (handleValidationErrors(req, res)) return;
 
     const { id } = req.params;
-    const measurementData = {
-      ...req.body,
-      measuredBy: req.user._id,
-      measuredAt: new Date()
-    };
+    const measurementData = createMeasurementData(req.body, req.user._id);
 
     const tree = await Tree.findById(id);
     if (!tree) {
@@ -242,21 +177,9 @@ export const addMeasurement = async (req, res) => {
     // Populate the new measurement
     await tree.populate('measurements.measuredBy', 'firstName lastName');
 
-    res.status(201).json({
-      success: true,
-      message: 'Measurement added successfully',
-      data: { 
-        tree,
-        latestMeasurement: tree.measurements[tree.measurements.length - 1]
-      }
-    });
+    sendMeasurementResponse(res, tree);
   } catch (error) {
-    console.error('Add measurement error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Add measurement');
   }
 };
 
@@ -279,20 +202,9 @@ export const getTreeMeasurements = async (req, res) => {
     // Get latest measurements
     const measurements = tree.getLatestMeasurements(parseInt(limit));
 
-    res.json({
-      success: true,
-      data: {
-        treeId: tree.treeId,
-        measurements
-      }
-    });
+    sendMeasurementsHistoryResponse(res, tree.treeId, measurements);
   } catch (error) {
-    console.error('Get tree measurements error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Get tree measurements');
   }
 };
 
@@ -303,8 +215,8 @@ export const getTreesByForest = async (req, res) => {
     const { isAlive = true } = req.query;
 
     // Verify forest exists
-    const forest = await Forest.findById(forestId);
-    if (!forest || !forest.isActive) {
+    const forest = await verifyForestExists(forestId);
+    if (!forest) {
       return res.status(404).json({
         success: false,
         message: 'Forest not found'
@@ -317,35 +229,11 @@ export const getTreesByForest = async (req, res) => {
     }).select('treeId location species measurements');
 
     // Transform data for mapping
-    const treeMarkers = trees.map(tree => ({
-      id: tree._id,
-      treeId: tree.treeId,
-      coordinates: tree.location.coordinates,
-      species: tree.species,
-      currentHeight: tree.currentHeight,
-      currentHealthStatus: tree.currentHealthStatus,
-      measurementCount: tree.measurements.length
-    }));
+    const treeMarkers = transformTreesForMapping(trees);
 
-    res.json({
-      success: true,
-      data: {
-        forest: {
-          id: forest._id,
-          name: forest.name,
-          region: forest.region
-        },
-        trees: treeMarkers,
-        totalCount: trees.length
-      }
-    });
+    sendTreeMappingResponse(res, forest, treeMarkers);
   } catch (error) {
-    console.error('Get trees by forest error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Get trees by forest');
   }
 };
 
@@ -373,17 +261,8 @@ export const markTreeDead = async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Tree marked as dead',
-      data: { tree }
-    });
+    sendTreeResponse(res, tree, 'Tree marked as dead');
   } catch (error) {
-    console.error('Mark tree dead error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleTreeError(res, error, 'Mark tree dead');
   }
 };

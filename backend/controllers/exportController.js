@@ -1,33 +1,30 @@
 import { validationResult } from 'express-validator';
 import { Tree, Forest } from '../models/index.js';
 import XLSX from 'xlsx';
-import path from 'path';
-import fs from 'fs';
+import {
+  buildExportTreeQuery,
+  processTreesForExport,
+  generateCSVContent,
+  generateExportFilename,
+  setCSVResponseHeaders,
+  setXLSXResponseHeaders,
+  calculateForestAnalytics,
+  generateExportStatistics,
+  transformTreeToExportRow
+} from '../utils/exportHelpers.js';
+import { handleDashboardError } from '../utils/dashboardUtils.js';
 
 // Export trees data to CSV
 export const exportTreesCSV = async (req, res) => {
   try {
     const {
-      forestId,
-      species,
-      isAlive,
-      startDate,
-      endDate,
       includeHealthStatus = true,
-      includeMeasurements = false
+      includeMeasurements = false,
+      ...queryParams
     } = req.query;
 
-    // Build query conditions
-    const queryConditions = {};
-    if (forestId) queryConditions.forestId = forestId;
-    if (species) queryConditions.species = new RegExp(species, 'i');
-    if (isAlive !== undefined) queryConditions.isAlive = isAlive === 'true';
-
-    if (startDate || endDate) {
-      queryConditions.plantedDate = {};
-      if (startDate) queryConditions.plantedDate.$gte = new Date(startDate);
-      if (endDate) queryConditions.plantedDate.$lte = new Date(endDate);
-    }
+    // Build query conditions using helper
+    const queryConditions = buildExportTreeQuery(queryParams);
 
     // Get trees with forest information
     const trees = await Tree.find(queryConditions)
@@ -41,81 +38,18 @@ export const exportTreesCSV = async (req, res) => {
       });
     }
 
-    // Prepare CSV data
-    const csvData = [];
-    
-    trees.forEach(tree => {
-      const baseRow = {
-        'Tree ID': tree.treeId,
-        'Forest Name': tree.forestId?.name || 'Unknown',
-        'Region': tree.forestId?.region || 'Unknown',
-        'Species': tree.species,
-        'Planted Date': tree.plantedDate.toISOString().split('T')[0],
-        'Is Alive': tree.isAlive ? 'Yes' : 'No',
-        'Longitude': tree.location.coordinates[0],
-        'Latitude': tree.location.coordinates[1],
-        'Age (Days)': Math.floor((new Date() - tree.plantedDate) / (1000 * 60 * 60 * 24))
-      };
+    // Process trees data for export
+    const csvData = processTreesForExport(trees, { includeHealthStatus, includeMeasurements });
 
-      if (!tree.isAlive) {
-        baseRow['Death Date'] = tree.deathDate ? tree.deathDate.toISOString().split('T')[0] : '';
-        baseRow['Death Cause'] = tree.deathCause || '';
-      }
+    // Generate CSV content
+    const csvContent = generateCSVContent(csvData);
 
-      if (includeHealthStatus === 'true' && tree.measurements.length > 0) {
-        const latestMeasurement = tree.measurements
-          .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        
-        baseRow['Current Height (m)'] = latestMeasurement.height || '';
-        baseRow['Current Health Status'] = latestMeasurement.healthStatus || '';
-        baseRow['Latest Measurement Date'] = latestMeasurement.measuredAt.toISOString().split('T')[0];
-      }
-
-      if (includeMeasurements === 'true') {
-        if (tree.measurements.length === 0) {
-          csvData.push(baseRow);
-        } else {
-          tree.measurements.forEach((measurement, index) => {
-            const row = { ...baseRow };
-            row['Measurement #'] = index + 1;
-            row['Height (m)'] = measurement.height;
-            row['Diameter (cm)'] = measurement.diameter || '';
-            row['CO2 Absorption (kg)'] = measurement.co2Absorption || '';
-            row['Health Status'] = measurement.healthStatus;
-            row['Measurement Date'] = measurement.measuredAt.toISOString().split('T')[0];
-            row['Notes'] = measurement.notes || '';
-            csvData.push(row);
-          });
-        }
-      } else {
-        csvData.push(baseRow);
-      }
-    });
-
-    // Convert to CSV format
-    const csvHeaders = Object.keys(csvData[0]);
-    const csvRows = csvData.map(row => 
-      csvHeaders.map(header => {
-        const value = row[header];
-        return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
-      }).join(',')
-    );
-    const csvContent = [csvHeaders.join(','), ...csvRows].join('\n');
-
-    // Set response headers
-    const filename = `nanwa_trees_export_${new Date().toISOString().split('T')[0]}.csv`;
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', Buffer.byteLength(csvContent));
-
+    // Set response headers and send
+    const filename = generateExportFilename('nanwa_trees_export', 'csv');
+    setCSVResponseHeaders(res, filename, csvContent);
     res.send(csvContent);
   } catch (error) {
-    console.error('Export trees CSV error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to export data',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleDashboardError(res, error, 'Failed to export data');
   }
 };
 
@@ -123,26 +57,13 @@ export const exportTreesCSV = async (req, res) => {
 export const exportTreesXLSX = async (req, res) => {
   try {
     const {
-      forestId,
-      species,
-      isAlive,
-      startDate,
-      endDate,
       includeHealthStatus = true,
-      includeMeasurements = false
+      includeMeasurements = false,
+      ...queryParams
     } = req.query;
 
-    // Build query conditions (same as CSV)
-    const queryConditions = {};
-    if (forestId) queryConditions.forestId = forestId;
-    if (species) queryConditions.species = new RegExp(species, 'i');
-    if (isAlive !== undefined) queryConditions.isAlive = isAlive === 'true';
-
-    if (startDate || endDate) {
-      queryConditions.plantedDate = {};
-      if (startDate) queryConditions.plantedDate.$gte = new Date(startDate);
-      if (endDate) queryConditions.plantedDate.$lte = new Date(endDate);
-    }
+    // Build query conditions using helper
+    const queryConditions = buildExportTreeQuery(queryParams);
 
     // Get trees with forest information
     const trees = await Tree.find(queryConditions)
@@ -159,36 +80,8 @@ export const exportTreesXLSX = async (req, res) => {
     // Create workbook
     const workbook = XLSX.utils.book_new();
 
-    // Prepare trees summary data
-    const treesData = trees.map(tree => {
-      const row = {
-        'Tree ID': tree.treeId,
-        'Forest Name': tree.forestId?.name || 'Unknown',
-        'Region': tree.forestId?.region || 'Unknown',
-        'Species': tree.species,
-        'Planted Date': tree.plantedDate.toISOString().split('T')[0],
-        'Is Alive': tree.isAlive ? 'Yes' : 'No',
-        'Longitude': tree.location.coordinates[0],
-        'Latitude': tree.location.coordinates[1],
-        'Age (Days)': Math.floor((new Date() - tree.plantedDate) / (1000 * 60 * 60 * 24))
-      };
-
-      if (!tree.isAlive) {
-        row['Death Date'] = tree.deathDate ? tree.deathDate.toISOString().split('T')[0] : '';
-        row['Death Cause'] = tree.deathCause || '';
-      }
-
-      if (includeHealthStatus === 'true' && tree.measurements.length > 0) {
-        const latestMeasurement = tree.measurements
-          .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        
-        row['Current Height (m)'] = latestMeasurement.height || '';
-        row['Current Health Status'] = latestMeasurement.healthStatus || '';
-        row['Latest Measurement Date'] = latestMeasurement.measuredAt.toISOString().split('T')[0];
-      }
-
-      return row;
-    });
+    // Prepare trees summary data using helper
+    const treesData = trees.map(tree => transformTreeToExportRow(tree, { includeHealthStatus }));
 
     // Add trees summary sheet
     const treesWorksheet = XLSX.utils.json_to_sheet(treesData);
@@ -221,17 +114,8 @@ export const exportTreesXLSX = async (req, res) => {
       }
     }
 
-    // Add statistics sheet
-    const statistics = {
-      'Total Trees': trees.length,
-      'Alive Trees': trees.filter(t => t.isAlive).length,
-      'Dead Trees': trees.filter(t => !t.isAlive).length,
-      'Survival Rate (%)': ((trees.filter(t => t.isAlive).length / trees.length) * 100).toFixed(2),
-      'Export Date': new Date().toISOString().split('T')[0],
-      'Unique Forests': [...new Set(trees.map(t => t.forestId?.name).filter(Boolean))].length,
-      'Unique Species': [...new Set(trees.map(t => t.species))].length
-    };
-
+    // Add statistics sheet using helper
+    const statistics = generateExportStatistics(trees);
     const statsData = Object.entries(statistics).map(([key, value]) => ({
       'Metric': key,
       'Value': value
@@ -243,20 +127,12 @@ export const exportTreesXLSX = async (req, res) => {
     // Convert workbook to buffer
     const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-    // Set response headers
-    const filename = `nanwa_trees_export_${new Date().toISOString().split('T')[0]}.xlsx`;
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', buffer.length);
-
+    // Set response headers and send
+    const filename = generateExportFilename('nanwa_trees_export', 'xlsx');
+    setXLSXResponseHeaders(res, filename, buffer);
     res.send(buffer);
   } catch (error) {
-    console.error('Export trees XLSX error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to export data',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleDashboardError(res, error, 'Failed to export data');
   }
 };
 
@@ -272,7 +148,6 @@ export const exportForestAnalytics = async (req, res) => {
       forests.map(async (forest) => {
         const totalTrees = await Tree.countDocuments({ forestId: forest._id });
         const aliveTrees = await Tree.countDocuments({ forestId: forest._id, isAlive: true });
-        const survivalRate = totalTrees > 0 ? (aliveTrees / totalTrees) * 100 : 0;
 
         // Get average height from latest measurements
         const avgHeightResult = await Tree.aggregate([
@@ -303,36 +178,16 @@ export const exportForestAnalytics = async (req, res) => {
 
         const totalCO2 = co2Result.length > 0 ? co2Result[0].totalCO2 : 0;
 
-        return {
-          'Forest Name': forest.name,
-          'Region': forest.region,
-          'Area (hectares)': forest.area,
-          'Established Date': forest.establishedDate.toISOString().split('T')[0],
-          'Total Trees': totalTrees,
-          'Alive Trees': aliveTrees,
-          'Dead Trees': totalTrees - aliveTrees,
-          'Survival Rate (%)': Math.round(survivalRate * 100) / 100,
-          'Average Height (m)': Math.round(avgHeight * 100) / 100,
-          'Total CO2 Absorption (kg)': Math.round(totalCO2 * 100) / 100,
-          'Trees per Hectare': totalTrees > 0 ? Math.round((totalTrees / forest.area) * 100) / 100 : 0
-        };
+        // Use helper to calculate analytics
+        return calculateForestAnalytics(forest, totalTrees, aliveTrees, avgHeight, totalCO2);
       })
     );
 
     if (format === 'csv') {
-      // Export as CSV
-      const csvHeaders = Object.keys(forestAnalytics[0]);
-      const csvRows = forestAnalytics.map(row => 
-        csvHeaders.map(header => {
-          const value = row[header];
-          return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
-        }).join(',')
-      );
-      const csvContent = [csvHeaders.join(','), ...csvRows].join('\n');
-
-      const filename = `nanwa_forest_analytics_${new Date().toISOString().split('T')[0]}.csv`;
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      // Export as CSV using helper
+      const csvContent = generateCSVContent(forestAnalytics);
+      const filename = generateExportFilename('nanwa_forest_analytics', 'csv');
+      setCSVResponseHeaders(res, filename, csvContent);
       res.send(csvContent);
     } else {
       // Export as XLSX
@@ -341,18 +196,11 @@ export const exportForestAnalytics = async (req, res) => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Forest Analytics');
 
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-      const filename = `nanwa_forest_analytics_${new Date().toISOString().split('T')[0]}.xlsx`;
-      
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      const filename = generateExportFilename('nanwa_forest_analytics', 'xlsx');
+      setXLSXResponseHeaders(res, filename, buffer);
       res.send(buffer);
     }
   } catch (error) {
-    console.error('Export forest analytics error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to export forest analytics',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    handleDashboardError(res, error, 'Failed to export forest analytics');
   }
 };
