@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import styled from 'styled-components';
+import { formatDateForInput } from '@utils/dateUtils';
 
 const ExportContainer = styled.div`
   position: relative;
@@ -178,7 +179,7 @@ export const ExportButtonComponent = ({
         'Latitude': item.lat,
         'Longitude': item.lng,
         'Forest': item.id <= 4 ? 'Forest A' : 'Forest B',
-        'Export Date': new Date().toISOString().split('T')[0]
+        'Export Date': formatDateForInput(new Date())
       }));
       
       // Generate CSV
@@ -189,7 +190,7 @@ export const ExportButtonComponent = ({
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `${fileName}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `${fileName}_${formatDateForInput(new Date())}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -226,7 +227,7 @@ export const ExportButtonComponent = ({
         'Latitude': item.lat,
         'Longitude': item.lng,
         'Forest': item.id <= 4 ? 'Forest A' : 'Forest B',
-        'Export Date': new Date().toISOString().split('T')[0]
+        'Export Date': formatDateForInput(new Date())
       }));
       
       // Create workbook and worksheet
@@ -237,7 +238,7 @@ export const ExportButtonComponent = ({
       XLSX.utils.book_append_sheet(wb, ws, 'Tree Data');
       
       // Generate and trigger download
-      XLSX.writeFile(wb, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      XLSX.writeFile(wb, `${fileName}_${formatDateForInput(new Date())}.xlsx`);
       
       showStatus(`XLSX exported successfully (${filteredData.length} records)`, 'success');
       if (onExportComplete) onExportComplete('xlsx', filteredData.length);

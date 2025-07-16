@@ -1,18 +1,21 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useProtectedRoute } from '../../hooks/useProtectedRoute';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 export const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, isLoading } = useProtectedRoute();
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-      </div>
+      <LoadingSpinner 
+        text="Authenticating..." 
+        fullscreen={true}
+        size="48px"
+      />
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

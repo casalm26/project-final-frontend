@@ -1,10 +1,6 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
-
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
+import styled from 'styled-components';
+import { Spinner } from './Spinner';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -26,13 +22,7 @@ const LoadingContainer = styled.div`
   `}
 `;
 
-const Spinner = styled.div`
-  width: ${({ size }) => size || '40px'};
-  height: ${({ size }) => size || '40px'};
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #007bff;
-  border-radius: 50%;
-  animation: ${spin} 1s linear infinite;
+const SpinnerWrapper = styled.div`
   margin-bottom: 1rem;
 `;
 
@@ -47,7 +37,8 @@ const LoadingSpinner = ({
   text = 'Loading...', 
   size = '40px', 
   fullscreen = false,
-  className = ''
+  className = '',
+  spinnerColor = '#007bff'
 }) => {
   return (
     <LoadingContainer 
@@ -57,7 +48,9 @@ const LoadingSpinner = ({
       aria-live="polite"
       aria-label={text}
     >
-      <Spinner size={size} />
+      <SpinnerWrapper>
+        <Spinner size={size} color={spinnerColor} />
+      </SpinnerWrapper>
       <LoadingText>{text}</LoadingText>
     </LoadingContainer>
   );

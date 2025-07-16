@@ -1,13 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-
-// Keep-alive configuration
-const KEEP_ALIVE_CONFIG = {
-  intervalMs: 10 * 60 * 1000, // 10 minutes
-  endpoint: '/auth/profile', // Simple endpoint to keep server warm
-  enabledInProduction: true,
-  enabledInDevelopment: false,
-};
+import { api } from '../lib/api';
+import { KEEP_ALIVE_CONFIG } from '../constants/keepAliveConstants';
 
 export const useKeepAlive = () => {
   const { user } = useAuth();
@@ -24,20 +18,9 @@ export const useKeepAlive = () => {
 
     const performKeepAlive = async () => {
       try {
-        // Make a lightweight request to keep the server warm
-        const response = await fetch(`${import.meta.env.VITE_API_URL}${KEEP_ALIVE_CONFIG.endpoint}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          console.log('Keep-alive ping successful');
-        } else {
-          console.log('Keep-alive ping failed, but continuing...');
-        }
+        // Make a lightweight request to keep the server warm using existing API client
+        await api.auth.getProfile();
+        console.log('Keep-alive ping successful');
       } catch (error) {
         // Silently fail - this is just a keep-alive, not critical
         console.log('Keep-alive ping error:', error.message);
@@ -58,18 +41,11 @@ export const useKeepAlive = () => {
 
   // Manual keep-alive trigger (can be used by components)
   const triggerKeepAlive = async () => {
-    if (!user || !isEnabled) return;
+    if (!user || !isEnabled) return false;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}${KEEP_ALIVE_CONFIG.endpoint}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      return response.ok;
+      await api.auth.getProfile();
+      return true;
     } catch (error) {
       console.log('Manual keep-alive failed:', error.message);
       return false;

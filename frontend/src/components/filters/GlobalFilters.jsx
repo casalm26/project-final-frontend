@@ -3,6 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { DateRangePicker } from './DateRangePicker';
 import { ForestSelector } from './ForestSelector';
+import { FilterErrors } from './FilterErrors';
+import { formatDateForInput } from '@utils/dateUtils';
+import { validateFilters, createDefaultFilters } from '@utils/filterValidation';
 
 const FiltersContainer = styled.div`
   background: #f9fafb;
@@ -138,11 +141,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
   const [filters, setFilters] = useState(() => {
     const urlFilters = getFiltersFromURL();
     return {
-      dateRange: {
-        startDate: new Date(new Date().getFullYear(), 0, 1),
-        endDate: new Date()
-      },
-      selectedForests: [],
+      ...createDefaultFilters(),
       ...initialFilters,
       ...urlFilters // URL parameters take precedence
     };
@@ -150,36 +149,9 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
 
   const [filterErrors, setFilterErrors] = useState({});
 
-  // Validate filters
-  const validateFilters = useCallback((filtersToValidate) => {
-    const errors = {};
-
-    // Validate date range
-    if (filtersToValidate.dateRange) {
-      const { startDate, endDate } = filtersToValidate.dateRange;
-      
-      if (startDate && endDate) {
-        if (startDate > endDate) {
-          errors.dateRange = 'Start date must be before or equal to end date';
-        }
-        
-        if (endDate > new Date()) {
-          errors.dateRange = 'End date cannot be in the future';
-        }
-        
-        // Check if date range is too large (more than 5 years)
-        const diffYears = (endDate - startDate) / (1000 * 60 * 60 * 24 * 365);
-        if (diffYears > 5) {
-          errors.dateRange = 'Date range cannot exceed 5 years';
-        }
-      }
-    }
-
-    // Validate selected forests (optional - could check against available forests)
-    if (filtersToValidate.selectedForests && filtersToValidate.selectedForests.length > 10) {
-      errors.selectedForests = 'Cannot select more than 10 forests at once';
-    }
-
+  // Validate filters using centralized validation utility
+  const validateFiltersWithState = useCallback((filtersToValidate) => {
+    const errors = validateFilters(filtersToValidate);
     setFilterErrors(errors);
     return Object.keys(errors).length === 0;
   }, []);
@@ -190,8 +162,8 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
 
     // Add date range to URL
     if (newFilters.dateRange?.startDate && newFilters.dateRange?.endDate) {
-      params.set('startDate', newFilters.dateRange.startDate.toISOString().split('T')[0]);
-      params.set('endDate', newFilters.dateRange.endDate.toISOString().split('T')[0]);
+      params.set('startDate', formatDateForInput(newFilters.dateRange.startDate));
+      params.set('endDate', formatDateForInput(newFilters.dateRange.endDate));
     }
 
     // Add selected forests to URL
@@ -236,7 +208,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
 
     const timer = setTimeout(() => {
       // Validate filters before applying
-      const isValid = validateFilters(filters);
+      const isValid = validateFiltersWithState(filters);
       
       if (isValid) {
         // Update URL parameters
@@ -250,7 +222,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
     }, 1000); // 1 second debounce
     
     return () => clearTimeout(timer);
-  }, [filters, validateFilters, updateURLParams]);
+  }, [filters, validateFiltersWithState, updateURLParams]);
 
   const handleDateChange = useCallback((dateRange) => {
     setFilters(prev => ({
@@ -267,13 +239,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
   }, []);
 
   const handleClearAll = useCallback(() => {
-    const clearedFilters = {
-      dateRange: {
-        startDate: new Date(new Date().getFullYear(), 0, 1),
-        endDate: new Date()
-      },
-      selectedForests: []
-    };
+    const clearedFilters = createDefaultFilters();
     setFilters(clearedFilters);
     setFilterErrors({});
     
@@ -297,22 +263,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
         )}
       </FiltersHeader>
 
-      {/* Display filter errors */}
-      {Object.keys(filterErrors).length > 0 && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center mb-2">
-            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="font-medium text-red-800">Filter Validation Errors</span>
-          </div>
-          <ul className="text-sm text-red-700 space-y-1">
-            {Object.entries(filterErrors).map(([field, error]) => (
-              <li key={field}>• {error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <FilterErrors errors={filterErrors} />
 
       <FiltersGrid>
         <DateRangePicker
