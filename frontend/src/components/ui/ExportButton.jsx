@@ -136,7 +136,7 @@ export const ExportButtonComponent = ({
   const [isExporting, setIsExporting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
-  const filteredData = data.filter(item => {
+  const filteredData = Array.isArray(data) ? data.filter(item => {
     // Apply filters here - for now using basic filtering
     if (filters.selectedForests && filters.selectedForests.length > 0) {
       const mockForestId = item.id <= 4 ? 1 : 2;
@@ -153,7 +153,7 @@ export const ExportButtonComponent = ({
     }
     
     return true;
-  });
+  }) : [];
 
   const showStatus = (message, type) => {
     setStatusMessage({ message, type });
@@ -273,7 +273,7 @@ export const ExportButtonComponent = ({
 
   return (
     <ExportContainer className="export-container">
-      <ExportButton onClick={handleToggleDropdown} disabled={isExporting}>
+      <ExportButton onClick={handleToggleDropdown} disabled={isExporting || !Array.isArray(data) || data.length === 0}>
         {isExporting ? (
           <>
             <ProgressSpinner />

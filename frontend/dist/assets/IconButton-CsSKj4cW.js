@@ -1,0 +1,1 @@
+import{R as e,j as m,o as l,g as i}from"./index-Dzr7PBfw.js";const u=e.forwardRef(({className:o,children:t,"aria-label":s,size:a="md",variant:n="ghost",...r},c)=>m.jsx(l,{className:i("btn-icon",a==="sm"&&"h-8 w-8",a==="md"&&"h-10 w-10",a==="lg"&&"h-12 w-12",o),ref:c,size:"icon",variant:n,"aria-label":s,...r,children:t}));u.displayName="IconButton";export{u as I};

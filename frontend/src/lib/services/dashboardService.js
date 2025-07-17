@@ -4,12 +4,12 @@ const apiClient = new ApiClient();
 
 // Dashboard API methods
 export const dashboardAPI = {
-  getStats: () => apiClient.get('/dashboard/stats'),
+  getStats: (params = {}) => apiClient.get('/dashboard/stats', params),
 };
 
 // Chart API methods
 export const chartAPI = {
-  getSurvivalRate: () => apiClient.get('/charts/survival-rate'),
-  getHeightGrowth: () => apiClient.get('/charts/height-growth'),
-  getCO2Absorption: () => apiClient.get('/charts/co2-absorption'),
+  getSurvivalRate: (params = {}) => apiClient.get('/charts/survival-rate', params),
+  getHeightGrowth: (params = {}) => apiClient.get('/charts/height-growth', params),
+  getCO2Absorption: (params = {}) => apiClient.get('/charts/co2-absorption', params),
 };
