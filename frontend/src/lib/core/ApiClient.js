@@ -30,6 +30,7 @@ export class ApiClient {
       const response = await fetch(url, {
         ...config,
         signal: controller.signal,
+        credentials: 'include', // Required for CORS with authentication
       });
 
       clearTimeout(timeoutId);
