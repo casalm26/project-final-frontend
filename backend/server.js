@@ -120,10 +120,12 @@ io.on('connection', (socket) => {
 global.io = io;
 global.realtimeController = realtimeController;
 
-// CORS configuration for production
+// CORS configuration - simplified for debugging
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
+  origin: true, // Allow all origins temporarily
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
