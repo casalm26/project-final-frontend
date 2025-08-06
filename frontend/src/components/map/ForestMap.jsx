@@ -10,10 +10,12 @@ import { useMapControls } from '@/hooks/useMapControls';
 import MarkerCluster from './MarkerCluster';
 import MapLoadingHandler from './MapLoadingHandler';
 import MapController from './MapController';
-import MapHeader from './MapHeader';
-import MapLegend from './MapLegend';
 import { 
   MapContainerStyled, 
+  MapHeader,
+  MapTitle,
+  MapControls,
+  ControlButton,
   LoadingOverlay, 
   ErrorOverlay, 
   ErrorContent 
@@ -28,16 +30,7 @@ L.Icon.Default.mergeOptions({
 });
 
 export const ForestMap = ({ 
-  trees = [
-    { id: 1, lat: 59.3293, lng: 18.0686, name: 'Tree A-001', health: 'healthy', height: 2.4, species: 'Pine' },
-    { id: 2, lat: 59.3300, lng: 18.0690, name: 'Tree A-002', health: 'healthy', height: 2.1, species: 'Oak' },
-    { id: 3, lat: 59.3285, lng: 18.0675, name: 'Tree A-003', health: 'warning', height: 1.8, species: 'Birch' },
-    { id: 4, lat: 59.3310, lng: 18.0700, name: 'Tree A-004', health: 'critical', height: 1.5, species: 'Spruce' },
-    { id: 5, lat: 59.3275, lng: 18.0660, name: 'Tree A-005', health: 'healthy', height: 2.7, species: 'Pine' },
-    { id: 6, lat: 59.3320, lng: 18.0710, name: 'Tree A-006', health: 'healthy', height: 2.3, species: 'Oak' },
-    { id: 7, lat: 59.3265, lng: 18.0650, name: 'Tree A-007', health: 'warning', height: 1.9, species: 'Birch' },
-    { id: 8, lat: 59.3330, lng: 18.0720, name: 'Tree A-008', health: 'healthy', height: 2.5, species: 'Spruce' }
-  ],
+  trees = [],
   onTreeSelect,
   filters = {},
   loading = false,
@@ -48,30 +41,8 @@ export const ForestMap = ({
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(null);
 
-  // Filter trees based on applied filters
-  const filteredTrees = trees.filter(tree => {
-    // Apply forest filters if selected forests exist
-    if (filters.selectedForests && filters.selectedForests.length > 0) {
-      // For now, assume tree has a forestId property (will be updated when backend is ready)
-      // Currently using a mock forestId based on tree position
-      const mockForestId = tree.id <= 4 ? 1 : 2; // Mock forest assignment
-      if (!filters.selectedForests.includes(mockForestId)) {
-        return false;
-      }
-    }
-    
-    // Apply date range filters if specified
-    if (filters.dateRange) {
-      // For now, assume tree has a plantedDate property (will be updated when backend is ready)
-      // Currently using a mock date based on tree ID
-      const mockPlantedDate = new Date(2023, tree.id % 12, tree.id % 28 + 1); // Mock planting date
-      if (mockPlantedDate < filters.dateRange.startDate || mockPlantedDate > filters.dateRange.endDate) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
+  // Trees are already filtered by the parent component
+  const filteredTrees = trees;
 
   const handleTreeClick = useCallback((tree) => {
     setSelectedTree(tree);

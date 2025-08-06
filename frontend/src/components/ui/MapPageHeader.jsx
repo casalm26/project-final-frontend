@@ -5,6 +5,16 @@ const Header = styled.header`
   background: white;
   border-bottom: 1px solid #e5e7eb;
   padding: 1rem 0;
+  
+  @media (prefers-color-scheme: dark) {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .dark & {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
 `;
 
 export const MapPageHeader = () => {
@@ -22,10 +32,10 @@ export const MapPageHeader = () => {
             <h1 className="text-2xl font-bold text-green-600">Nanwa Map View</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
               Welcome, <span className="font-medium">{user?.name}</span>
               {isAdmin() && (
-                <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded-full">
                   Admin
                 </span>
               )}

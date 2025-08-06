@@ -1,86 +1,145 @@
-import styled from 'styled-components';
+import { useState, useEffect, useCallback } from 'react';
 import { ForestMap } from '../components/map/ForestMap';
 import { GlobalFilters } from '../components/filters';
+import { ExportButtonComponent } from '../components/ui/ExportButton';
+import { DashboardHeader } from '../components/ui/DashboardHeader';
+import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { TreeDetailModal } from '../components/ui/TreeDetailModal';
-import { MapPageHeader } from '../components/ui/MapPageHeader';
-import { MapSidebar } from '../components/ui/MapSidebar';
-import { MapPageHeaderSection } from '../components/ui/MapPageHeaderSection';
 import { useMapFilters } from '../hooks/useMapFilters';
 import { useTreeSelection } from '../hooks/useTreeSelection';
-
-const MapPageContainer = styled.div`
-  min-height: 100vh;
-  background-color: #f9fafb;
-`;
-
-const MainContent = styled.main`
-  margin-left: 250px;
-  padding: 2rem;
-`;
-
-// Mock data for export
-const mockTreeData = [
-  { id: 1, name: 'Tree A-001', species: 'Pine', height: 2.4, health: 'healthy', lat: 59.3293, lng: 18.0686 },
-  { id: 2, name: 'Tree A-002', species: 'Oak', height: 2.1, health: 'healthy', lat: 59.3300, lng: 18.0690 },
-  { id: 3, name: 'Tree A-003', species: 'Birch', height: 1.8, health: 'warning', lat: 59.3285, lng: 18.0675 },
-  { id: 4, name: 'Tree A-004', species: 'Spruce', height: 1.5, health: 'critical', lat: 59.3310, lng: 18.0700 },
-  { id: 5, name: 'Tree A-005', species: 'Pine', height: 2.7, health: 'healthy', lat: 59.3275, lng: 18.0660 },
-  { id: 6, name: 'Tree A-006', species: 'Oak', height: 2.3, health: 'healthy', lat: 59.3320, lng: 18.0710 },
-  { id: 7, name: 'Tree A-007', species: 'Birch', height: 1.9, health: 'warning', lat: 59.3265, lng: 18.0650 },
-  { id: 8, name: 'Tree A-008', species: 'Spruce', height: 2.5, health: 'healthy', lat: 59.3330, lng: 18.0720 },
-];
-
-
-
-export const MapPage = () => {
+import { useSidebarState } from '../hooks/useSidebarState';
+import { treeAPI } from '../lib/api';
+import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPage = () => {
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
   const { filters, handleFiltersChange } = useMapFilters();
   const { selectedTree, isModalOpen, handleTreeSelect, handleCloseTreeDetail } = useTreeSelection();
+  const [trees, setTrees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);  // Fetch trees data
+  useEffect(() => {
+    const fetchTrees = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Build API query params from filters
+        const params = {};
+        
+        if (filters.selectedForests && filters.selectedForests.length > 0) {
+          params.forestIds = filters.selectedForests.join(',');
+        }
+        
+        if (filters.dateRange) {
+          params.startDate = filters.dateRange.startDate.toISOString();
+          params.endDate = filters.dateRange.endDate.toISOString();
+        }
+        
+        const response = await treeAPI.getAll(params);
+        
+        // The API returns { success: true, data: { trees: [...], pagination: {...} } }
+        // Handle different possible response structures
+        let treesData = [];
+        if (response.data && Array.isArray(response.data.trees)) {
+          treesData = response.data.trees;
+        } else if (response.data && Array.isArray(response.data)) {
+          treesData = response.data;
+        } else if (Array.isArray(response)) {
+          treesData = response;
+        }
+        
+        // Transform the data to include lat/lng from location if needed
+        const transformedTrees = treesData.map(tree => ({
+          ...tree,
+          lat: tree.location?.coordinates?.[1] || tree.lat || 59.3293,
+          lng: tree.location?.coordinates?.[0] || tree.lng || 18.0686,
+          name: tree.treeId || tree.name || `Tree ${tree._id}`,
+          health: tree.health || 'healthy'
+        }));
+        
+        setTrees(transformedTrees);
+      } catch (err) {
+        console.error('Failed to fetch trees:', err);
+        setError(err.message || 'Failed to load trees');
+        // Set empty trees array on error so map doesn't crash
+        setTrees([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTrees();
+  }, [filters]);
 
-  const handleExportStart = () => {
+  const handleExportStart = useCallback(() => {
     console.log('Export started');
-  };
+  }, []);
 
-  const handleExportComplete = (format, recordCount) => {
-    console.log(`Export completed: ${format} with ${recordCount} records`);
-  };
+  const handleExportComplete = useCallback((format) => {
+    console.log(`Export completed: ${format}`);
+  }, []);
 
-  const handleExportError = (error) => {
+  const handleExportError = useCallback((error) => {
     console.error('Export error:', error);
-  };
+  }, []);
 
   return (
-    <MapPageContainer>
-      <MapPageHeader />
-      <MapSidebar />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <DashboardHeader onToggleSidebar={toggleSidebar} />
 
-      {/* Main Content */}
-      <MainContent>
-        <div className="max-w-7xl mx-auto">
-          <MapPageHeaderSection
-            filters={filters}
-            onExportStart={handleExportStart}
-            onExportComplete={handleExportComplete}
-            onExportError={handleExportError}
-            mockTreeData={mockTreeData}
-          />
+      {/* Content Area with Sidebar */}
+      <div className="flex flex-1 lg:flex-row">
+        <DashboardSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
-          {/* Global Filters */}
-          <GlobalFilters onFiltersChange={handleFiltersChange} />
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Header Section */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Forest Map</h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Explore your forests and individual trees with interactive mapping.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <ExportButtonComponent
+                    filters={filters}
+                    onExportStart={handleExportStart}
+                    onExportComplete={handleExportComplete}
+                    onExportError={handleExportError}
+                  />
+                </div>
+              </div>
+            </div>
 
-          {/* Tree Detail Modal */}
-          <TreeDetailModal
-            tree={selectedTree}
-            isOpen={isModalOpen}
-            onClose={handleCloseTreeDetail}
-          />
+            {/* Global Filters */}
+            <GlobalFilters onFiltersChange={handleFiltersChange} />
 
-          {/* Map */}
-          <ForestMap 
-            onTreeSelect={handleTreeSelect}
-            filters={filters}
-          />
-        </div>
-      </MainContent>
-    </MapPageContainer>
+            {/* Tree Detail Modal */}
+            <TreeDetailModal
+              tree={selectedTree}
+              isOpen={isModalOpen}
+              onClose={handleCloseTreeDetail}
+            />
+
+            {/* Map */}
+            {loading ? (
+              <div className="flex justify-center items-center h-96 bg-white dark:bg-gray-800 rounded-lg shadow">
+                <LoadingSpinner text="Loading trees..." />
+              </div>
+            ) : (
+              <ForestMap 
+                trees={trees}
+                onTreeSelect={handleTreeSelect}
+                filters={filters}
+                loading={loading}
+                error={error}
+              />
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }; 

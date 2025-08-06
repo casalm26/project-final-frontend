@@ -5,9 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/tree.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ENTity app</title>
-    <script type="module" crossorigin src="/assets/index-Dzr7PBfw.js"></script>
+    <script>
+      // Prevent FOUC (Flash of Unstyled Content) for dark mode
+      (function() {
+        const stored = localStorage.getItem('darkMode');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = stored ? JSON.parse(stored) : prefersDark;
+        
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+          document.body.style.colorScheme = 'dark';
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.body.style.colorScheme = 'light';
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-CGkKx7Xv.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-BtP0CW_r.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CnE9ecPt.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-3rMZFSc5.css">
   </head>
   <body>
     <div id="root"></div>

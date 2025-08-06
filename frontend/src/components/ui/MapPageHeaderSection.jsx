@@ -1,6 +1,6 @@
 import { ExportButtonComponent } from './ExportButton';
 
-export const MapPageHeaderSection = ({ filters, onExportStart, onExportComplete, onExportError, mockTreeData }) => {
+export const MapPageHeaderSection = ({ filters, onExportStart, onExportComplete, onExportError }) => {
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
@@ -12,8 +12,6 @@ export const MapPageHeaderSection = ({ filters, onExportStart, onExportComplete,
         </div>
         <div className="flex items-center space-x-4">
           <ExportButtonComponent
-            data={mockTreeData}
-            fileName="map_data"
             filters={filters}
             onExportStart={onExportStart}
             onExportComplete={onExportComplete}

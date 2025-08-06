@@ -12,15 +12,22 @@ export const useDarkMode = () => {
 
 export const DarkModeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage first
-    const saved = localStorage.getItem('darkMode');
-    if (saved !== null) {
-      return JSON.parse(saved);
+    // Safely check localStorage (handles SSR)
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode');
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+      
+      // Fall back to system preference
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     
-    // Fall back to system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Default for SSR
+    return false;
   });
+
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const toggleDarkMode = () => {
     setIsDarkMode(prev => !prev);
@@ -30,16 +37,36 @@ export const DarkModeProvider = ({ children }) => {
     setIsDarkMode(dark);
   };
 
+  // Initialize dark mode on client-side
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode');
+      if (saved !== null) {
+        const savedMode = JSON.parse(saved);
+        setIsDarkMode(savedMode);
+      } else {
+        // Use system preference if no saved preference
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(systemPreference);
+      }
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
+
   // Update localStorage and document class when dark mode changes
   useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    if (isInitialized && typeof window !== 'undefined') {
+      localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+      
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.body.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.style.colorScheme = 'light';
+      }
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, isInitialized]);
 
   // Listen for system preference changes
   useEffect(() => {
@@ -60,6 +87,7 @@ export const DarkModeProvider = ({ children }) => {
     isDarkMode,
     toggleDarkMode,
     setDarkMode,
+    isInitialized,
   };
 
   return (

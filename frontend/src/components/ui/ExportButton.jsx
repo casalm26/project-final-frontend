@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
 import styled from 'styled-components';
 import { formatDateForInput } from '@utils/dateUtils';
+import { exportAPI } from '@/lib/api';
 
 const ExportContainer = styled.div`
   position: relative;
@@ -125,8 +124,6 @@ const StatusMessage = styled.div`
 `;
 
 export const ExportButtonComponent = ({ 
-  data = [], 
-  fileName = 'export', 
   filters = {},
   onExportStart,
   onExportComplete,
@@ -136,24 +133,29 @@ export const ExportButtonComponent = ({
   const [isExporting, setIsExporting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
-  const filteredData = Array.isArray(data) ? data.filter(item => {
-    // Apply filters here - for now using basic filtering
+  // Build export parameters from filters
+  const buildExportParams = () => {
+    const params = {};
+    
     if (filters.selectedForests && filters.selectedForests.length > 0) {
-      const mockForestId = item.id <= 4 ? 1 : 2;
-      if (!filters.selectedForests.includes(mockForestId)) {
-        return false;
-      }
+      params.forestIds = filters.selectedForests.join(',');
     }
     
     if (filters.dateRange) {
-      const mockDate = new Date(2023, item.id % 12, item.id % 28 + 1);
-      if (mockDate < filters.dateRange.startDate || mockDate > filters.dateRange.endDate) {
-        return false;
-      }
+      params.startDate = formatDateForInput(filters.dateRange.startDate);
+      params.endDate = formatDateForInput(filters.dateRange.endDate);
     }
     
-    return true;
-  }) : [];
+    if (filters.species) {
+      params.species = filters.species;
+    }
+    
+    if (filters.health) {
+      params.health = filters.health;
+    }
+    
+    return params;
+  };
 
   const showStatus = (message, type) => {
     setStatusMessage({ message, type });
@@ -167,41 +169,17 @@ export const ExportButtonComponent = ({
     try {
       if (onExportStart) onExportStart();
       
-      // Simulate processing delay for large datasets
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const params = buildExportParams();
+      const filename = `nanwa_trees_export_${formatDateForInput(new Date())}.csv`;
       
-      // Prepare data for CSV export
-      const csvData = filteredData.map(item => ({
-        'Tree ID': item.name,
-        'Species': item.species,
-        'Height (m)': item.height,
-        'Health': item.health,
-        'Latitude': item.lat,
-        'Longitude': item.lng,
-        'Forest': item.id <= 4 ? 'Forest A' : 'Forest B',
-        'Export Date': formatDateForInput(new Date())
-      }));
+      await exportAPI.exportTreesCSV(params, filename);
       
-      // Generate CSV
-      const csv = Papa.unparse(csvData);
-      
-      // Create and trigger download
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `${fileName}_${formatDateForInput(new Date())}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      showStatus(`CSV exported successfully (${filteredData.length} records)`, 'success');
-      if (onExportComplete) onExportComplete('csv', filteredData.length);
+      showStatus('CSV exported successfully', 'success');
+      if (onExportComplete) onExportComplete('csv');
       
     } catch (error) {
       console.error('CSV export error:', error);
-      showStatus('CSV export failed', 'error');
+      showStatus(error.message || 'CSV export failed', 'error');
       if (onExportError) onExportError(error);
     } finally {
       setIsExporting(false);
@@ -215,37 +193,17 @@ export const ExportButtonComponent = ({
     try {
       if (onExportStart) onExportStart();
       
-      // Simulate processing delay for large datasets
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const params = buildExportParams();
+      const filename = `nanwa_trees_export_${formatDateForInput(new Date())}.xlsx`;
       
-      // Prepare data for XLSX export
-      const xlsxData = filteredData.map(item => ({
-        'Tree ID': item.name,
-        'Species': item.species,
-        'Height (m)': item.height,
-        'Health': item.health,
-        'Latitude': item.lat,
-        'Longitude': item.lng,
-        'Forest': item.id <= 4 ? 'Forest A' : 'Forest B',
-        'Export Date': formatDateForInput(new Date())
-      }));
+      await exportAPI.exportTreesXLSX(params, filename);
       
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(xlsxData);
-      
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, 'Tree Data');
-      
-      // Generate and trigger download
-      XLSX.writeFile(wb, `${fileName}_${formatDateForInput(new Date())}.xlsx`);
-      
-      showStatus(`XLSX exported successfully (${filteredData.length} records)`, 'success');
-      if (onExportComplete) onExportComplete('xlsx', filteredData.length);
+      showStatus('XLSX exported successfully', 'success');
+      if (onExportComplete) onExportComplete('xlsx');
       
     } catch (error) {
       console.error('XLSX export error:', error);
-      showStatus('XLSX export failed', 'error');
+      showStatus(error.message || 'XLSX export failed', 'error');
       if (onExportError) onExportError(error);
     } finally {
       setIsExporting(false);
@@ -273,7 +231,7 @@ export const ExportButtonComponent = ({
 
   return (
     <ExportContainer className="export-container">
-      <ExportButton onClick={handleToggleDropdown} disabled={isExporting || !Array.isArray(data) || data.length === 0}>
+      <ExportButton onClick={handleToggleDropdown} disabled={isExporting}>
         {isExporting ? (
           <>
             <ProgressSpinner />
@@ -301,7 +259,7 @@ export const ExportButtonComponent = ({
             <div>
               <div className="font-medium">Export as CSV</div>
               <div className="text-xs text-gray-500">
-                {filteredData.length} records • Comma-separated values
+                Comma-separated values
               </div>
             </div>
           </DropdownItem>
@@ -312,7 +270,7 @@ export const ExportButtonComponent = ({
             <div>
               <div className="font-medium">Export as XLSX</div>
               <div className="text-xs text-gray-500">
-                {filteredData.length} records • Excel spreadsheet
+                Excel spreadsheet
               </div>
             </div>
           </DropdownItem>

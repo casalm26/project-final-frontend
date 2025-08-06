@@ -125,4 +125,42 @@ export class ApiClient {
       headers: getFileUploadHeaders(),
     });
   }
+
+  // File download method
+  async downloadFile(endpoint, params = {}, filename) {
+    const queryString = new URLSearchParams(params).toString();
+    const url = `${this.baseURL}${endpoint}${queryString ? `?${queryString}` : ''}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+      
+      // Create a download link
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename || 'download';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      return { success: true, filename };
+    } catch (error) {
+      console.error('File download failed:', error);
+      throw error;
+    }
+  }
 }

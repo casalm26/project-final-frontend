@@ -81,10 +81,7 @@ export const DashboardPage = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <ExportButtonComponent
-                  data={treeData}
-                  fileName="dashboard_tree_data"
                   filters={filters}
-                  loading={treesLoading}
                   onExportStart={handleExportStart}
                   onExportComplete={handleExportComplete}
                   onExportError={handleExportError}
