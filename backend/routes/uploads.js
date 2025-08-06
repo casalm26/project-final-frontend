@@ -10,7 +10,7 @@ import {
 } from '../controllers/uploadController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { upload, handleUploadError } from '../middleware/upload.js';
-// import { dataLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
+import { dataLimiter } from '../middleware/rateLimiter.js';
 import { emitImageUpload, emitUserActivity } from '../middleware/realtimeEvents.js';
 
 const router = express.Router();
@@ -19,7 +19,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Apply rate limiting
-// router.use(dataLimiter); // TEMPORARILY DISABLED FOR DEVELOPMENT
+router.use(dataLimiter);
 
 /**
  * @swagger

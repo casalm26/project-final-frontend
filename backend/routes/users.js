@@ -13,7 +13,7 @@ import {
   validateUserUpdate
 } from '../middleware/validation.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-// import { adminLimiter } from '../middleware/rateLimiter.js'; // TEMPORARILY DISABLED FOR DEVELOPMENT
+import { adminLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -26,11 +26,11 @@ router.get('/statistics', getUserStatistics);
 // User CRUD operations
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);
-router.post('/', /* adminLimiter, */ validateUserCreate, createUser);
-router.put('/:id', /* adminLimiter, */ validateUserUpdate, updateUser);
-router.delete('/:id', /* adminLimiter, */ deleteUser);
+router.post('/', adminLimiter, validateUserCreate, createUser);
+router.put('/:id', adminLimiter, validateUserUpdate, updateUser);
+router.delete('/:id', adminLimiter, deleteUser);
 
 // User token management
-router.post('/:id/revoke-tokens', /* adminLimiter, */ revokeUserTokens);
+router.post('/:id/revoke-tokens', adminLimiter, revokeUserTokens);
 
 export default router;
