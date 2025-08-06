@@ -1,4 +1,4 @@
-import{j as r,d as c,r as l,u as b,L as x}from"./index-CGkKx7Xv.js";import{F as u,P as h}from"./PasswordInput-Bff6SLQJ.js";import"./vendor-BtP0CW_r.js";const j=c.div`
+import{j as r,d as c,r as l,u as b,L as x}from"./index-Cp0G27Fl.js";import{F as u}from"./FormField-BLwCJzgw.js";import{P as h}from"./PasswordInput-C1THfjeW.js";import"./vendor-BtP0CW_r.js";const j=c.div`
   width: 100%;
   height: 4px;
   background-color: #e5e7eb;
@@ -24,4 +24,4 @@ import{j as r,d as c,r as l,u as b,L as x}from"./index-CGkKx7Xv.js";import{F as 
   padding: 2rem;
   width: 100%;
   max-width: 450px;
-`,M=()=>r.jsx(E,{children:r.jsxs(R,{children:[r.jsx(q,{}),r.jsx(k,{})]})}),q=()=>r.jsxs("div",{className:"text-center mb-8",children:[r.jsx(x,{to:"/",className:"inline-block mb-6",children:r.jsx("h1",{className:"text-3xl font-bold text-green-600",children:"Nanwa"})}),r.jsx("h2",{className:"text-2xl font-bold text-gray-900 mb-2",children:"Create your account"}),r.jsx("p",{className:"text-gray-600",children:"Join Nanwa to start monitoring your trees"})]});export{M as RegisterPage};
+`,T=()=>r.jsx(E,{children:r.jsxs(R,{children:[r.jsx(q,{}),r.jsx(k,{})]})}),q=()=>r.jsxs("div",{className:"text-center mb-8",children:[r.jsx(x,{to:"/",className:"inline-block mb-6",children:r.jsx("h1",{className:"text-3xl font-bold text-green-600",children:"Nanwa"})}),r.jsx("h2",{className:"text-2xl font-bold text-gray-900 mb-2",children:"Create your account"}),r.jsx("p",{className:"text-gray-600",children:"Join Nanwa to start monitoring your trees"})]});export{T as RegisterPage};

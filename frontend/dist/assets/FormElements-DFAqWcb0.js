@@ -1,4 +1,4 @@
-import{j as n,d as e,r as u}from"./index-CGkKx7Xv.js";const x=e.span`
+import{j as n,d as e,r as u}from"./index-Cp0G27Fl.js";const x=e.span`
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;

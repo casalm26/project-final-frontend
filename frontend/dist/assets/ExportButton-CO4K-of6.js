@@ -1,4 +1,4 @@
-import{A as C,r as m,j as e,d as o,i as x}from"./index-CGkKx7Xv.js";const f=new C,k={exportTreesCSV:(t={},r="trees_export.csv")=>f.downloadFile("/exports/trees/csv",t,r),exportTreesXLSX:(t={},r="trees_export.xlsx")=>f.downloadFile("/exports/trees/xlsx",t,r),exportForestAnalytics:(t={},r="forest_analytics.xlsx")=>f.downloadFile("/exports/forest-analytics",t,r)},L=o.div`
+import{A as C,r as m,j as e,d as o,i as x}from"./index-Cp0G27Fl.js";const f=new C,k={exportTreesCSV:(t={},r="trees_export.csv")=>f.downloadFile("/exports/trees/csv",t,r),exportTreesXLSX:(t={},r="trees_export.xlsx")=>f.downloadFile("/exports/trees/xlsx",t,r),exportForestAnalytics:(t={},r="forest_analytics.xlsx")=>f.downloadFile("/exports/forest-analytics",t,r)},L=o.div`
   position: relative;
   display: inline-block;
 `,X=o.button`

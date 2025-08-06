@@ -1,4 +1,4 @@
-import{j as n,d as r}from"./index-CGkKx7Xv.js";const j=r.div`
+import{j as n,d as r}from"./index-Cp0G27Fl.js";const j=r.div`
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
