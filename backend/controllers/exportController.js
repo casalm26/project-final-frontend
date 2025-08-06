@@ -26,10 +26,43 @@ export const exportTreesCSV = async (req, res) => {
     // Build query conditions using helper
     const queryConditions = buildExportTreeQuery(queryParams);
 
-    // Get trees with forest information
-    const trees = await Tree.find(queryConditions)
-      .populate('forestId', 'name region')
-      .lean();
+    // DEBUG: Log query parameters and conditions
+    console.log('=== CSV Export Debug ===');
+    console.log('Query Parameters:', queryParams);
+    console.log('Query Conditions:', JSON.stringify(queryConditions, null, 2));
+
+    // DEBUG: Check total trees in database first
+    const totalTreesInDB = await Tree.countDocuments({});
+    console.log('Total trees in database:', totalTreesInDB);
+
+    // DEBUG: Check trees matching query conditions (before populate)
+    const treesMatchingQuery = await Tree.countDocuments(queryConditions);
+    console.log('Trees matching query conditions:', treesMatchingQuery);
+
+    // Get ALL trees first, then manually populate to avoid losing trees
+    // with invalid forestId references
+    const trees = await Tree.find(queryConditions).lean();
+    
+    // Manually populate forestId information for valid references
+    const forestIds = [...new Set(trees.map(t => t.forestId).filter(Boolean))];
+    const forests = await Forest.find(
+      { _id: { $in: forestIds } },
+      { name: 1, region: 1 }
+    ).lean();
+    
+    const forestMap = new Map(forests.map(f => [f._id.toString(), f]));
+    
+    // Attach forest info to trees
+    trees.forEach(tree => {
+      if (tree.forestId) {
+        tree.forestId = forestMap.get(tree.forestId.toString()) || null;
+      }
+    });
+
+    // DEBUG: Log final results
+    console.log('Trees after populate:', trees.length);
+    console.log('Trees with missing forestId:', trees.filter(t => !t.forestId).length);
+    console.log('=== End CSV Export Debug ===');
 
     if (trees.length === 0) {
       return res.status(404).json({
@@ -65,10 +98,43 @@ export const exportTreesXLSX = async (req, res) => {
     // Build query conditions using helper
     const queryConditions = buildExportTreeQuery(queryParams);
 
-    // Get trees with forest information
-    const trees = await Tree.find(queryConditions)
-      .populate('forestId', 'name region')
-      .lean();
+    // DEBUG: Log query parameters and conditions
+    console.log('=== XLSX Export Debug ===');
+    console.log('Query Parameters:', queryParams);
+    console.log('Query Conditions:', JSON.stringify(queryConditions, null, 2));
+
+    // DEBUG: Check total trees in database first
+    const totalTreesInDB = await Tree.countDocuments({});
+    console.log('Total trees in database:', totalTreesInDB);
+
+    // DEBUG: Check trees matching query conditions (before populate)
+    const treesMatchingQuery = await Tree.countDocuments(queryConditions);
+    console.log('Trees matching query conditions:', treesMatchingQuery);
+
+    // Get ALL trees first, then manually populate to avoid losing trees
+    // with invalid forestId references
+    const trees = await Tree.find(queryConditions).lean();
+    
+    // Manually populate forestId information for valid references
+    const forestIds = [...new Set(trees.map(t => t.forestId).filter(Boolean))];
+    const forests = await Forest.find(
+      { _id: { $in: forestIds } },
+      { name: 1, region: 1 }
+    ).lean();
+    
+    const forestMap = new Map(forests.map(f => [f._id.toString(), f]));
+    
+    // Attach forest info to trees
+    trees.forEach(tree => {
+      if (tree.forestId) {
+        tree.forestId = forestMap.get(tree.forestId.toString()) || null;
+      }
+    });
+
+    // DEBUG: Log final results
+    console.log('Trees after populate:', trees.length);
+    console.log('Trees with missing forestId:', trees.filter(t => !t.forestId).length);
+    console.log('=== End XLSX Export Debug ===');
 
     if (trees.length === 0) {
       return res.status(404).json({
@@ -133,6 +199,61 @@ export const exportTreesXLSX = async (req, res) => {
     res.send(buffer);
   } catch (error) {
     handleDashboardError(res, error, 'Failed to export data');
+  }
+};
+
+// DEBUG: Diagnostic endpoint to check database state (REMOVE IN PRODUCTION)
+export const diagnosticTreeCount = async (req, res) => {
+  try {
+    // Total trees
+    const totalTrees = await Tree.countDocuments({});
+    
+    // Trees with valid forestId
+    const treesWithValidForest = await Tree.countDocuments({ forestId: { $ne: null } });
+    
+    // Trees with invalid or missing forestId
+    const treesWithoutForest = await Tree.countDocuments({ forestId: null });
+    
+    // Sample of trees without forest
+    const orphanedTrees = await Tree.find({ forestId: null }).limit(5).lean();
+    
+    // Sample of trees with forest
+    const treesWithForest = await Tree.find({ forestId: { $ne: null } }).limit(5).lean();
+    
+    // Check what happens with populate
+    const populateTest = await Tree.find({}).populate('forestId', 'name region').limit(10).lean();
+    const populateTestCount = populateTest.length;
+    const populateTestWithoutForest = populateTest.filter(t => !t.forestId).length;
+    
+    res.json({
+      success: true,
+      diagnostics: {
+        totalTrees,
+        treesWithValidForest,
+        treesWithoutForest,
+        populateTestCount,
+        populateTestWithoutForest,
+        orphanedTreesSample: orphanedTrees.map(t => ({
+          _id: t._id,
+          treeId: t.treeId,
+          species: t.species,
+          forestId: t.forestId
+        })),
+        treesWithForestSample: treesWithForest.map(t => ({
+          _id: t._id,
+          treeId: t.treeId,
+          species: t.species,
+          forestId: t.forestId
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Diagnostic error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Diagnostic failed',
+      error: error.message
+    });
   }
 };
 
