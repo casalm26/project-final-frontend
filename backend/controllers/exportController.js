@@ -2,7 +2,6 @@ import { validationResult } from 'express-validator';
 import { Tree, Forest } from '../models/index.js';
 import XLSX from 'xlsx';
 import {
-  buildExportTreeQuery,
   processTreesForExport,
   generateCSVContent,
   generateExportFilename,
@@ -19,29 +18,19 @@ export const exportTreesCSV = async (req, res) => {
   try {
     const {
       includeHealthStatus = true,
-      includeMeasurements = false,
-      ...queryParams
+      includeMeasurements = false
     } = req.query;
 
-    // Build query conditions using helper
-    const queryConditions = buildExportTreeQuery(queryParams);
-
-    // DEBUG: Log query parameters and conditions
+    // Export ALL trees without any filters
     console.log('=== CSV Export Debug ===');
-    console.log('Query Parameters:', queryParams);
-    console.log('Query Conditions:', JSON.stringify(queryConditions, null, 2));
+    console.log('Exporting ALL trees from database without filters');
 
-    // DEBUG: Check total trees in database first
+    // DEBUG: Check total trees in database
     const totalTreesInDB = await Tree.countDocuments({});
     console.log('Total trees in database:', totalTreesInDB);
 
-    // DEBUG: Check trees matching query conditions (before populate)
-    const treesMatchingQuery = await Tree.countDocuments(queryConditions);
-    console.log('Trees matching query conditions:', treesMatchingQuery);
-
-    // Get ALL trees first, then manually populate to avoid losing trees
-    // with invalid forestId references
-    const trees = await Tree.find(queryConditions).lean();
+    // Get ALL trees from database
+    const trees = await Tree.find({}).lean();
     
     // Manually populate forestId information for valid references
     const forestIds = [...new Set(trees.map(t => t.forestId).filter(Boolean))];
@@ -91,29 +80,19 @@ export const exportTreesXLSX = async (req, res) => {
   try {
     const {
       includeHealthStatus = true,
-      includeMeasurements = false,
-      ...queryParams
+      includeMeasurements = false
     } = req.query;
 
-    // Build query conditions using helper
-    const queryConditions = buildExportTreeQuery(queryParams);
-
-    // DEBUG: Log query parameters and conditions
+    // Export ALL trees without any filters
     console.log('=== XLSX Export Debug ===');
-    console.log('Query Parameters:', queryParams);
-    console.log('Query Conditions:', JSON.stringify(queryConditions, null, 2));
+    console.log('Exporting ALL trees from database without filters');
 
-    // DEBUG: Check total trees in database first
+    // DEBUG: Check total trees in database
     const totalTreesInDB = await Tree.countDocuments({});
     console.log('Total trees in database:', totalTreesInDB);
 
-    // DEBUG: Check trees matching query conditions (before populate)
-    const treesMatchingQuery = await Tree.countDocuments(queryConditions);
-    console.log('Trees matching query conditions:', treesMatchingQuery);
-
-    // Get ALL trees first, then manually populate to avoid losing trees
-    // with invalid forestId references
-    const trees = await Tree.find(queryConditions).lean();
+    // Get ALL trees from database
+    const trees = await Tree.find({}).lean();
     
     // Manually populate forestId information for valid references
     const forestIds = [...new Set(trees.map(t => t.forestId).filter(Boolean))];
