@@ -81,7 +81,6 @@ export const DashboardPage = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <ExportButtonComponent
-                  filters={filters}
                   onExportStart={handleExportStart}
                   onExportComplete={handleExportComplete}
                   onExportError={handleExportError}

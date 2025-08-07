@@ -104,7 +104,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
                 </div>
                 <div className="flex items-center space-x-4">
                   <ExportButtonComponent
-                    filters={filters}
                     onExportStart={handleExportStart}
                     onExportComplete={handleExportComplete}
                     onExportError={handleExportError}

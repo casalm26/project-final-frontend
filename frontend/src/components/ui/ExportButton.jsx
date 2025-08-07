@@ -124,7 +124,6 @@ const StatusMessage = styled.div`
 `;
 
 export const ExportButtonComponent = ({ 
-  filters = {},
   onExportStart,
   onExportComplete,
   onExportError
@@ -133,28 +132,11 @@ export const ExportButtonComponent = ({
   const [isExporting, setIsExporting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
-  // Build export parameters from filters
+  // Build export parameters (no filters applied - exports all trees)
   const buildExportParams = () => {
-    const params = {};
-    
-    if (filters.selectedForests && filters.selectedForests.length > 0) {
-      params.forestIds = filters.selectedForests.join(',');
-    }
-    
-    if (filters.dateRange) {
-      params.startDate = formatDateForInput(filters.dateRange.startDate);
-      params.endDate = formatDateForInput(filters.dateRange.endDate);
-    }
-    
-    if (filters.species) {
-      params.species = filters.species;
-    }
-    
-    if (filters.health) {
-      params.health = filters.health;
-    }
-    
-    return params;
+    // Only include export options, not filters
+    // All trees in database will be exported
+    return {};
   };
 
   const showStatus = (message, type) => {
