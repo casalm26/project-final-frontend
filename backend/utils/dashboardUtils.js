@@ -3,7 +3,8 @@
 /**
  * Build query conditions for tree filtering
  * @param {Object} filters - Filter parameters
- * @param {string} filters.forestId - Forest ID filter
+ * @param {string} filters.forestId - Forest ID filter (single)
+ * @param {string} filters.forestIds - Forest IDs filter (comma-separated)
  * @param {string} filters.species - Species filter (regex)
  * @param {string} filters.isAlive - Alive status filter
  * @param {string} filters.startDate - Start date filter
@@ -11,10 +12,16 @@
  * @returns {Object} Query conditions for trees
  */
 export const buildTreeQuery = (filters = {}) => {
-  const { forestId, species, isAlive, startDate, endDate } = filters;
+  const { forestId, forestIds, species, isAlive, startDate, endDate } = filters;
   const query = {};
 
-  if (forestId) {
+  // Handle both single forestId and multiple forestIds
+  if (forestIds) {
+    // Multiple forests selected (comma-separated string)
+    const forestIdArray = forestIds.split(',').map(id => id.trim());
+    query.forestId = { $in: forestIdArray };
+  } else if (forestId) {
+    // Single forest selected
     query.forestId = forestId;
   }
 
