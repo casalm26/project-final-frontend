@@ -4,6 +4,7 @@ import Tree from './Tree.js';
 import RefreshToken from './RefreshToken.js';
 import AuditLog from './AuditLog.js';
 import TreeImage from './TreeImage.js';
+import { Owner } from './Owner.js';
 
 export {
   User,
@@ -11,5 +12,6 @@ export {
   Tree,
   RefreshToken,
   AuditLog,
-  TreeImage
+  TreeImage,
+  Owner
 };

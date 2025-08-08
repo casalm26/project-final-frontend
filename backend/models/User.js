@@ -32,6 +32,14 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  
+  // Owner relationship - null for admin users (they can access all data)
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Owner',
+    default: null // Admin users have no owner, regular users belong to an owner
+  },
+  
   isActive: {
     type: Boolean,
     default: true
@@ -75,6 +83,34 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// Instance method to check if user is admin
+userSchema.methods.isAdmin = function() {
+  return this.role === 'admin';
+};
+
+// Instance method to check if user can access owner data
+userSchema.methods.canAccessOwner = function(ownerId) {
+  // Admin users can access all owners
+  if (this.isAdmin()) return true;
+  
+  // Regular users can only access their own owner's data
+  return this.owner && this.owner.toString() === ownerId.toString();
+};
+
+// Instance method to check if user can access forest data
+userSchema.methods.canAccessForest = async function(forestId) {
+  // Admin users can access all forests
+  if (this.isAdmin()) return true;
+  
+  // Regular users can only access forests owned by their owner
+  const Forest = mongoose.model('Forest');
+  const forest = await Forest.findById(forestId);
+  
+  if (!forest || !this.owner) return false;
+  
+  return forest.owner.toString() === this.owner.toString();
+};
+
 // Instance method to get user info without password
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
@@ -86,6 +122,14 @@ userSchema.methods.toJSON = function() {
 userSchema.statics.findByEmail = function(email) {
   return this.findOne({ email: email.toLowerCase() });
 };
+
+// Static method to find users by owner
+userSchema.statics.findByOwner = function(ownerId) {
+  return this.find({ owner: ownerId, isActive: true });
+};
+
+// Add index for owner-based queries
+userSchema.index({ owner: 1, isActive: 1 });
 
 const User = mongoose.model('User', userSchema);
 
