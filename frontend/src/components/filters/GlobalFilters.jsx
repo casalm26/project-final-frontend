@@ -10,15 +10,17 @@ import { validateFilters, createDefaultFilters } from '@utils/filterValidation';
 const FiltersContainer = styled.div`
   background: #f9fafb;
   border-radius: 0.75rem;
-  padding: 1.5rem;
+  padding: ${props => props.$isCollapsed ? '1rem' : '1.5rem'};
   margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
 `;
 
 const FiltersHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: ${props => props.$isCollapsed ? '0' : '1.5rem'};
 `;
 
 const FiltersTitle = styled.h2`
@@ -29,7 +31,7 @@ const FiltersTitle = styled.h2`
 `;
 
 const FiltersSubtitle = styled.p`
-  color: #6b7280;
+  color: #4b5563;
   margin: 0.5rem 0 0 0;
   font-size: 0.875rem;
 `;
@@ -83,9 +85,89 @@ const ClearAllButton = styled.button`
     background-color: #dc2626;
   }
   
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
+  }
+`;
+
+const ToggleButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #059669;
+  }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
+  }
+  
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const CollapsedInfo = styled.span`
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+`;
+
+const FiltersContent = styled.div`
+  display: ${props => props.$isCollapsed ? 'none' : 'block'};
+`;
+
+const PresetButtons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const PresetButton = styled.button`
+  padding: 0.375rem 0.75rem;
+  background-color: ${props => props.$isActive ? '#10b981' : '#ffffff'};
+  color: ${props => props.$isActive ? 'white' : '#374151'};
+  border: 1px solid ${props => props.$isActive ? '#10b981' : '#d1d5db'};
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: ${props => props.$isActive ? '#059669' : '#f3f4f6'};
+    border-color: ${props => props.$isActive ? '#059669' : '#9ca3af'};
+  }
+  
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
   }
 `;
 
@@ -94,6 +176,8 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
   const didInit = useRef(false);
   const onFiltersChangeRef = useRef(onFiltersChange);
   const hasMounted = useRef(false);
+  const [isCollapsed, setIsCollapsed] = useState(true); // Default to collapsed
+  const [activePreset, setActivePreset] = useState(null);
   
   // Keep the ref up to date
   useEffect(() => {
@@ -242,50 +326,204 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
     const clearedFilters = createDefaultFilters();
     setFilters(clearedFilters);
     setFilterErrors({});
+    setActivePreset(null);
     
     // Clear URL parameters
     setSearchParams({}, { replace: true });
   }, [setSearchParams]);
 
+  const applyDatePreset = useCallback((presetName) => {
+    const now = new Date();
+    let startDate, endDate;
+    
+    switch (presetName) {
+      case 'mtd': // Month to date
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = now;
+        break;
+      case 'ytd': // Year to date
+        startDate = new Date(now.getFullYear(), 0, 1);
+        endDate = now;
+        break;
+      case '30days':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        endDate = now;
+        break;
+      case '90days':
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        endDate = now;
+        break;
+      case '1year':
+        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        endDate = now;
+        break;
+      case '3years':
+        startDate = new Date(now.getFullYear() - 3, now.getMonth(), now.getDate());
+        endDate = now;
+        break;
+      case '5years':
+        startDate = new Date(now.getFullYear() - 5, now.getMonth(), now.getDate());
+        endDate = now;
+        break;
+      case 'all':
+        startDate = null;
+        endDate = null;
+        break;
+      default:
+        return;
+    }
+    
+    setActivePreset(presetName);
+    handleDateChange({ startDate, endDate });
+  }, [handleDateChange]);
+
+  const toggleCollapsed = useCallback(() => {
+    setIsCollapsed(prev => !prev);
+  }, []);
+
+  // Reset active preset when dates are manually changed
+  useEffect(() => {
+    // Only reset if dates were changed manually (not by preset)
+    if (activePreset && filters.dateRange.startDate && filters.dateRange.endDate) {
+      const now = new Date();
+      const { startDate, endDate } = filters.dateRange;
+      
+      // Check if current dates match any preset
+      let matchesPreset = false;
+      // Add logic here if needed to verify preset match
+      
+      if (!matchesPreset) {
+        setActivePreset(null);
+      }
+    }
+  }, [filters.dateRange, activePreset]);
+
   return (
-    <FiltersContainer>
-      <FiltersHeader>
-        <div>
-          <FiltersTitle>Global Filters</FiltersTitle>
-          <FiltersSubtitle>
-            Filter your data by date range and forest selection
-          </FiltersSubtitle>
-        </div>
-        {activeFilters.length > 0 && (
-          <ClearAllButton onClick={handleClearAll}>
-            Clear All
-          </ClearAllButton>
-        )}
+    <FiltersContainer $isCollapsed={isCollapsed}>
+      <FiltersHeader $isCollapsed={isCollapsed}>
+        <HeaderLeft>
+          <div>
+            <FiltersTitle>
+              Global Filters
+              {isCollapsed && activeFilters.length > 0 && (
+                <CollapsedInfo>
+                  ({activeFilters.length} active)
+                </CollapsedInfo>
+              )}
+            </FiltersTitle>
+            {!isCollapsed && (
+              <FiltersSubtitle>
+                Filter your data by date range and forest selection
+              </FiltersSubtitle>
+            )}
+          </div>
+        </HeaderLeft>
+        <HeaderRight>
+          {!isCollapsed && activeFilters.length > 0 && (
+            <ClearAllButton onClick={handleClearAll}>
+              Clear All
+            </ClearAllButton>
+          )}
+          <ToggleButton 
+            onClick={toggleCollapsed}
+            aria-expanded={!isCollapsed}
+            aria-controls="global-filters-content"
+          >
+            {isCollapsed ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+                Show Filters
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                </svg>
+                Hide Filters
+              </>
+            )}
+          </ToggleButton>
+        </HeaderRight>
       </FiltersHeader>
 
-      <FilterErrors errors={filterErrors} />
+      <FiltersContent id="global-filters-content" $isCollapsed={isCollapsed}>
+        <FilterErrors errors={filterErrors} />
+        
+        <PresetButtons>
+          <PresetButton 
+            $isActive={activePreset === 'mtd'}
+            onClick={() => applyDatePreset('mtd')}
+          >
+            Month to Date
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === 'ytd'}
+            onClick={() => applyDatePreset('ytd')}
+          >
+            Year to Date
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === '30days'}
+            onClick={() => applyDatePreset('30days')}
+          >
+            Last 30 Days
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === '90days'}
+            onClick={() => applyDatePreset('90days')}
+          >
+            Last 90 Days
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === '1year'}
+            onClick={() => applyDatePreset('1year')}
+          >
+            Last 1 Year
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === '3years'}
+            onClick={() => applyDatePreset('3years')}
+          >
+            Last 3 Years
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === '5years'}
+            onClick={() => applyDatePreset('5years')}
+          >
+            Last 5 Years
+          </PresetButton>
+          <PresetButton 
+            $isActive={activePreset === 'all'}
+            onClick={() => applyDatePreset('all')}
+          >
+            All Time
+          </PresetButton>
+        </PresetButtons>
 
-      <FiltersGrid>
-        <DateRangePicker
-          onDateChange={handleDateChange}
-          initialStartDate={filters.dateRange.startDate}
-          initialEndDate={filters.dateRange.endDate}
-        />
-        <ForestSelector
-          selectedForests={filters.selectedForests}
-          onChange={handleForestChange}
-        />
-      </FiltersGrid>
+        <FiltersGrid>
+          <DateRangePicker
+            onDateChange={handleDateChange}
+            initialStartDate={filters.dateRange.startDate}
+            initialEndDate={filters.dateRange.endDate}
+          />
+          <ForestSelector
+            selectedForests={filters.selectedForests}
+            onChange={handleForestChange}
+          />
+        </FiltersGrid>
 
-      {activeFilters.length > 0 && (
-        <ActiveFilters>
-          {activeFilters.map((filter, index) => (
-            <FilterTag key={index}>
-              {filter}
-            </FilterTag>
-          ))}
-        </ActiveFilters>
-      )}
+        {activeFilters.length > 0 && (
+          <ActiveFilters>
+            {activeFilters.map((filter, index) => (
+              <FilterTag key={index}>
+                {filter}
+              </FilterTag>
+            ))}
+          </ActiveFilters>
+        )}
+      </FiltersContent>
     </FiltersContainer>
   );
 }; 

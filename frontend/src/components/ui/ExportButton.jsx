@@ -48,6 +48,7 @@ const DropdownMenu = styled.div`
   z-index: 50;
   margin-top: 0.5rem;
   overflow: hidden;
+  color: #111827; /* ensure readable text on white in dark mode */
 `;
 
 const DropdownItem = styled.button`
@@ -61,6 +62,7 @@ const DropdownItem = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: #111827;
   
   &:hover {
     background: #f9fafb;
@@ -240,7 +242,7 @@ export const ExportButtonComponent = ({
             </svg>
             <div>
               <div className="font-medium">Export as CSV</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs">
                 Comma-separated values
               </div>
             </div>
@@ -251,7 +253,7 @@ export const ExportButtonComponent = ({
             </svg>
             <div>
               <div className="font-medium">Export as XLSX</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs">
                 Excel spreadsheet
               </div>
             </div>

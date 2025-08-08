@@ -29,7 +29,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
           params.forestIds = filters.selectedForests.join(',');
         }
         
-        if (filters.dateRange) {
+        if (filters.dateRange && filters.dateRange.startDate && filters.dateRange.endDate) {
           params.startDate = filters.dateRange.startDate.toISOString();
           params.endDate = filters.dateRange.endDate.toISOString();
         }

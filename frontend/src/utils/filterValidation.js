@@ -106,8 +106,8 @@ export const areFiltersValid = (filters) => {
  */
 export const createDefaultFilters = () => ({
   dateRange: {
-    startDate: new Date(new Date().getFullYear(), 0, 1),
-    endDate: new Date()
+    startDate: null,
+    endDate: null
   },
   selectedForests: []
 });

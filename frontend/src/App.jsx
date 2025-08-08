@@ -15,6 +15,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ defau
 const RegisterPage = lazy(() => import('./pages/RegisterPage').then(module => ({ default: module.RegisterPage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
 const MapPage = lazy(() => import('./pages/MapPage').then(module => ({ default: module.MapPage })));
+const ExportPage = lazy(() => import('./pages/ExportPage').then(module => ({ default: module.ExportPage })));
 const TreeDetailPage = lazy(() => import('./pages/TreeDetailPage').then(module => ({ default: module.TreeDetailPage })));
 const AdminPage = lazy(() => import('./pages/AdminPage').then(module => ({ default: module.AdminPage })));
 const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })));
@@ -33,15 +34,18 @@ export const App = () => {
             <AuthProvider>
               <KeepAliveProvider>
                 <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
+                {/* Skip link for keyboard users */}
+                <a href="#main-content" className="skip-link">Skip to content</a>
+
                 <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/" element={<main id="main-content" tabIndex="-1"><LandingPage /></main>} />
+                  <Route path="/login" element={<main id="main-content" tabIndex="-1"><LoginPage /></main>} />
+                  <Route path="/register" element={<main id="main-content" tabIndex="-1"><RegisterPage /></main>} />
                   <Route 
                     path="/dashboard" 
                     element={
                       <ProtectedRoute>
-                        <DashboardPage />
+                        <main id="main-content" tabIndex="-1"><DashboardPage /></main>
                       </ProtectedRoute>
                     } 
                   />
@@ -49,7 +53,15 @@ export const App = () => {
                     path="/map" 
                     element={
                       <ProtectedRoute>
-                        <MapPage />
+                        <main id="main-content" tabIndex="-1"><MapPage /></main>
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/export" 
+                    element={
+                      <ProtectedRoute>
+                        <main id="main-content" tabIndex="-1"><ExportPage /></main>
                       </ProtectedRoute>
                     } 
                   />
@@ -57,7 +69,7 @@ export const App = () => {
                     path="/tree/:id" 
                     element={
                       <ProtectedRoute>
-                        <TreeDetailPage />
+                        <main id="main-content" tabIndex="-1"><TreeDetailPage /></main>
                       </ProtectedRoute>
                     } 
                   />
@@ -65,11 +77,11 @@ export const App = () => {
                     path="/admin" 
                     element={
                       <ProtectedRoute>
-                        <AdminPage />
+                        <main id="main-content" tabIndex="-1"><AdminPage /></main>
                       </ProtectedRoute>
                     } 
                   />
-                  <Route path="*" element={<NotFoundPage />} />
+                  <Route path="*" element={<main id="main-content" tabIndex="-1"><NotFoundPage /></main>} />
                 </Routes>
                 </Suspense>
                 <ToastNotifications />

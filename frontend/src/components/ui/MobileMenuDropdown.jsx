@@ -5,7 +5,7 @@ export const MobileMenuDropdown = ({ isOpen }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pb-4 space-y-1">
+    <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pb-4 space-y-1" role="menu" aria-label="Mobile menu">
       <NavMenuItems />
     </div>
   );

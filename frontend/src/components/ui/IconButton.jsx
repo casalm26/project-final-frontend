@@ -9,6 +9,7 @@ export const IconButton = React.forwardRef(
     'aria-label': ariaLabel,
     size = 'md',
     variant = 'ghost',
+    type = 'button',
     ...props 
   }, ref) => {
     return (
@@ -23,6 +24,7 @@ export const IconButton = React.forwardRef(
         ref={ref}
         size="icon"
         variant={variant}
+        type={type}
         aria-label={ariaLabel}
         {...props}
       >

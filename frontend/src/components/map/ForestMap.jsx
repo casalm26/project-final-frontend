@@ -175,9 +175,9 @@ export const ForestMap = ({
       </MapContainerStyled>
       
       {/* Map Legend */}
-      <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-        <h4 className="font-medium text-gray-900 mb-2">Legend</h4>
-        <div className="flex flex-wrap gap-4 text-sm">
+      <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200" role="region" aria-label="Map legend">
+        <h4 className="font-semibold text-gray-900 mb-2">Legend</h4>
+        <div className="flex flex-wrap gap-4 text-sm text-gray-900">
           <div className="flex items-center">
             <div className="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
             <span>Healthy Trees</span>
@@ -190,11 +190,11 @@ export const ForestMap = ({
             <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
             <span>Critical</span>
           </div>
-          <div className="flex items-center text-gray-500">
+          <div className="flex items-center">
             <span>Showing {filteredTrees.length} of {trees.length} trees</span>
           </div>
-          <div className="flex items-center text-gray-500">
-            <span>Zoom level: {zoom}</span>
+          <div className="flex items-center">
+            <span aria-live="polite">Zoom level: {zoom}</span>
             {zoom < 12 && <span className="ml-4 text-xs">(Clustering enabled)</span>}
           </div>
         </div>

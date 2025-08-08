@@ -48,7 +48,7 @@ export const Navbar = () => {
   // TODO: Consider moving menu open state to Zustand store for better state management across components
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700" role="navigation" aria-label="Main">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -66,6 +66,8 @@ export const Navbar = () => {
             <IconButton
               ref={menuButtonRef}
               aria-label="Toggle menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
               className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
               onClick={toggleMenu}
               onKeyDown={handleMenuKeyDown}
@@ -81,7 +83,7 @@ export const Navbar = () => {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      <div ref={containerRef}>
+      <div ref={containerRef} id="mobile-menu">
         <MobileMenuDropdown isOpen={open} />
       </div>
     </nav>

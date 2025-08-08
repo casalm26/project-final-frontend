@@ -28,7 +28,7 @@ const Toast = ({ toast, onRemove }) => {
       <ToastCard 
         $type={toast.type}
         role="alert"
-        aria-live="polite"
+        aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
         aria-atomic="true"
       >
         <ToastIcon type={toast.type} />

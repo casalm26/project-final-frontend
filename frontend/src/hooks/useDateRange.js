@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 
 export const useDateRange = (onDateChange, initialStartDate, initialEndDate) => {
-  const [startDate, setStartDate] = useState(
-    initialStartDate || new Date(new Date().getFullYear(), 0, 1)
-  );
-  const [endDate, setEndDate] = useState(initialEndDate || new Date());
+  const [startDate, setStartDate] = useState(initialStartDate || null);
+  const [endDate, setEndDate] = useState(initialEndDate || null);
   const onDateChangeRef = useRef(onDateChange);
   const hasMounted = useRef(false);
 
@@ -45,12 +43,10 @@ export const useDateRange = (onDateChange, initialStartDate, initialEndDate) => 
   };
 
   const handleReset = () => {
-    const defaultStartDate = new Date(new Date().getFullYear(), 0, 1);
-    const defaultEndDate = new Date();
-    setStartDate(defaultStartDate);
-    setEndDate(defaultEndDate);
+    setStartDate(null);
+    setEndDate(null);
     if (onDateChangeRef.current) {
-      onDateChangeRef.current({ startDate: defaultStartDate, endDate: defaultEndDate });
+      onDateChangeRef.current({ startDate: null, endDate: null });
     }
   };
 

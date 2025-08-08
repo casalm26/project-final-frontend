@@ -36,7 +36,7 @@ const ImageIcon = () => (
 
 const ImageCardItem = ({ caption }) => (
   <ImageCard>
-    <ImagePlaceholder>
+    <ImagePlaceholder role="img" aria-label={`${caption} placeholder image`}>
       <ImageIcon />
     </ImagePlaceholder>
     <div className="text-xs text-gray-600">{caption}</div>

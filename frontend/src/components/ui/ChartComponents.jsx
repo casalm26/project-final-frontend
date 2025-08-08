@@ -74,7 +74,7 @@ export const LegendDot = styled.div`
 
 export const LegendText = styled.span`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #374151;
 `;
 
 // Helper function to format tooltip values

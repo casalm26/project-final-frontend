@@ -12,6 +12,7 @@ const ModalOverlay = styled.div`
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  outline: none;
 `;
 
 const ModalContent = styled.div`
@@ -23,6 +24,7 @@ const ModalContent = styled.div`
   overflow-y: auto;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
+  outline: none;
 `;
 
 const ModalHeader = styled.div`
@@ -56,9 +58,9 @@ const CloseButton = styled.button`
     color: #111827;
   }
   
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
   }
 `;
 
@@ -82,11 +84,11 @@ export const Modal = ({ isOpen, onClose, title, children, containerRef }) => {
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={handleOverlayClick}>
-      <ModalContent ref={containerRef} role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <ModalOverlay onClick={handleOverlayClick} role="presentation">
+      <ModalContent ref={containerRef} role="dialog" aria-modal="true" aria-labelledby="modal-title" tabIndex="-1">
         <ModalHeader>
           <ModalTitle id="modal-title">{title}</ModalTitle>
-          <CloseButton onClick={onClose} aria-label="Close modal">
+          <CloseButton onClick={onClose} aria-label="Close modal" type="button">
             <CloseIcon />
           </CloseButton>
         </ModalHeader>

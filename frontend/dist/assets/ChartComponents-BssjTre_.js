@@ -1,4 +1,4 @@
-import{j as n,d as r}from"./index-Cp0G27Fl.js";const j=r.div`
+import{j as n,d as r}from"./index-bfSkSDqu.js";const j=r.div`
   background: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
@@ -49,5 +49,5 @@ import{j as n,d as r}from"./index-Cp0G27Fl.js";const j=r.div`
   background-color: ${t=>t.color};
 `,b=r.span`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #374151;
 `,u=(t,e,o)=>e?e(t):`${t}${o}`,v=({active:t,payload:e,label:o,valueFormatter:s,unit:i=""})=>t&&e&&e.length?n.jsxs(d,{children:[n.jsx("p",{className:"font-medium",children:o}),e.map((a,c)=>n.jsx("p",{className:"text-sm text-gray-600",children:u(a.value,s,i)},c))]}):null,y=({value:t,label:e})=>n.jsxs(l,{children:[n.jsxs(m,{children:[t,"%"]}),n.jsx(g,{children:e})]}),L=({data:t})=>n.jsx(x,{children:t.map((e,o)=>n.jsxs(p,{children:[n.jsx(h,{color:e.color}),n.jsxs(b,{children:[e.name," (",e.value,"%)"]})]},o))});export{j as C,C as a,w as b,y as c,v as d,L as e};

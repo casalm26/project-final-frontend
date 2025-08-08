@@ -10,9 +10,9 @@ const MarkerCluster = ({ trees, onTreeClick, zoom }) => {
   useEffect(() => {
     if (!map || !trees.length) return;
     
-    // Remove existing cluster layer if it exists
+    // Clear prior marker layers that we created (cluster groups or layer groups)
     map.eachLayer(layer => {
-      if (layer instanceof L.MarkerClusterGroup) {
+      if (layer instanceof L.MarkerClusterGroup || layer instanceof L.LayerGroup) {
         map.removeLayer(layer);
       }
     });
@@ -45,22 +45,23 @@ const MarkerCluster = ({ trees, onTreeClick, zoom }) => {
       
       map.addLayer(clusterGroup);
     } else {
-      // For zoom >= 12, show individual markers without clustering
+      // For zoom >= 12, show individual markers inside a layer group
+      const layerGroup = L.layerGroup();
       trees.forEach(tree => {
         const marker = L.marker([tree.lat, tree.lng], {
           icon: createTreeIcon(tree.health)
         });
-        
         marker.bindPopup(getTreePopupContent(tree));
         marker.on('click', () => onTreeClick(tree));
-        marker.addTo(map);
+        layerGroup.addLayer(marker);
       });
+      layerGroup.addTo(map);
     }
     
     // Cleanup function
     return () => {
       map.eachLayer(layer => {
-        if (layer instanceof L.MarkerClusterGroup) {
+        if (layer instanceof L.MarkerClusterGroup || layer instanceof L.LayerGroup) {
           map.removeLayer(layer);
         }
       });

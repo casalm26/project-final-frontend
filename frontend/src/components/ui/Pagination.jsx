@@ -3,7 +3,7 @@ import { usePagination } from '../../hooks/usePagination';
 import { PaginationInfo } from './PaginationInfo';
 import { PageNumbers } from './PageNumbers';
 
-const PaginationContainer = styled.div`
+const PaginationContainer = styled.nav`
   padding: 1rem 1.5rem;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
@@ -12,10 +12,13 @@ const PaginationContainer = styled.div`
   align-items: center;
 `;
 
-const PaginationControls = styled.div`
+const PaginationControls = styled.ul`
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 `;
 
 const PaginationButton = styled.button`
@@ -35,6 +38,11 @@ const PaginationButton = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
   }
 `;
 
@@ -57,42 +65,54 @@ export const Pagination = ({
   // TODO: Consider moving pagination state to Zustand store for better state management across components
   
   return (
-    <PaginationContainer>
+    <PaginationContainer role="navigation" aria-label="Pagination">
       <PaginationInfo 
         startIndex={startIndex}
         pageSize={pageSize}
         totalItems={totalItems}
       />
       <PaginationControls>
+        <li>
         <PaginationButton
           onClick={() => onPageChange(1)}
           disabled={!canGoFirst}
+          aria-label="Go to first page"
         >
           First
         </PaginationButton>
+        </li>
+        <li>
         <PaginationButton
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!canGoPrevious}
+          aria-label="Go to previous page"
         >
           Previous
         </PaginationButton>
+        </li>
         <PageNumbers
           pageNumbers={pageNumbers}
           currentPage={currentPage}
           onPageChange={onPageChange}
         />
+        <li>
         <PaginationButton
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!canGoNext}
+          aria-label="Go to next page"
         >
           Next
         </PaginationButton>
+        </li>
+        <li>
         <PaginationButton
           onClick={() => onPageChange(totalPages)}
           disabled={!canGoLast}
+          aria-label="Go to last page"
         >
           Last
         </PaginationButton>
+        </li>
       </PaginationControls>
     </PaginationContainer>
   );

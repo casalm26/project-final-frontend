@@ -10,6 +10,8 @@ export const PasswordInput = ({
   placeholder = '',
   disabled = false,
   error = '',
+  label = 'Password',
+  required = false,
   ...props 
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,10 @@ export const PasswordInput = ({
 
   return (
     <div className="relative">
+      <label htmlFor={id} className="form-label block mb-2 text-gray-700 dark:text-gray-300">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
       <input
         type={showPassword ? 'text' : 'password'}
         id={id}
@@ -33,6 +39,7 @@ export const PasswordInput = ({
         placeholder={placeholder}
         disabled={disabled}
         aria-describedby={error ? `${id}-error` : undefined}
+        aria-invalid={!!error}
         {...props}
       />
       <button
@@ -41,6 +48,7 @@ export const PasswordInput = ({
         className="absolute inset-y-0 right-0 pr-3 flex items-center"
         disabled={disabled}
         aria-label={showPassword ? 'Hide password' : 'Show password'}
+        aria-pressed={showPassword}
       >
         {showPassword ? (
           <EyeOffIcon className="h-5 w-5 text-gray-400" />
@@ -48,6 +56,11 @@ export const PasswordInput = ({
           <EyeIcon className="h-5 w-5 text-gray-400" />
         )}
       </button>
+      {error && (
+        <p id={`${id}-error`} className="mt-2 text-sm text-red-600 dark:text-red-400">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

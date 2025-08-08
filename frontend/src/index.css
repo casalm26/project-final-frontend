@@ -9,6 +9,7 @@
     --color-success: 34 197 94;
     --color-warning: 245 158 11;
     --color-error: 239 68 68;
+    --focus-ring: 59 130 246; /* tailwind blue-500 as default focus ring for contrast */
   }
 
   .dark {
@@ -30,11 +31,15 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
+
+  a {
+    @apply underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--focus-ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900;
+  }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--focus-ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-primary {
@@ -49,6 +54,34 @@
     @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700;
   }
 
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800;
+  }
+
+  .btn-link {
+    @apply btn bg-transparent text-primary-600 underline hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-600;
+  }
+
+  .btn-destructive {
+    @apply btn bg-error text-white hover:bg-red-700;
+  }
+
+  .btn-success {
+    @apply btn bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .btn-disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+
+  .btn-loading {
+    @apply relative;
+  }
+
+  .btn-icon {
+    @apply p-0 rounded-full;
+  }
+
   .form-input {
     @apply flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400;
   }
@@ -60,10 +93,32 @@
   .card {
     @apply rounded-lg border border-gray-200 bg-white text-gray-950 shadow-sm dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50;
   }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--focus-ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900;
+  }
+
+  .link {
+    @apply text-primary-600 underline hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-600;
+  }
 }
 
 @layer utilities {
   .skip-link {
     @apply absolute left-0 top-0 z-50 -translate-y-full transform bg-primary-600 px-4 py-2 text-white transition-transform focus:translate-y-0;
+  }
+
+  .visually-hidden {
+    border: 0 !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    -webkit-clip-path: inset(50%) !important;
+    clip-path: inset(50%) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+    white-space: nowrap !important;
   }
 }

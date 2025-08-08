@@ -9,7 +9,7 @@ export const PaginationInfo = ({ startIndex, pageSize, totalItems }) => {
   const endIndex = Math.min(startIndex + pageSize, totalItems);
   
   return (
-    <InfoContainer>
+    <InfoContainer aria-live="polite">
       Showing {startIndex + 1} to {endIndex} of {totalItems} entries
     </InfoContainer>
   );

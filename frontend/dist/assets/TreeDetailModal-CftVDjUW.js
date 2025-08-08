@@ -1,4 +1,4 @@
-import{r as c,j as e,d as a,p as b,L as f}from"./index-Cp0G27Fl.js";import{u as j}from"./useKeyboardNavigation-BEEMcJj7.js";import{b as h,c as i,d as s,T as p,M as w}from"./Modal-BNFLubTG.js";const k=[{date:"2024-01-15",height:2.4,diameter:8.2,health:"healthy"},{date:"2024-02-15",height:2.3,diameter:8.1,health:"healthy"},{date:"2024-03-15",height:2.2,diameter:8,health:"healthy"},{date:"2024-04-15",height:2.1,diameter:7.9,health:"warning"},{date:"2024-05-15",height:2,diameter:7.8,health:"warning"},{date:"2024-06-15",height:1.9,diameter:7.7,health:"warning"},{date:"2024-07-15",height:1.8,diameter:7.6,health:"critical"},{date:"2024-08-15",height:1.7,diameter:7.5,health:"critical"},{date:"2024-09-15",height:1.6,diameter:7.4,health:"critical"},{date:"2024-10-15",height:1.5,diameter:7.3,health:"critical"}],v=(t,r)=>{const[o,l]=c.useState([]);return c.useEffect(()=>{t&&r&&l(k)},[t,r]),o},y=t=>c.useCallback(()=>{t&&(navigator.share?navigator.share({title:`Tree Details - ${t.name}`,text:`Check out this tree: ${t.name} (${t.species})`,url:window.location.href}):(navigator.clipboard.writeText(window.location.href),alert("Tree URL copied to clipboard!")))},[t]),T=a.div`
+import{r as c,j as e,d as a,s as b,L as f}from"./index-bfSkSDqu.js";import{u as j}from"./useKeyboardNavigation-Ccelunos.js";import{b as h,c as o,d as s,T as p,M as w}from"./Modal-CwRIuUem.js";const k=[{date:"2024-01-15",height:2.4,diameter:8.2,health:"healthy"},{date:"2024-02-15",height:2.3,diameter:8.1,health:"healthy"},{date:"2024-03-15",height:2.2,diameter:8,health:"healthy"},{date:"2024-04-15",height:2.1,diameter:7.9,health:"warning"},{date:"2024-05-15",height:2,diameter:7.8,health:"warning"},{date:"2024-06-15",height:1.9,diameter:7.7,health:"warning"},{date:"2024-07-15",height:1.8,diameter:7.6,health:"critical"},{date:"2024-08-15",height:1.7,diameter:7.5,health:"critical"},{date:"2024-09-15",height:1.6,diameter:7.4,health:"critical"},{date:"2024-10-15",height:1.5,diameter:7.3,health:"critical"}],v=(t,r)=>{const[i,l]=c.useState([]);return c.useEffect(()=>{t&&r&&l(k)},[t,r]),i},y=t=>c.useCallback(()=>{t&&(navigator.share?navigator.share({title:`Tree Details - ${t.name}`,text:`Check out this tree: ${t.name} (${t.species})`,url:window.location.href}):(navigator.clipboard.writeText(window.location.href),alert("Tree URL copied to clipboard!")))},[t]),T=a.div`
   background: #f9fafb;
   border-radius: 0.75rem;
   padding: 1.5rem;
@@ -39,14 +39,14 @@ import{r as c,j as e,d as a,p as b,L as f}from"./index-Cp0G27Fl.js";import{u as 
   font-weight: 600;
   color: #111827;
   margin: 0 0 1rem 0;
-`,F=a(p)`
+`,$=a(p)`
   background: white;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-`,N=a.thead`
+`,F=a.thead`
   background: #f3f4f6;
-`,P=({measurementHistory:t})=>e.jsxs(z,{children:[e.jsx(D,{children:"Measurement History (Last 10 Entries)"}),e.jsxs(F,{children:[e.jsx(N,{children:e.jsxs(h,{children:[e.jsx(i,{children:"Date"}),e.jsx(i,{children:"Height (m)"}),e.jsx(i,{children:"Diameter (cm)"}),e.jsx(i,{children:"Health"})]})}),e.jsx("tbody",{children:t.slice(0,10).map((r,o)=>e.jsxs(h,{children:[e.jsx(s,{children:b(r.date)}),e.jsx(s,{children:r.height}),e.jsx(s,{children:r.diameter}),e.jsx(s,{children:e.jsx(x,{health:r.health,children:r.health})})]},o))})]})]}),$=a.div`
+`,N=({measurementHistory:t})=>e.jsxs(z,{children:[e.jsx(D,{children:"Measurement History (Last 10 Entries)"}),e.jsxs($,{children:[e.jsx(F,{children:e.jsxs(h,{children:[e.jsx(o,{children:"Date"}),e.jsx(o,{children:"Height (m)"}),e.jsx(o,{children:"Diameter (cm)"}),e.jsx(o,{children:"Health"})]})}),e.jsx("tbody",{children:t.slice(0,10).map((r,i)=>e.jsxs(h,{children:[e.jsx(s,{children:b(r.date)}),e.jsx(s,{children:r.height}),e.jsx(s,{children:r.diameter}),e.jsx(s,{children:e.jsx(x,{health:r.health,children:r.health})})]},i))})]})]}),P=a.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
@@ -68,7 +68,7 @@ import{r as c,j as e,d as a,p as b,L as f}from"./index-Cp0G27Fl.js";import{u as 
   color: #6b7280;
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
-`,R=()=>e.jsx("svg",{className:"w-8 h-8",fill:"none",viewBox:"0 0 24 24",stroke:"currentColor",children:e.jsx("path",{strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:2,d:"M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"})}),d=({caption:t})=>e.jsxs(E,{children:[e.jsx(G,{children:e.jsx(R,{})}),e.jsx("div",{className:"text-xs text-gray-600",children:t})]}),V=()=>e.jsxs($,{children:[e.jsx(d,{caption:"Latest Photo"}),e.jsx(d,{caption:"Growth Progress"}),e.jsx(d,{caption:"Planting Day"})]}),A=a.button`
+`,R=()=>e.jsx("svg",{className:"w-8 h-8",fill:"none",viewBox:"0 0 24 24",stroke:"currentColor",children:e.jsx("path",{strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:2,d:"M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"})}),d=({caption:t})=>e.jsxs(E,{children:[e.jsx(G,{role:"img","aria-label":`${t} placeholder image`,children:e.jsx(R,{})}),e.jsx("div",{className:"text-xs text-gray-600",children:t})]}),V=()=>e.jsxs(P,{children:[e.jsx(d,{caption:"Latest Photo"}),e.jsx(d,{caption:"Growth Progress"}),e.jsx(d,{caption:"Planting Day"})]}),A=a.button`
   padding: 0.75rem 1.5rem;
   background: #10b981;
   color: white;
@@ -123,4 +123,4 @@ import{r as c,j as e,d as a,p as b,L as f}from"./index-Cp0G27Fl.js";import{u as 
   font-weight: 600;
   color: #111827;
   margin: 0 0 1rem 0;
-`,O=({tree:t,isOpen:r,onClose:o})=>{const{containerRef:l}=j({onEscape:o,trapFocus:!0,autoFocus:!0}),g=v(t,r),u=y(t);return t?e.jsxs(w,{isOpen:r,onClose:o,title:t.name,containerRef:l,children:[e.jsxs(q,{children:[e.jsx(M,{tree:t}),e.jsx(B,{tree:t})]}),e.jsx(P,{measurementHistory:g}),e.jsxs(Q,{children:[e.jsx(X,{children:"Tree Images"}),e.jsx(V,{})]}),e.jsx(U,{tree:t,onShare:u})]}):null};export{x as H,O as T,y as u};
+`,O=({tree:t,isOpen:r,onClose:i})=>{const{containerRef:l}=j({onEscape:i,trapFocus:!0,autoFocus:!0}),g=v(t,r),u=y(t);return t?e.jsxs(w,{isOpen:r,onClose:i,title:t.name,containerRef:l,children:[e.jsxs(q,{children:[e.jsx(M,{tree:t}),e.jsx(B,{tree:t})]}),e.jsx(N,{measurementHistory:g}),e.jsxs(Q,{children:[e.jsx(X,{children:"Tree Images"}),e.jsx(V,{})]}),e.jsx(U,{tree:t,onShare:u})]}):null};export{x as H,O as T,y as u};

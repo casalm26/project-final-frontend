@@ -24,19 +24,27 @@ const PageButton = styled.button`
     color: white;
     border-color: #10b981;
   }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
+  }
 `;
 
 export const PageNumbers = ({ pageNumbers, currentPage, onPageChange }) => {
   return (
     <>
       {pageNumbers.map(pageNumber => (
-        <PageButton
-          key={pageNumber}
-          onClick={() => onPageChange(pageNumber)}
-          className={currentPage === pageNumber ? 'active' : ''}
-        >
-          {pageNumber}
-        </PageButton>
+        <li key={pageNumber} style={{ listStyle: 'none' }}>
+          <PageButton
+            onClick={() => onPageChange(pageNumber)}
+            className={currentPage === pageNumber ? 'active' : ''}
+            aria-current={currentPage === pageNumber ? 'page' : undefined}
+            aria-label={`Go to page ${pageNumber}`}
+          >
+            {pageNumber}
+          </PageButton>
+        </li>
       ))}
     </>
   );
