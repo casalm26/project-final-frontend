@@ -2,15 +2,11 @@ import express from 'express';
 import {
   exportTreesCSV,
   exportTreesXLSX,
-  exportForestAnalytics,
-  diagnosticTreeCount
+  exportForestAnalytics
 } from '../controllers/exportController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
-
-// DEBUG: Diagnostic endpoint (no auth required for debugging)
-router.get('/diagnostic', diagnosticTreeCount);
 
 // All export routes require authentication
 router.use(authenticateToken);
