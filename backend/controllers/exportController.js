@@ -21,14 +21,6 @@ export const exportTreesCSV = async (req, res) => {
       includeMeasurements = false
     } = req.query;
 
-    // Export ALL trees without any filters
-    console.log('=== CSV Export Debug ===');
-    console.log('Exporting ALL trees from database without filters');
-
-    // DEBUG: Check total trees in database
-    const totalTreesInDB = await Tree.countDocuments({});
-    console.log('Total trees in database:', totalTreesInDB);
-
     // Get ALL trees from database
     const trees = await Tree.find({}).lean();
     
@@ -48,10 +40,6 @@ export const exportTreesCSV = async (req, res) => {
       }
     });
 
-    // DEBUG: Log final results
-    console.log('Trees after populate:', trees.length);
-    console.log('Trees with missing forestId:', trees.filter(t => !t.forestId).length);
-    console.log('=== End CSV Export Debug ===');
 
     if (trees.length === 0) {
       return res.status(404).json({
@@ -83,14 +71,6 @@ export const exportTreesXLSX = async (req, res) => {
       includeMeasurements = false
     } = req.query;
 
-    // Export ALL trees without any filters
-    console.log('=== XLSX Export Debug ===');
-    console.log('Exporting ALL trees from database without filters');
-
-    // DEBUG: Check total trees in database
-    const totalTreesInDB = await Tree.countDocuments({});
-    console.log('Total trees in database:', totalTreesInDB);
-
     // Get ALL trees from database
     const trees = await Tree.find({}).lean();
     
@@ -110,10 +90,6 @@ export const exportTreesXLSX = async (req, res) => {
       }
     });
 
-    // DEBUG: Log final results
-    console.log('Trees after populate:', trees.length);
-    console.log('Trees with missing forestId:', trees.filter(t => !t.forestId).length);
-    console.log('=== End XLSX Export Debug ===');
 
     if (trees.length === 0) {
       return res.status(404).json({
@@ -181,60 +157,6 @@ export const exportTreesXLSX = async (req, res) => {
   }
 };
 
-// DEBUG: Diagnostic endpoint to check database state (REMOVE IN PRODUCTION)
-export const diagnosticTreeCount = async (req, res) => {
-  try {
-    // Total trees
-    const totalTrees = await Tree.countDocuments({});
-    
-    // Trees with valid forestId
-    const treesWithValidForest = await Tree.countDocuments({ forestId: { $ne: null } });
-    
-    // Trees with invalid or missing forestId
-    const treesWithoutForest = await Tree.countDocuments({ forestId: null });
-    
-    // Sample of trees without forest
-    const orphanedTrees = await Tree.find({ forestId: null }).limit(5).lean();
-    
-    // Sample of trees with forest
-    const treesWithForest = await Tree.find({ forestId: { $ne: null } }).limit(5).lean();
-    
-    // Check what happens with populate
-    const populateTest = await Tree.find({}).populate('forestId', 'name region').limit(10).lean();
-    const populateTestCount = populateTest.length;
-    const populateTestWithoutForest = populateTest.filter(t => !t.forestId).length;
-    
-    res.json({
-      success: true,
-      diagnostics: {
-        totalTrees,
-        treesWithValidForest,
-        treesWithoutForest,
-        populateTestCount,
-        populateTestWithoutForest,
-        orphanedTreesSample: orphanedTrees.map(t => ({
-          _id: t._id,
-          treeId: t.treeId,
-          species: t.species,
-          forestId: t.forestId
-        })),
-        treesWithForestSample: treesWithForest.map(t => ({
-          _id: t._id,
-          treeId: t.treeId,
-          species: t.species,
-          forestId: t.forestId
-        }))
-      }
-    });
-  } catch (error) {
-    console.error('Diagnostic error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Diagnostic failed',
-      error: error.message
-    });
-  }
-};
 
 // Export forest analytics data
 export const exportForestAnalytics = async (req, res) => {

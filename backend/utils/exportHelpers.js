@@ -14,21 +14,13 @@ import { buildTreeQuery, roundToTwo } from './dashboardUtils.js';
 export const buildExportTreeQuery = (queryParams) => {
   const { isAlive, ...baseFilters } = queryParams;
   
-  // DEBUG: Log input parameters
-  console.log('buildExportTreeQuery - Input queryParams:', queryParams);
-  console.log('buildExportTreeQuery - Base filters:', baseFilters);
-  console.log('buildExportTreeQuery - isAlive filter:', isAlive);
-  
   const query = buildTreeQuery(baseFilters);
-  console.log('buildExportTreeQuery - Query after buildTreeQuery:', JSON.stringify(query, null, 2));
 
   // Add export-specific isAlive filter
   if (isAlive !== undefined) {
     query.isAlive = isAlive === 'true';
-    console.log('buildExportTreeQuery - Applied isAlive filter:', query.isAlive);
   }
 
-  console.log('buildExportTreeQuery - Final query:', JSON.stringify(query, null, 2));
   return query;
 };
 
