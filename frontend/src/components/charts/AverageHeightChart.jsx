@@ -49,7 +49,7 @@ export const AverageHeightChart = ({ filters = {} }) => {
         <ChartTitle>Average Tree Height Over Time</ChartTitle>
       </ChartHeader>
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={chartConfig.margin}>
           <CartesianGrid {...chartConfig.gridProps} />
           <XAxis 

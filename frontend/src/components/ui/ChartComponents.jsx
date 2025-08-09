@@ -7,6 +7,10 @@ export const ChartContainer = styled.div`
   padding: 1.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 `;
 
 export const ChartHeader = styled.div`

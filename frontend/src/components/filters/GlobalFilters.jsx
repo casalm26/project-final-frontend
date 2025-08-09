@@ -419,11 +419,15 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
           </div>
         </HeaderLeft>
         <HeaderRight>
-          {!isCollapsed && activeFilters.length > 0 && (
-            <ClearAllButton onClick={handleClearAll}>
-              Clear All
-            </ClearAllButton>
-          )}
+          <ClearAllButton 
+            onClick={handleClearAll}
+            style={{ 
+              visibility: !isCollapsed && activeFilters.length > 0 ? 'visible' : 'hidden',
+              pointerEvents: !isCollapsed && activeFilters.length > 0 ? 'auto' : 'none'
+            }}
+          >
+            Clear All
+          </ClearAllButton>
           <ToggleButton 
             onClick={toggleCollapsed}
             aria-expanded={!isCollapsed}

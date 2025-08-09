@@ -154,13 +154,13 @@ export const DashboardPage = () => {
 
           {/* Charts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-1">
+            <div className="col-span-1">
               <SurvivalRateChart filters={filters} />
             </div>
-            <div className="lg:col-span-1 xl:col-span-2">
+            <div className="col-span-1 xl:col-span-2">
               <AverageHeightChart filters={filters} />
             </div>
-            <div className="lg:col-span-2 xl:col-span-3">
+            <div className="col-span-1 lg:col-span-2 xl:col-span-3">
               <CO2AbsorptionChart filters={filters} />
             </div>
           </div>

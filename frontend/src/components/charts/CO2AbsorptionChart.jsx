@@ -49,7 +49,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
         <ChartTitle>CO₂ Absorption Over Time</ChartTitle>
       </ChartHeader>
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={chartConfig.margin}>
           <CartesianGrid {...chartConfig.gridProps} />
           <XAxis 
