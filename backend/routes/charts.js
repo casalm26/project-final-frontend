@@ -7,15 +7,15 @@ import {
   getCombinedChartData
 } from '../controllers/chartController.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { dataLimiter } from '../middleware/rateLimiter.js';
+// import { dataLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 // All chart routes require authentication
 router.use(authenticateToken);
 
-// Apply data rate limiting
-router.use(dataLimiter);
+// Rate limiting disabled for development
+// router.use(dataLimiter);
 
 /**
  * @swagger
