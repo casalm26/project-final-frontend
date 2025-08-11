@@ -15,7 +15,20 @@ import {
   getForestStatsPipeline,
   getLatestHeightPipeline,
   getTotalCO2Pipeline,
-  getForestComparisonPipeline
+  getForestComparisonPipeline,
+  // Investor-focused metrics
+  getPortfolioValuePipeline,
+  getROIStatsPipeline,
+  getCarbonCreditsPipeline,
+  getTimberValuePipeline,
+  getMaintenanceBudgetPipeline,
+  // Manager-focused metrics
+  getBiodiversityIndexPipeline,
+  getTreesAtRiskPipeline,
+  getFireRiskPipeline,
+  getSpeciesDiversityPipeline,
+  getSoilHealthPipeline,
+  getInfrastructureConditionPipeline
 } from '../utils/aggregationHelpers.js';
 import { 
   formatDashboardResponse, 
@@ -86,13 +99,39 @@ export const getDashboardStats = async (req, res) => {
       heightStats,
       co2Stats,
       healthDistribution,
-      forestStats
+      forestStats,
+      // Investor metrics
+      portfolioValue,
+      roiStats,
+      carbonCredits,
+      timberValue,
+      maintenanceBudget,
+      // Manager metrics
+      biodiversityIndex,
+      treesAtRisk,
+      fireRisk,
+      speciesDiversity,
+      soilHealth,
+      infrastructureCondition
     ] = await Promise.all([
       Tree.aggregate(getSpeciesDistributionPipeline(treeQuery)),
       Tree.aggregate(getHeightStatsPipeline(treeQuery)),
       Tree.aggregate(getCO2StatsPipeline(treeQuery)),
       Tree.aggregate(getHealthDistributionPipeline(treeQuery)),
-      Forest.aggregate(getForestStatsPipeline(forestQuery))
+      Forest.aggregate(getForestStatsPipeline(forestQuery)),
+      // Investor metrics
+      Forest.aggregate(getPortfolioValuePipeline(forestQuery)),
+      Forest.aggregate(getROIStatsPipeline(forestQuery)),
+      Forest.aggregate(getCarbonCreditsPipeline(forestQuery)),
+      Tree.aggregate(getTimberValuePipeline(treeQuery)),
+      Forest.aggregate(getMaintenanceBudgetPipeline(forestQuery)),
+      // Manager metrics
+      Forest.aggregate(getBiodiversityIndexPipeline(forestQuery)),
+      Tree.aggregate(getTreesAtRiskPipeline(treeQuery)),
+      Forest.aggregate(getFireRiskPipeline(forestQuery)),
+      Forest.aggregate(getSpeciesDiversityPipeline(forestQuery)),
+      Forest.aggregate(getSoilHealthPipeline(forestQuery)),
+      Forest.aggregate(getInfrastructureConditionPipeline(forestQuery))
     ]);
 
     // Prepare raw data for formatting
@@ -106,7 +145,20 @@ export const getDashboardStats = async (req, res) => {
       heightStats,
       co2Stats,
       healthDistribution,
-      forestStats
+      forestStats,
+      // Investor metrics
+      portfolioValue,
+      roiStats,
+      carbonCredits,
+      timberValue,
+      maintenanceBudget,
+      // Manager metrics
+      biodiversityIndex,
+      treesAtRisk,
+      fireRisk,
+      speciesDiversity,
+      soilHealth,
+      infrastructureCondition
     };
 
     // Format and send response

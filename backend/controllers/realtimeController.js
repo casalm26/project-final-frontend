@@ -1,6 +1,14 @@
 import { Tree, Forest, TreeImage, AuditLog } from '../models/index.js';
 import { SocketEventHandlers } from '../utils/socketEventHandlers.js';
-import { RealtimeDataService } from '../utils/realtimeDataService.js';
+import { 
+  formatAuditLogEntry,
+  getRecentActivity,
+  getDashboardData,
+  getForestData,
+  validateAndGetTree,
+  validateAndGetForest,
+  getUserTreeStats 
+} from '../utils/realtimeDataService.js';
 import { BroadcastUtils } from '../utils/broadcastUtils.js';
 import { RoomManager } from '../utils/roomManager.js';
 
@@ -55,11 +63,11 @@ export class RealtimeController {
       this.sendOnlineUsersCount(socket);
 
       // Send recent activity
-      const recentActivity = await RealtimeDataService.getRecentActivity();
+      const recentActivity = await getRecentActivity();
       socket.emit('data:recent-activity', recentActivity);
 
       // Send user's tree count
-      const userStats = await RealtimeDataService.getUserTreeStats();
+      const userStats = await getUserTreeStats();
       socket.emit('data:user-stats', userStats);
 
     } catch (error) {
@@ -71,7 +79,7 @@ export class RealtimeController {
   async subscribeToTree(socket, treeId) {
     try {
       // Validate tree exists
-      const tree = await RealtimeDataService.validateAndGetTree(treeId);
+      const tree = await validateAndGetTree(treeId);
 
       const treeRoom = RoomManager.generateTreeRoom(treeId);
       socket.join(treeRoom);
@@ -108,7 +116,7 @@ export class RealtimeController {
   // Subscribe to forest updates
   async subscribeToForest(socket, forestId) {
     try {
-      await RealtimeDataService.validateAndGetForest(forestId);
+      await validateAndGetForest(forestId);
 
       const forestRoom = RoomManager.generateForestRoom(forestId);
       socket.join(forestRoom);
@@ -116,7 +124,7 @@ export class RealtimeController {
       console.log(`User ${socket.user.email} subscribed to forest ${forestId}`);
 
       // Send current forest data
-      const forestData = await RealtimeDataService.getForestData(forestId);
+      const forestData = await getForestData(forestId);
       socket.emit('forest:data', {
         forestId,
         forest: forestData,
@@ -132,7 +140,7 @@ export class RealtimeController {
   // Send dashboard data
   async sendDashboardData(socket) {
     try {
-      const dashboardData = await RealtimeDataService.getDashboardData(this.roomManager.connectedUsers.size);
+      const dashboardData = await getDashboardData(this.roomManager.connectedUsers.size);
       socket.emit('dashboard:data', dashboardData);
     } catch (error) {
       console.error('Error sending dashboard data:', error);

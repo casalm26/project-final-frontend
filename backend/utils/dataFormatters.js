@@ -116,7 +116,19 @@ export const formatDashboardResponse = (rawData, filters) => {
     heightStats,
     co2Stats,
     healthDistribution,
-    forestStats
+    forestStats,
+    // New metrics data
+    portfolioValue,
+    roiStats,
+    carbonCredits,
+    timberValue,
+    maintenanceBudget,
+    biodiversityIndex,
+    treesAtRisk,
+    fireRisk,
+    speciesDiversity,
+    soilHealth,
+    infrastructureCondition
   } = rawData;
 
   return {
@@ -136,6 +148,22 @@ export const formatDashboardResponse = (rawData, filters) => {
         species: speciesDistribution,
         health: healthDistribution
       },
+      // Enhanced metrics for investors and managers
+      investor: formatInvestorMetrics({
+        portfolioValue,
+        roiStats,
+        carbonCredits,
+        timberValue,
+        maintenanceBudget
+      }),
+      manager: formatManagerMetrics({
+        biodiversityIndex,
+        treesAtRisk,
+        fireRisk,
+        speciesDiversity,
+        soilHealth,
+        infrastructureCondition
+      }),
       filters,
       lastUpdated: new Date().toISOString()
     }
@@ -182,6 +210,114 @@ export const formatForestComparisonResponse = (forestStats) => {
     data: {
       forests: forestStats,
       totalForests: forestStats.length
+    }
+  };
+};
+
+/**
+ * ENHANCED FORMATTERS FOR NEW METRICS
+ */
+
+/**
+ * Format investor metrics data
+ * @param {Object} data - Raw investor metrics data
+ * @returns {Object} Formatted investor metrics
+ */
+export const formatInvestorMetrics = (data) => {
+  const { portfolioValue, roiStats, carbonCredits, timberValue, maintenanceBudget } = data;
+  
+  // Safely extract values with proper fallbacks
+  const portfolioData = portfolioValue && portfolioValue.length > 0 ? portfolioValue[0] : {};
+  const roiData = roiStats && roiStats.length > 0 ? roiStats[0] : {};
+  const carbonData = carbonCredits && carbonCredits.length > 0 ? carbonCredits[0] : {};
+  const timberData = timberValue && timberValue.length > 0 ? timberValue[0] : {};
+  const budgetData = maintenanceBudget && maintenanceBudget.length > 0 ? maintenanceBudget[0] : {};
+  
+  return {
+    portfolio: {
+      totalCurrentValue: roundToTwo(portfolioData.totalCurrentValue || 0),
+      totalAcquisitionCost: roundToTwo(portfolioData.totalAcquisitionCost || 0),
+      forestCount: portfolioData.forestCount || 0,
+      averageValue: roundToTwo(portfolioData.avgCurrentValue || 0)
+    },
+    roi: {
+      averageROI: roundToTwo(roiData.avgROI || 0),
+      totalValueGain: roundToTwo(roiData.totalValueGain || 0),
+      minROI: roundToTwo(roiData.minROI || 0),
+      maxROI: roundToTwo(roiData.maxROI || 0)
+    },
+    carbonCredits: {
+      totalAvailable: carbonData.totalAvailable || 0,
+      totalSold: carbonData.totalSold || 0,
+      averagePrice: roundToTwo(carbonData.avgPricePerCredit || 0),
+      totalCarbonStored: roundToTwo(carbonData.totalCarbonStored || 0),
+      annualSequestration: roundToTwo(carbonData.totalAnnualSequestration || 0)
+    },
+    timber: {
+      totalValue: roundToTwo(timberData.totalTimberValue || 0),
+      carbonCreditValue: roundToTwo(timberData.totalCarbonCreditValue || 0),
+      averageValuePerTree: roundToTwo(timberData.avgTimberValuePerTree || 0)
+    },
+    maintenance: {
+      totalBudget: roundToTwo(budgetData.totalAnnualBudget || 0),
+      totalSpent: roundToTwo(budgetData.totalSpent || 0),
+      utilization: roundToTwo(budgetData.avgUtilization || 0)
+    }
+  };
+};
+
+/**
+ * Format manager metrics data
+ * @param {Object} data - Raw manager metrics data
+ * @returns {Object} Formatted manager metrics
+ */
+export const formatManagerMetrics = (data) => {
+  const { biodiversityIndex, treesAtRisk, fireRisk, speciesDiversity, soilHealth, infrastructureCondition } = data;
+  
+  // Safely extract values with proper fallbacks
+  const biodiversityData = biodiversityIndex && biodiversityIndex.length > 0 ? biodiversityIndex[0] : {};
+  const riskData = treesAtRisk && treesAtRisk.length > 0 ? treesAtRisk[0] : {};
+  const fireData = fireRisk && fireRisk.length > 0 ? fireRisk[0] : {};
+  const speciesData = speciesDiversity && speciesDiversity.length > 0 ? speciesDiversity[0] : {};
+  const soilData = soilHealth && soilHealth.length > 0 ? soilHealth[0] : {};
+  const infrastructureData = infrastructureCondition && infrastructureCondition.length > 0 ? infrastructureCondition[0] : {};
+  
+  return {
+    biodiversity: {
+      averageIndex: roundToTwo(biodiversityData.avgBiodiversityIndex || 0),
+      totalSpecies: biodiversityData.totalSpeciesCount || 0,
+      forestsWithData: biodiversityData.forestsWithData || 0,
+      range: {
+        min: roundToTwo(biodiversityData.minBiodiversity || 0),
+        max: roundToTwo(biodiversityData.maxBiodiversity || 0)
+      }
+    },
+    treesAtRisk: {
+      total: riskData.treesAtRisk || 0,
+      critical: riskData.criticalTrees || 0,
+      healthy: riskData.healthyTrees || 0,
+      riskBySpecies: riskData.riskBySpecies || []
+    },
+    fireRisk: {
+      highRiskForests: fireData.highRiskForests || 0,
+      highRiskArea: roundToTwo(fireData.highRiskArea || 0),
+      distribution: fireData.riskDistribution || []
+    },
+    speciesDiversity: {
+      uniqueSpecies: speciesData.uniqueSpecies || 0,
+      endangeredSpecies: speciesData.endangeredSpecies || 0,
+      speciesDetails: speciesData.speciesDetails || []
+    },
+    soilHealth: {
+      averagePH: roundToTwo(soilData.avgPH || 0),
+      averageOrganicMatter: roundToTwo(soilData.avgOrganicMatter || 0),
+      forestsWithData: soilData.forestsWithSoilData || 0
+    },
+    infrastructure: {
+      totalRoads: infrastructureData.totalRoads || 0,
+      totalFacilities: infrastructureData.totalFacilities || 0,
+      roadConditions: infrastructureData.roadsCondition || [],
+      facilityConditions: infrastructureData.facilitiesCondition || []
     }
   };
 };
