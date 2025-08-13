@@ -13,7 +13,9 @@ import { KeepAliveProvider } from './components/KeepAliveProvider';
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
 const RegisterPage = lazy(() => import('./pages/RegisterPage').then(module => ({ default: module.RegisterPage })));
-const DashboardPage = lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
+const OverviewDashboardPage = lazy(() => import('./pages/OverviewDashboardPage').then(module => ({ default: module.OverviewDashboardPage })));
+const FinancialDashboardPage = lazy(() => import('./pages/FinancialDashboardPage').then(module => ({ default: module.FinancialDashboardPage })));
+const EcologicalDashboardPage = lazy(() => import('./pages/EcologicalDashboardPage').then(module => ({ default: module.EcologicalDashboardPage })));
 const MapPage = lazy(() => import('./pages/MapPage').then(module => ({ default: module.MapPage })));
 const ExportPage = lazy(() => import('./pages/ExportPage').then(module => ({ default: module.ExportPage })));
 const TreeDetailPage = lazy(() => import('./pages/TreeDetailPage').then(module => ({ default: module.TreeDetailPage })));
@@ -45,7 +47,23 @@ export const App = () => {
                     path="/dashboard" 
                     element={
                       <ProtectedRoute>
-                        <main id="main-content" tabIndex="-1"><DashboardPage /></main>
+                        <main id="main-content" tabIndex="-1"><OverviewDashboardPage /></main>
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/financial" 
+                    element={
+                      <ProtectedRoute>
+                        <main id="main-content" tabIndex="-1"><FinancialDashboardPage /></main>
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/ecological" 
+                    element={
+                      <ProtectedRoute>
+                        <main id="main-content" tabIndex="-1"><EcologicalDashboardPage /></main>
                       </ProtectedRoute>
                     } 
                   />

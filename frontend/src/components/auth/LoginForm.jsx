@@ -77,12 +77,7 @@ export const LoginForm = ({ onSubmit, isSubmitting, errors: externalErrors }) =>
         />
       </FormField>
 
-      <FormField
-        label="Password"
-        id="password"
-        error={combinedErrors.password}
-        required
-      >
+      <FormField>
         <PasswordInput
           id="password"
           name="password"
@@ -91,6 +86,7 @@ export const LoginForm = ({ onSubmit, isSubmitting, errors: externalErrors }) =>
           onBlur={handleBlur}
           error={combinedErrors.password}
           placeholder="Enter your password"
+          required
           disabled={isSubmitting}
         />
       </FormField>
