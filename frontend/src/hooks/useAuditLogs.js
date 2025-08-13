@@ -1,100 +1,70 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AUDIT_LOG_PAGINATION_SIZE } from '@constants/auditLogConstants';
-
-const mockAuditLogs = [
-  {
-    id: 1,
-    timestamp: '2024-01-15T10:30:00Z',
-    user: 'admin@nanwa.com',
-    action: 'CREATE',
-    resource: 'Tree',
-    resourceId: 'tree_001',
-    details: 'Created new tree record for Forest A',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-  },
-  {
-    id: 2,
-    timestamp: '2024-01-15T10:25:00Z',
-    user: 'user@nanwa.com',
-    action: 'UPDATE',
-    resource: 'Tree',
-    resourceId: 'tree_002',
-    details: 'Updated height measurement from 2.3m to 2.4m',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-  },
-  {
-    id: 3,
-    timestamp: '2024-01-15T10:20:00Z',
-    user: 'admin@nanwa.com',
-    action: 'DELETE',
-    resource: 'Forest',
-    resourceId: 'forest_003',
-    details: 'Deleted forest record due to data cleanup',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-  },
-  {
-    id: 4,
-    timestamp: '2024-01-15T10:15:00Z',
-    user: 'user@nanwa.com',
-    action: 'LOGIN',
-    resource: 'Authentication',
-    resourceId: 'auth_session_001',
-    details: 'User logged in successfully',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-  },
-  {
-    id: 5,
-    timestamp: '2024-01-15T10:10:00Z',
-    user: 'admin@nanwa.com',
-    action: 'UPDATE',
-    resource: 'User',
-    resourceId: 'user_001',
-    details: 'Updated user permissions to admin level',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-  },
-  {
-    id: 6,
-    timestamp: '2024-01-15T10:05:00Z',
-    user: 'system',
-    action: 'CREATE',
-    resource: 'Measurement',
-    resourceId: 'measurement_001',
-    details: 'Automated measurement recorded for tree batch',
-    ipAddress: '127.0.0.1',
-    userAgent: 'System/1.0'
-  },
-  {
-    id: 7,
-    timestamp: '2024-01-15T10:00:00Z',
-    user: 'user@nanwa.com',
-    action: 'LOGOUT',
-    resource: 'Authentication',
-    resourceId: 'auth_session_002',
-    details: 'User logged out',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-  }
-];
+import { auditAPI } from '@/lib/api';
 
 export const useAuditLogs = () => {
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchAuditLogs = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setAuditLogs(mockAuditLogs);
-    } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      const response = await auditAPI.getLogs({
+        page: 1,
+        limit: 100,
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      });
+      
+      if (response.success) {
+        // Transform the API response to match the expected format
+        const transformedLogs = (response.data.logs || []).map(log => ({
+          id: log._id,
+          timestamp: log.timestamp,
+          user: log.userEmail || 'Unknown',
+          action: log.action,
+          resource: log.resource,
+          resourceId: log.resourceId || '',
+          details: generateLogDetails(log),
+          ipAddress: log.metadata?.ipAddress || '',
+          userAgent: log.metadata?.userAgent || ''
+        }));
+        
+        setAuditLogs(transformedLogs);
+      } else {
+        throw new Error(response.message || 'Failed to fetch audit logs');
+      }
+    } catch (err) {
+      console.error('Failed to fetch audit logs:', err);
+      setError(err.message);
+      // Keep empty array on error
+      setAuditLogs([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateLogDetails = (log) => {
+    // Generate human-readable details based on the log data
+    const action = log.action.toLowerCase();
+    const resource = log.resource.toLowerCase();
+    
+    switch (action) {
+      case 'create':
+        return `Created new ${resource} record`;
+      case 'update':
+        return `Updated ${resource} record`;
+      case 'delete':
+        return `Deleted ${resource} record`;
+      case 'login':
+        return 'User logged in successfully';
+      case 'logout':
+        return 'User logged out';
+      default:
+        return `Performed ${action} action on ${resource}`;
     }
   };
 
@@ -102,7 +72,7 @@ export const useAuditLogs = () => {
     fetchAuditLogs();
   }, []);
 
-  return { auditLogs, loading, refetchAuditLogs: fetchAuditLogs };
+  return { auditLogs, loading, error, refetchAuditLogs: fetchAuditLogs };
 };
 
 export const useAuditLogFilters = (auditLogs) => {

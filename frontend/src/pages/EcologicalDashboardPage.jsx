@@ -89,7 +89,7 @@ export const EcologicalDashboardPage = () => {
                       </li>
                     </ol>
                   </nav>
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">🌿 Ecological Dashboard</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Ecological Dashboard</h2>
                   <p className="text-gray-600 dark:text-gray-300">
                     Environmental impact, biodiversity tracking, and conservation metrics for sustainable forest management.
                   </p>
@@ -126,7 +126,7 @@ export const EcologicalDashboardPage = () => {
               <>
                 {/* Forest Health Metrics */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌲 Forest Health Metrics</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Health Metrics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <EnhancedStatCard
                       icon={
@@ -177,7 +177,7 @@ export const EcologicalDashboardPage = () => {
 
                 {/* Soil & Environment */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌱 Soil & Environment</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Soil & Environment</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <EnhancedStatCard
                       icon={
@@ -208,7 +208,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Biodiversity Analysis */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🦋 Biodiversity Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Biodiversity Analysis</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <BiodiversityTrendsChart filters={filters} chartType="line" />
@@ -224,7 +224,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Ecological Impact */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌍 Ecological Impact</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ecological Impact</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <EcologicalBenefitsChart filters={filters} chartType="radar" />
@@ -240,7 +240,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Forest Health & Risk */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">⚕️ Forest Health & Risk</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Health & Risk</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <HealthStatusDistributionChart filters={filters} chartType="bar" />
@@ -259,7 +259,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Growth & Conservation */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌱 Growth & Conservation Performance</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Growth & Conservation Performance</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1 lg:col-span-2">
                   <GrowthPerformancePredictionsChart filters={filters} chartType="line" />
@@ -272,7 +272,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Conservation Impact Summary */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Conservation Impact Summary</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Conservation Impact Summary</h3>
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
@@ -305,7 +305,7 @@ export const EcologicalDashboardPage = () => {
 
             {/* Quick Navigation */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔗 Related Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Related Analysis</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Link to="/dashboard" className="block">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">

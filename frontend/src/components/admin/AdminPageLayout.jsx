@@ -1,8 +1,9 @@
 import styled from 'styled-components';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
 const AdminContainer = styled.div`
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: ${props => props.$isDarkMode ? '#111827' : '#f9fafb'};
 `;
 
 const MainContent = styled.main`
@@ -18,29 +19,33 @@ const PageHeader = styled.div`
 const PageTitle = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
-  color: #111827;
+  color: ${props => props.$isDarkMode ? '#f9fafb' : '#111827'};
   margin: 0 0 1rem 0;
 `;
 
 const PageDescription = styled.p`
-  color: #6b7280;
+  color: ${props => props.$isDarkMode ? '#9ca3af' : '#6b7280'};
   font-size: 1.125rem;
   margin: 0;
 `;
 
 export const AdminPageLayout = ({ children }) => {
+  const { isDarkMode } = useDarkMode();
+  
   return (
-    <AdminContainer>
+    <AdminContainer $isDarkMode={isDarkMode}>
       {children}
     </AdminContainer>
   );
 };
 
 export const AdminPageHeader = ({ title, description }) => {
+  const { isDarkMode } = useDarkMode();
+  
   return (
     <PageHeader>
-      <PageTitle>{title}</PageTitle>
-      <PageDescription>{description}</PageDescription>
+      <PageTitle $isDarkMode={isDarkMode}>{title}</PageTitle>
+      <PageDescription $isDarkMode={isDarkMode}>{description}</PageDescription>
     </PageHeader>
   );
 };

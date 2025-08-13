@@ -107,7 +107,7 @@ export const FinancialDashboardPage = () => {
                       </li>
                     </ol>
                   </nav>
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">💰 Financial Dashboard</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Financial Dashboard</h2>
                   <p className="text-gray-600 dark:text-gray-300">
                     Investment performance, revenue analysis, and financial risk assessment for your forest portfolio.
                   </p>
@@ -144,7 +144,7 @@ export const FinancialDashboardPage = () => {
               <>
                 {/* Investment Metrics */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Investment Performance</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investment Performance</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <EnhancedStatCard
                       icon={
@@ -195,7 +195,7 @@ export const FinancialDashboardPage = () => {
 
                 {/* Maintenance Budget */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💼 Budget & Costs</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Budget & Costs</h3>
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                     <EnhancedStatCard
                       icon={
@@ -215,7 +215,7 @@ export const FinancialDashboardPage = () => {
 
             {/* Revenue Analysis */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💸 Revenue Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue Analysis</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <CarbonCreditRevenueChart filters={filters} chartType="line" />
@@ -234,7 +234,7 @@ export const FinancialDashboardPage = () => {
 
             {/* Cost Management */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 Cost Management</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Cost Management</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <MaintenanceCostAnalysisChart filters={filters} chartType="composed" />
@@ -247,7 +247,7 @@ export const FinancialDashboardPage = () => {
 
             {/* Growth & Returns */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Growth & Returns</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Growth & Returns</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <ForestValueAppreciationChart filters={filters} />
@@ -263,7 +263,7 @@ export const FinancialDashboardPage = () => {
 
             {/* Risk Assessment */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">⚠️ Financial Risk Assessment</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial Risk Assessment</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
                   <HealthStatusDistributionChart filters={filters} chartType="bar" />
@@ -282,7 +282,7 @@ export const FinancialDashboardPage = () => {
 
             {/* Quick Navigation */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔗 Related Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Related Analysis</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Link to="/dashboard" className="block">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">

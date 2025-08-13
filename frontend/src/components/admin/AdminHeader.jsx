@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDarkMode } from '../../contexts/DarkModeContext';
+import { DarkModeToggle } from '../ui/DarkModeToggle';
 
 const Header = styled.header`
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: ${props => props.$isDarkMode ? '#1f2937' : 'white'};
+  border-bottom: 1px solid ${props => props.$isDarkMode ? '#374151' : '#e5e7eb'};
   padding: 1rem 0;
 `;
 
@@ -51,11 +53,11 @@ const UserInfo = styled.div`
 
 const WelcomeText = styled.span`
   font-size: 0.875rem;
-  color: #374151;
+  color: ${props => props.$isDarkMode ? '#d1d5db' : '#374151'};
 `;
 
 const LogoutButton = styled.button`
-  color: #374151;
+  color: ${props => props.$isDarkMode ? '#d1d5db' : '#374151'};
   background: none;
   border: none;
   padding: 0.5rem;
@@ -82,13 +84,14 @@ const LogoutIcon = () => (
 
 export const AdminHeader = () => {
   const { user, logout } = useAuth();
+  const { isDarkMode } = useDarkMode();
 
   const handleLogout = async () => {
     await logout();
   };
 
   return (
-    <Header>
+    <Header $isDarkMode={isDarkMode}>
       <HeaderContent>
         <BackLink href="/dashboard">
           <BackIcon />
@@ -97,10 +100,11 @@ export const AdminHeader = () => {
         
         <UserInfo>
           <AdminBadge>Admin Panel</AdminBadge>
-          <WelcomeText>
+          <DarkModeToggle />
+          <WelcomeText $isDarkMode={isDarkMode}>
             Welcome, <strong>{user?.name}</strong>
           </WelcomeText>
-          <LogoutButton onClick={handleLogout} aria-label="Logout">
+          <LogoutButton onClick={handleLogout} aria-label="Logout" $isDarkMode={isDarkMode}>
             <LogoutIcon />
           </LogoutButton>
         </UserInfo>

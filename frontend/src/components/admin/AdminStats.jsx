@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import { StatCard } from './StatCard';
+import { useAdminStats } from '../../hooks/useAdminStats';
+import LoadingSpinner from '@components/ui/LoadingSpinner';
 
 const StatsGrid = styled.div`
   display: grid;
@@ -33,29 +35,38 @@ const ActivityIcon = () => (
 );
 
 export const AdminStats = () => {
-  // TODO: Consider moving this stats data to Zustand store for better state management
+  const { stats, loading, error } = useAdminStats();
+
+  if (loading) {
+    return <LoadingSpinner text="Loading statistics..." />;
+  }
+
+  if (error) {
+    console.error('Admin stats error:', error);
+  }
+
   const statsData = [
     {
       icon: <UsersIcon />,
-      value: '42',
-      label: 'Active Users',
+      value: stats.activeUsers.toString(),
+      label: 'Active Users Today',
       type: 'users'
     },
     {
       icon: <ActionsIcon />,
-      value: '1,247',
+      value: stats.totalActions.toLocaleString(),
       label: 'Total Actions Today',
       type: 'actions'
     },
     {
       icon: <ErrorsIcon />,
-      value: '3',
+      value: stats.failedActions.toString(),
       label: 'Failed Actions',
       type: 'errors'
     },
     {
       icon: <ActivityIcon />,
-      value: '98.5%',
+      value: `${stats.systemUptime}%`,
       label: 'System Uptime',
       type: 'activity'
     }

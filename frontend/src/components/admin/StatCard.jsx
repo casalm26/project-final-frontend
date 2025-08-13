@@ -1,23 +1,24 @@
 import styled from 'styled-components';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
 const StatCardContainer = styled.div`
-  background: white;
+  background: ${props => props.$isDarkMode ? '#1f2937' : 'white'};
   padding: 1.5rem;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid ${props => props.$isDarkMode ? '#374151' : '#e5e7eb'};
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, ${props => props.$isDarkMode ? '0.3' : '0.1'});
 `;
 
 const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: ${props => props.$isDarkMode ? '#f9fafb' : '#111827'};
   margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: ${props => props.$isDarkMode ? '#9ca3af' : '#6b7280'};
   font-weight: 500;
 `;
 
@@ -47,13 +48,15 @@ const StatIcon = styled.div`
 `;
 
 export const StatCard = ({ icon, value, label, type }) => {
+  const { isDarkMode } = useDarkMode();
+  
   return (
-    <StatCardContainer>
+    <StatCardContainer $isDarkMode={isDarkMode}>
       <StatIcon type={type}>
         {icon}
       </StatIcon>
-      <StatValue>{value}</StatValue>
-      <StatLabel>{label}</StatLabel>
+      <StatValue $isDarkMode={isDarkMode}>{value}</StatValue>
+      <StatLabel $isDarkMode={isDarkMode}>{label}</StatLabel>
     </StatCardContainer>
   );
 };
