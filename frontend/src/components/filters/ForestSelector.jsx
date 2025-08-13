@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { forestAPI } from '../../lib/api';
 
 const FilterContainer = styled.div`
   background: white;
@@ -124,22 +125,47 @@ const ResetButton = styled.button`
   }
 `;
 
-// Default forests array moved outside component to make it stable
-const DEFAULT_FORESTS = [
-  { id: 1, name: 'Forest A', region: 'North Region', treeCount: 2500, area: '150 ha' },
-  { id: 2, name: 'Forest B', region: 'South Region', treeCount: 3200, area: '200 ha' },
-  { id: 3, name: 'Forest C', region: 'East Region', treeCount: 1800, area: '120 ha' },
-  { id: 4, name: 'Forest D', region: 'West Region', treeCount: 2750, area: '180 ha' },
-  { id: 5, name: 'Forest E', region: 'Central Region', treeCount: 4100, area: '250 ha' }
-];
-
 export const ForestSelector = ({ 
   selectedForests = [],
-  onChange,
-  forests = DEFAULT_FORESTS
+  onChange
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredForests, setFilteredForests] = useState(forests);
+  const [forests, setForests] = useState([]);
+  const [filteredForests, setFilteredForests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch forests from API on component mount
+  useEffect(() => {
+    const fetchForests = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await forestAPI.getAll();
+        
+        // Transform the forest data to match our component's expectations
+        const transformedForests = response.data.forests.map(forest => ({
+          id: forest.id,
+          name: forest.name,
+          region: forest.region,
+          treeCount: forest.treeCount || 0,
+          area: `${Math.round(forest.area)} ha`,
+          areaNumeric: forest.area, // Store numeric value for sorting if needed
+          isActive: forest.isActive
+        })).filter(forest => forest.isActive); // Only show active forests
+        
+        setForests(transformedForests);
+      } catch (err) {
+        console.error('Error fetching forests:', err);
+        setError('Failed to load forests');
+        setForests([]); // Fallback to empty array
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchForests();
+  }, []);
 
   // Filter forests based on search term
   useEffect(() => {
@@ -188,50 +214,68 @@ export const ForestSelector = ({
         </ResetButton>
       </FilterHeader>
       
-      <SearchInput
-        type="text"
-        placeholder="Search forests by name or region..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      
-      <div className="flex gap-2 mb-3">
-        <button
-          onClick={handleSelectAll}
-          className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded border border-green-200 hover:bg-green-200 transition-colors"
-        >
-          Select All
-        </button>
-        <button
-          onClick={handleSelectNone}
-          className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded border border-gray-200 hover:bg-gray-200 transition-colors"
-        >
-          Select None
-        </button>
-      </div>
-      
-      <ForestList>
-        {filteredForests.map(forest => (
-          <ForestItem key={forest.id}>
-            <Checkbox
-              type="checkbox"
-              checked={selectedForests.includes(forest.id)}
-              onChange={() => handleForestToggle(forest.id)}
-            />
-            <ForestInfo>
-              <ForestName>{forest.name}</ForestName>
-              <ForestDetails>
-                {forest.region} • {forest.treeCount} trees • {forest.area}
-              </ForestDetails>
-            </ForestInfo>
-          </ForestItem>
-        ))}
-        {filteredForests.length === 0 && (
-          <div className="p-4 text-center text-gray-500 text-sm">
-            No forests found matching your search.
+      {loading ? (
+        <div className="p-4 text-center">
+          <div className="text-sm text-gray-500">Loading forests...</div>
+        </div>
+      ) : error ? (
+        <div className="p-4 text-center">
+          <div className="text-sm text-red-600">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <>
+          <SearchInput
+            type="text"
+            placeholder="Search forests by name or region..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          
+          <div className="flex gap-2 mb-3">
+            <button
+              onClick={handleSelectAll}
+              className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded border border-green-200 hover:bg-green-200 transition-colors"
+            >
+              Select All
+            </button>
+            <button
+              onClick={handleSelectNone}
+              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded border border-gray-200 hover:bg-gray-200 transition-colors"
+            >
+              Select None
+            </button>
           </div>
-        )}
-      </ForestList>
+          
+          <ForestList>
+            {filteredForests.map(forest => (
+              <ForestItem key={forest.id}>
+                <Checkbox
+                  type="checkbox"
+                  checked={selectedForests.includes(forest.id)}
+                  onChange={() => handleForestToggle(forest.id)}
+                />
+                <ForestInfo>
+                  <ForestName>{forest.name}</ForestName>
+                  <ForestDetails>
+                    {forest.region} • {forest.treeCount} trees • {forest.area}
+                  </ForestDetails>
+                </ForestInfo>
+              </ForestItem>
+            ))}
+            {filteredForests.length === 0 && !loading && (
+              <div className="p-4 text-center text-gray-500 text-sm">
+                {forests.length === 0 ? 'No forests available.' : 'No forests found matching your search.'}
+              </div>
+            )}
+          </ForestList>
+        </>
+      )}
       
       <SelectedCount>
         {selectedForests.length} of {forests.length} forests selected

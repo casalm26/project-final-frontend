@@ -113,12 +113,6 @@ export const FinancialDashboardPage = () => {
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <Link 
-                    to="/dashboard/ecological"
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-                  >
-                    View Ecological Dashboard
-                  </Link>
                   <ExportButtonComponent
                     onExportStart={handleExportStart}
                     onExportComplete={handleExportComplete}

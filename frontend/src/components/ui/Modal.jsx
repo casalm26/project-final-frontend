@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -16,7 +17,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: ${props => props.$isDarkMode ? '#1f2937' : 'white'};
   border-radius: 0.75rem;
   max-width: 800px;
   width: 100%;
@@ -32,15 +33,15 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid ${props => props.$isDarkMode ? '#374151' : '#e5e7eb'};
+  background: ${props => props.$isDarkMode ? '#111827' : '#f9fafb'};
   border-radius: 0.75rem 0.75rem 0 0;
 `;
 
 const ModalTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: ${props => props.$isDarkMode ? '#f9fafb' : '#111827'};
   margin: 0;
 `;
 
@@ -50,12 +51,12 @@ const CloseButton = styled.button`
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  color: #6b7280;
+  color: ${props => props.$isDarkMode ? '#9ca3af' : '#6b7280'};
   transition: all 0.2s;
   
   &:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: ${props => props.$isDarkMode ? '#374151' : '#f3f4f6'};
+    color: ${props => props.$isDarkMode ? '#f9fafb' : '#111827'};
   }
   
   &:focus-visible {
@@ -75,6 +76,8 @@ const CloseIcon = () => (
 );
 
 export const Modal = ({ isOpen, onClose, title, children, containerRef }) => {
+  const { isDarkMode } = useDarkMode();
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -85,10 +88,10 @@ export const Modal = ({ isOpen, onClose, title, children, containerRef }) => {
 
   return (
     <ModalOverlay onClick={handleOverlayClick} role="presentation">
-      <ModalContent ref={containerRef} role="dialog" aria-modal="true" aria-labelledby="modal-title" tabIndex="-1">
-        <ModalHeader>
-          <ModalTitle id="modal-title">{title}</ModalTitle>
-          <CloseButton onClick={onClose} aria-label="Close modal" type="button">
+      <ModalContent ref={containerRef} role="dialog" aria-modal="true" aria-labelledby="modal-title" tabIndex="-1" $isDarkMode={isDarkMode}>
+        <ModalHeader $isDarkMode={isDarkMode}>
+          <ModalTitle id="modal-title" $isDarkMode={isDarkMode}>{title}</ModalTitle>
+          <CloseButton onClick={onClose} aria-label="Close modal" type="button" $isDarkMode={isDarkMode}>
             <CloseIcon />
           </CloseButton>
         </ModalHeader>

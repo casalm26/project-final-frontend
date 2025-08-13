@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
 const Gallery = styled.div`
   display: grid;
@@ -8,22 +9,22 @@ const Gallery = styled.div`
 `;
 
 const ImageCard = styled.div`
-  background: #f9fafb;
+  background: ${props => props.$isDarkMode ? '#374151' : '#f9fafb'};
   border-radius: 0.5rem;
   padding: 1rem;
   text-align: center;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${props => props.$isDarkMode ? '#4b5563' : '#e5e7eb'};
 `;
 
 const ImagePlaceholder = styled.div`
   width: 100%;
   height: 100px;
-  background: #e5e7eb;
+  background: ${props => props.$isDarkMode ? '#4b5563' : '#e5e7eb'};
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: ${props => props.$isDarkMode ? '#9ca3af' : '#6b7280'};
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
 `;
@@ -34,14 +35,18 @@ const ImageIcon = () => (
   </svg>
 );
 
-const ImageCardItem = ({ caption }) => (
-  <ImageCard>
-    <ImagePlaceholder role="img" aria-label={`${caption} placeholder image`}>
-      <ImageIcon />
-    </ImagePlaceholder>
-    <div className="text-xs text-gray-600">{caption}</div>
-  </ImageCard>
-);
+const ImageCardItem = ({ caption }) => {
+  const { isDarkMode } = useDarkMode();
+  
+  return (
+    <ImageCard $isDarkMode={isDarkMode}>
+      <ImagePlaceholder $isDarkMode={isDarkMode} role="img" aria-label={`${caption} placeholder image`}>
+        <ImageIcon />
+      </ImagePlaceholder>
+      <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#9ca3af' : '#6b7280' }}>{caption}</div>
+    </ImageCard>
+  );
+};
 
 export const ImageGallery = () => (
   <Gallery>

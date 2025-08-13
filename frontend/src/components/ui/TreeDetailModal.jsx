@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 import { useTreeMeasurements } from '../../hooks/useTreeMeasurements';
 import { useTreeShare } from '../../hooks/useTreeShare';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 import { Modal } from './Modal';
 import { TreeBasicInfo } from './TreeBasicInfo';
 import { TreeLocationInfo } from './TreeLocationInfo';
@@ -27,7 +28,7 @@ const Section = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: ${props => props.$isDarkMode ? '#f9fafb' : '#111827'};
   margin: 0 0 1rem 0;
 `;
 
@@ -39,6 +40,7 @@ export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
     autoFocus: true,
   });
 
+  const { isDarkMode } = useDarkMode();
   const measurementHistory = useTreeMeasurements(tree, isOpen);
   const handleShare = useTreeShare(tree);
 
@@ -59,7 +61,7 @@ export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
       <TreeMeasurementHistory measurementHistory={measurementHistory} />
 
       <Section>
-        <SectionTitle>Tree Images</SectionTitle>
+        <SectionTitle $isDarkMode={isDarkMode}>Tree Images</SectionTitle>
         <ImageGallery />
       </Section>
 

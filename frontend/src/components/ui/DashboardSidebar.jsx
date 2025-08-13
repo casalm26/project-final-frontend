@@ -54,7 +54,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
                   <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
-                  💰 Financial
+                  Financial
                 </Link>
                 <Link
                   to="/dashboard/ecological"
@@ -68,7 +68,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
                   <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
-                  🌿 Ecological
+                  Ecological
                 </Link>
               </div>
             </div>
