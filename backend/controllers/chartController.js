@@ -223,7 +223,7 @@ export const getCO2AbsorptionChart = async (req, res) => {
       forestId,
       startDate,
       endDate,
-      groupBy = 'month',
+      groupBy = 'year',
       species
     } = req.query;
 
