@@ -27,42 +27,202 @@ export const buildExportTreeQuery = (queryParams) => {
 /**
  * Transform tree data into export row format
  * @param {Object} tree - Tree document from database
- * @param {Object} options - Export options
- * @param {boolean} options.includeHealthStatus - Include health status data
+ * @param {Object} options - Export options with field selections
  * @returns {Object} Formatted tree row data
  */
 export const transformTreeToExportRow = (tree, options = {}) => {
-  const { includeHealthStatus } = options;
+  const row = {};
   
-  const baseRow = {
-    'Tree ID': tree.treeId,
-    'Forest Name': tree.forestId?.name || 'Unknown',
-    'Region': tree.forestId?.region || 'Unknown',
-    'Species': tree.species,
-    'Planted Date': tree.plantedDate.toISOString().split('T')[0],
-    'Is Alive': tree.isAlive ? 'Yes' : 'No',
-    'Longitude': tree.location.coordinates[0],
-    'Latitude': tree.location.coordinates[1],
-    'Age (Days)': Math.floor((new Date() - tree.plantedDate) / (1000 * 60 * 60 * 24))
-  };
-
-  // Add death information for dead trees
-  if (!tree.isAlive) {
-    baseRow['Death Date'] = tree.deathDate ? tree.deathDate.toISOString().split('T')[0] : '';
-    baseRow['Death Cause'] = tree.deathCause || '';
-  }
-
-  // Add health status information if requested and available
-  if (includeHealthStatus === 'true' && tree.measurements.length > 0) {
-    const latestMeasurement = tree.measurements
-      .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+  // Basic Information - always included
+  if (options.basicInfo !== 'false') {
+    row['Tree ID'] = tree.treeId;
+    row['Forest Name'] = tree.forestId?.name || 'Unknown';
+    row['Region'] = tree.forestId?.region || 'Unknown';
+    row['Species'] = tree.species;
+    row['Planted Date'] = tree.plantedDate ? new Date(tree.plantedDate).toISOString().split('T')[0] : '';
+    row['Is Alive'] = tree.isAlive ? 'Yes' : 'No';
+    row['Age (Days)'] = tree.plantedDate ? Math.floor((new Date() - new Date(tree.plantedDate)) / (1000 * 60 * 60 * 24)) : 0;
     
-    baseRow['Current Height (m)'] = latestMeasurement.height || '';
-    baseRow['Current Health Status'] = latestMeasurement.healthStatus || '';
-    baseRow['Latest Measurement Date'] = latestMeasurement.measuredAt.toISOString().split('T')[0];
+    if (!tree.isAlive) {
+      row['Death Date'] = tree.deathDate ? new Date(tree.deathDate).toISOString().split('T')[0] : '';
+      row['Death Cause'] = tree.deathCause || '';
+    }
   }
-
-  return baseRow;
+  
+  // Location
+  if (options.location === 'true') {
+    row['Longitude'] = tree.location?.coordinates?.[0] || '';
+    row['Latitude'] = tree.location?.coordinates?.[1] || '';
+  }
+  
+  // Health Status & Latest Measurements
+  if (options.health === 'true' || options.measurements === 'true') {
+    if (tree.measurements && tree.measurements.length > 0) {
+      const latestMeasurement = tree.measurements
+        .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+      
+      if (options.health === 'true') {
+        row['Current Health Status'] = latestMeasurement.healthStatus || '';
+      }
+      
+      if (options.measurements === 'true') {
+        row['Current Height (m)'] = latestMeasurement.height || '';
+        row['Current Diameter (cm)'] = latestMeasurement.diameter || '';
+        row['Current CO2 Absorption (kg)'] = latestMeasurement.co2Absorption || '';
+        row['Latest Measurement Date'] = latestMeasurement.measuredAt ? new Date(latestMeasurement.measuredAt).toISOString().split('T')[0] : '';
+        row['Measurement Notes'] = latestMeasurement.notes || '';
+      }
+    }
+  }
+  
+  // Images
+  if (options.images === 'true' && tree.images && tree.images.length > 0) {
+    row['Image URLs'] = tree.images.map(img => img.url).join('; ');
+    row['Image Count'] = tree.images.length;
+  }
+  
+  // Genetics
+  if (options.genetics === 'true' && tree.genetics) {
+    row['Seed Source'] = tree.genetics.seedSource || '';
+    row['Cultivar'] = tree.genetics.cultivar || '';
+    row['Parent Tree ID'] = tree.genetics.parentTreeId || '';
+    row['Genetic Diversity'] = tree.genetics.geneticDiversity || '';
+    row['Provenance Region'] = tree.genetics.provenanceRegion || '';
+  }
+  
+  // Growth Model
+  if (options.growthModel === 'true' && tree.growthModel) {
+    row['Expected Height at 15 Years (m)'] = tree.growthModel.expectedHeightAt15Years || '';
+    row['Expected Diameter at 15 Years (cm)'] = tree.growthModel.expectedDiameterAt15Years || '';
+    row['Growth Rate'] = tree.growthModel.growthRate || '';
+    row['Site Index'] = tree.growthModel.siteIndex || '';
+    row['Maturity Age (years)'] = tree.growthModel.maturityAge || '';
+    row['Max Height (m)'] = tree.growthModel.maxHeight || '';
+    row['Max Diameter (cm)'] = tree.growthModel.maxDiameter || '';
+  }
+  
+  // Economic Value
+  if (options.economicValue === 'true' && tree.economicValue) {
+    row['Current Timber Value'] = tree.economicValue.currentTimberValue || '';
+    row['Carbon Credit Value'] = tree.economicValue.carbonCreditValue || '';
+    row['Last Valuation Date'] = tree.economicValue.lastValuation ? new Date(tree.economicValue.lastValuation).toISOString().split('T')[0] : '';
+    row['Valuation Method'] = tree.economicValue.valuationMethod || '';
+    row['Market Price per m³'] = tree.economicValue.marketPricePerCubicMeter || '';
+  }
+  
+  // Canopy
+  if (options.canopy === 'true' && tree.canopy) {
+    row['Canopy Diameter (m)'] = tree.canopy.diameter || '';
+    row['Canopy Area (m²)'] = tree.canopy.area || '';
+    row['Canopy Density'] = tree.canopy.density || '';
+    row['Canopy Condition'] = tree.canopy.condition || '';
+    row['Leaf Area Index'] = tree.canopy.leafArea || '';
+    if (tree.canopy.seasonalChanges) {
+      row['Spring Bud Break'] = tree.canopy.seasonalChanges.springBudBreak ? new Date(tree.canopy.seasonalChanges.springBudBreak).toISOString().split('T')[0] : '';
+      row['Fall Color Change'] = tree.canopy.seasonalChanges.fallColorChange ? new Date(tree.canopy.seasonalChanges.fallColorChange).toISOString().split('T')[0] : '';
+      row['Leaf Drop'] = tree.canopy.seasonalChanges.leafDrop ? new Date(tree.canopy.seasonalChanges.leafDrop).toISOString().split('T')[0] : '';
+    }
+  }
+  
+  // Ecological Benefits
+  if (options.ecologicalBenefits === 'true' && tree.ecologicalBenefits) {
+    // Stormwater
+    if (tree.ecologicalBenefits.stormwaterIntercepted) {
+      row['Stormwater Intercepted (gallons)'] = tree.ecologicalBenefits.stormwaterIntercepted.gallons || '';
+      row['Stormwater Value'] = tree.ecologicalBenefits.stormwaterIntercepted.value || '';
+    }
+    // CO2
+    if (tree.ecologicalBenefits.co2Sequestered) {
+      row['CO2 Sequestered (lbs)'] = tree.ecologicalBenefits.co2Sequestered.pounds || '';
+      row['CO2 Sequestered Value'] = tree.ecologicalBenefits.co2Sequestered.value || '';
+    }
+    if (tree.ecologicalBenefits.co2Stored) {
+      row['CO2 Stored (lbs)'] = tree.ecologicalBenefits.co2Stored.pounds || '';
+      row['CO2 Stored Value'] = tree.ecologicalBenefits.co2Stored.value || '';
+    }
+    // Air quality
+    if (tree.ecologicalBenefits.airPollutantsRemoved) {
+      row['Air Pollutants Removed (lbs)'] = tree.ecologicalBenefits.airPollutantsRemoved.pounds || '';
+      row['Air Pollutants Value'] = tree.ecologicalBenefits.airPollutantsRemoved.value || '';
+    }
+    // Soil
+    if (tree.ecologicalBenefits.soilStabilization) {
+      row['Root Area (m²)'] = tree.ecologicalBenefits.soilStabilization.rootArea || '';
+      row['Erosion Prevention (tons/year)'] = tree.ecologicalBenefits.soilStabilization.erosionPrevention || '';
+    }
+    // Wildlife
+    if (tree.ecologicalBenefits.wildlifeHabitat) {
+      row['Nesting Sites'] = tree.ecologicalBenefits.wildlifeHabitat.nestingSites || '';
+      row['Food Production (kg/year)'] = tree.ecologicalBenefits.wildlifeHabitat.foodProduction || '';
+      row['Biodiversity Support'] = tree.ecologicalBenefits.wildlifeHabitat.biodiversitySupport || '';
+    }
+  }
+  
+  // Environmental Factors
+  if (options.environmentalFactors === 'true' && tree.environmentalFactors) {
+    if (tree.environmentalFactors.microclimate) {
+      row['Avg Temperature'] = tree.environmentalFactors.microclimate.avgTemperature || '';
+      row['Humidity'] = tree.environmentalFactors.microclimate.humidity || '';
+      row['Wind Exposure'] = tree.environmentalFactors.microclimate.windExposure || '';
+    }
+    if (tree.environmentalFactors.siteConditions) {
+      row['Slope'] = tree.environmentalFactors.siteConditions.slope || '';
+      row['Aspect'] = tree.environmentalFactors.siteConditions.aspect || '';
+      row['Drainage'] = tree.environmentalFactors.siteConditions.drainage || '';
+      row['Competition Index'] = tree.environmentalFactors.siteConditions.competitionIndex || '';
+    }
+    row['Forest Position'] = tree.environmentalFactors.forestPosition || '';
+  }
+  
+  // Maintenance
+  if (options.maintenance === 'true' && tree.maintenance) {
+    // Latest fertilization
+    if (tree.maintenance.fertilization && tree.maintenance.fertilization.length > 0) {
+      const latestFert = tree.maintenance.fertilization
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      row['Last Fertilization Date'] = latestFert.date ? new Date(latestFert.date).toISOString().split('T')[0] : '';
+      row['Fertilization Type'] = latestFert.type || '';
+      row['NPK Ratio'] = latestFert.npkRatio || '';
+    }
+    // Latest pest control
+    if (tree.maintenance.pestControl && tree.maintenance.pestControl.length > 0) {
+      const latestPest = tree.maintenance.pestControl
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      row['Last Pest Control Date'] = latestPest.date ? new Date(latestPest.date).toISOString().split('T')[0] : '';
+      row['Pest Type'] = latestPest.pestType || '';
+      row['Treatment'] = latestPest.treatment || '';
+    }
+    // Latest damage report
+    if (tree.maintenance.damageReports && tree.maintenance.damageReports.length > 0) {
+      const latestDamage = tree.maintenance.damageReports
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      row['Last Damage Date'] = latestDamage.date ? new Date(latestDamage.date).toISOString().split('T')[0] : '';
+      row['Damage Type'] = latestDamage.type || '';
+      row['Damage Severity'] = latestDamage.severity || '';
+    }
+    // Pruning
+    if (tree.maintenance.pruning) {
+      row['Last Pruned'] = tree.maintenance.pruning.lastPruned ? new Date(tree.maintenance.pruning.lastPruned).toISOString().split('T')[0] : '';
+      row['Next Pruning Scheduled'] = tree.maintenance.pruning.nextScheduled ? new Date(tree.maintenance.pruning.nextScheduled).toISOString().split('T')[0] : '';
+    }
+  }
+  
+  // Metadata
+  if (options.metadata === 'true') {
+    if (tree.metadata) {
+      row['Soil Condition'] = tree.metadata.soilCondition || '';
+      row['Sunlight Exposure'] = tree.metadata.sunlightExposure || '';
+      row['Water Access'] = tree.metadata.waterAccess || '';
+      row['Seedling Source'] = tree.metadata.seedlingSource || '';
+      row['Planting Method'] = tree.metadata.plantingMethod || '';
+      row['Initial Spacing (m)'] = tree.metadata.initialSpacing || '';
+      row['Management Objective'] = tree.metadata.managementObjective || '';
+    }
+    row['Created At'] = tree.createdAt ? new Date(tree.createdAt).toISOString() : '';
+    row['Updated At'] = tree.updatedAt ? new Date(tree.updatedAt).toISOString() : '';
+  }
+  
+  return row;
 };
 
 /**
@@ -88,32 +248,18 @@ export const transformMeasurementToExportRow = (tree, measurement, measurementIn
 };
 
 /**
- * Process trees data for CSV export with measurements
+ * Process trees data for CSV export
  * @param {Array} trees - Array of tree documents
- * @param {Object} options - Processing options
- * @param {boolean} options.includeMeasurements - Include measurements data
- * @param {boolean} options.includeHealthStatus - Include health status data
+ * @param {Object} options - Processing options with field selections
  * @returns {Array} Array of formatted export rows
  */
 export const processTreesForExport = (trees, options = {}) => {
-  const { includeMeasurements, includeHealthStatus } = options;
   const exportData = [];
 
   trees.forEach(tree => {
-    const baseRow = transformTreeToExportRow(tree, { includeHealthStatus });
-
-    if (includeMeasurements === 'true') {
-      if (tree.measurements.length === 0) {
-        exportData.push(baseRow);
-      } else {
-        tree.measurements.forEach((measurement, index) => {
-          const measurementRow = transformMeasurementToExportRow(tree, measurement, index);
-          exportData.push({ ...baseRow, ...measurementRow });
-        });
-      }
-    } else {
-      exportData.push(baseRow);
-    }
+    // Transform each tree with all field options
+    const row = transformTreeToExportRow(tree, options);
+    exportData.push(row);
   });
 
   return exportData;

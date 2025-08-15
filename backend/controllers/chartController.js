@@ -216,7 +216,7 @@ export const getHeightGrowthChart = async (req, res) => {
   }
 };
 
-// Get CO2 absorption trends over time
+// Get CO2 absorption trends over time (based on planted dates for historical trends)
 export const getCO2AbsorptionChart = async (req, res) => {
   try {
     const {
@@ -232,6 +232,13 @@ export const getCO2AbsorptionChart = async (req, res) => {
     if (forestId) matchConditions.forestId = forestId;
     if (species) matchConditions.species = new RegExp(species, 'i');
 
+    // Add date range filter for planted dates (not measurement dates)
+    if (startDate || endDate) {
+      matchConditions.plantedDate = {};
+      if (startDate) matchConditions.plantedDate.$gte = new Date(startDate);
+      if (endDate) matchConditions.plantedDate.$lte = new Date(endDate);
+    }
+
     // Define grouping format
     const dateFormats = {
       day: '%Y-%m-%d',
@@ -242,12 +249,30 @@ export const getCO2AbsorptionChart = async (req, res) => {
 
     const co2Data = await Tree.aggregate([
       { $match: matchConditions },
-      { $unwind: '$measurements' },
       {
         $match: {
-          'measurements.co2Absorption': { $exists: true, $ne: null },
-          ...(startDate && { 'measurements.measuredAt': { $gte: new Date(startDate) } }),
-          ...(endDate && { 'measurements.measuredAt': { $lte: new Date(endDate) } })
+          measurements: { $exists: true, $ne: [] }
+        }
+      },
+      {
+        $addFields: {
+          // Get the latest (most recent) measurement for current CO2 absorption
+          latestMeasurement: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$measurements',
+                  cond: { $ne: ['$$this.co2Absorption', null] }
+                }
+              },
+              -1
+            ]
+          }
+        }
+      },
+      {
+        $match: {
+          'latestMeasurement.co2Absorption': { $exists: true, $ne: null, $gt: 0 }
         }
       },
       {
@@ -256,22 +281,22 @@ export const getCO2AbsorptionChart = async (req, res) => {
             period: {
               $dateToString: {
                 format: dateFormats[groupBy] || dateFormats.month,
-                date: '$measurements.measuredAt'
+                date: '$plantedDate'
               }
             }
           },
-          totalCO2: { $sum: '$measurements.co2Absorption' },
-          avgCO2: { $avg: '$measurements.co2Absorption' },
-          minCO2: { $min: '$measurements.co2Absorption' },
-          maxCO2: { $max: '$measurements.co2Absorption' },
-          measurementCount: { $sum: 1 },
-          uniqueTrees: { $addToSet: '$_id' }
+          // Current CO2 absorption from trees planted in this period
+          totalCO2: { $sum: '$latestMeasurement.co2Absorption' },
+          avgCO2: { $avg: '$latestMeasurement.co2Absorption' },
+          minCO2: { $min: '$latestMeasurement.co2Absorption' },
+          maxCO2: { $max: '$latestMeasurement.co2Absorption' },
+          treeCount: { $sum: 1 },
+          trees: { $addToSet: '$_id' }
         }
       },
       {
         $addFields: {
-          treeCount: { $size: '$uniqueTrees' },
-          avgCO2PerTree: { $divide: ['$totalCO2', { $size: '$uniqueTrees' }] }
+          avgCO2PerTree: { $divide: ['$totalCO2', '$treeCount'] }
         }
       },
       {
@@ -282,7 +307,6 @@ export const getCO2AbsorptionChart = async (req, res) => {
           minCO2: { $round: ['$minCO2', 2] },
           maxCO2: { $round: ['$maxCO2', 2] },
           avgCO2PerTree: { $round: ['$avgCO2PerTree', 2] },
-          measurementCount: 1,
           treeCount: 1,
           _id: 0
         }
@@ -290,7 +314,7 @@ export const getCO2AbsorptionChart = async (req, res) => {
       { $sort: { period: 1 } }
     ]);
 
-    // Calculate cumulative CO2 absorption
+    // Calculate cumulative CO2 absorption over time (historical buildup)
     let cumulativeCO2 = 0;
     const chartDataWithCumulative = co2Data.map(item => {
       cumulativeCO2 += item.totalCO2;
@@ -308,8 +332,8 @@ export const getCO2AbsorptionChart = async (req, res) => {
         totalDataPoints: chartDataWithCumulative.length,
         summary: {
           totalCO2Absorption: cumulativeCO2,
-          totalMeasurements: co2Data.reduce((sum, item) => sum + item.measurementCount, 0),
-          uniqueTrees: Math.max(...co2Data.map(item => item.treeCount), 0)
+          totalTrees: co2Data.reduce((sum, item) => sum + item.treeCount, 0),
+          avgCO2PerPeriod: Math.round((cumulativeCO2 / co2Data.length) * 100) / 100
         },
         filters: {
           forestId,

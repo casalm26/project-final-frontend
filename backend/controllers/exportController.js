@@ -16,10 +16,8 @@ import { handleDashboardError } from '../utils/dashboardUtils.js';
 // Export trees data to CSV
 export const exportTreesCSV = async (req, res) => {
   try {
-    const {
-      includeHealthStatus = true,
-      includeMeasurements = false
-    } = req.query;
+    // Extract all field selection parameters from query
+    const fieldOptions = { ...req.query };
 
     // Get ALL trees from database
     const trees = await Tree.find({}).lean();
@@ -48,8 +46,8 @@ export const exportTreesCSV = async (req, res) => {
       });
     }
 
-    // Process trees data for export
-    const csvData = processTreesForExport(trees, { includeHealthStatus, includeMeasurements });
+    // Process trees data for export with all field options
+    const csvData = processTreesForExport(trees, fieldOptions);
 
     // Generate CSV content
     const csvContent = generateCSVContent(csvData);
@@ -66,10 +64,8 @@ export const exportTreesCSV = async (req, res) => {
 // Export trees data to XLSX
 export const exportTreesXLSX = async (req, res) => {
   try {
-    const {
-      includeHealthStatus = true,
-      includeMeasurements = false
-    } = req.query;
+    // Extract all field selection parameters from query
+    const fieldOptions = { ...req.query };
 
     // Get ALL trees from database
     const trees = await Tree.find({}).lean();
@@ -101,15 +97,15 @@ export const exportTreesXLSX = async (req, res) => {
     // Create workbook
     const workbook = XLSX.utils.book_new();
 
-    // Prepare trees summary data using helper
-    const treesData = trees.map(tree => transformTreeToExportRow(tree, { includeHealthStatus }));
+    // Prepare trees summary data using helper with all field options
+    const treesData = trees.map(tree => transformTreeToExportRow(tree, fieldOptions));
 
     // Add trees summary sheet
     const treesWorksheet = XLSX.utils.json_to_sheet(treesData);
     XLSX.utils.book_append_sheet(workbook, treesWorksheet, 'Trees Summary');
 
     // Add measurements sheet if requested
-    if (includeMeasurements === 'true') {
+    if (fieldOptions.measurements === 'true') {
       const measurementsData = [];
       
       trees.forEach(tree => {
