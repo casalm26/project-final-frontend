@@ -10,8 +10,6 @@ export {
   chartAPI,
   exportAPI,
   uploadAPI,
-  auditAPI,
-  bulkAPI
 } from './services/index.js';
 
 // Create singleton instance for direct client access
