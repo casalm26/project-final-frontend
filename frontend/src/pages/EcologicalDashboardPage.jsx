@@ -6,14 +6,12 @@ import GrowthPerformancePredictionsChart from '../components/charts/GrowthPerfor
 import EcologicalBenefitsChart from '../components/charts/EcologicalBenefitsChart';
 import BiodiversityTrendsChart from '../components/charts/BiodiversityTrendsChart';
 import { GlobalFilters } from '../components/filters';
-import { ExportButtonComponent } from '../components/ui/ExportButton';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { EnhancedStatCard } from '../components/ui/EnhancedStatCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useDashboardStats } from '../hooks/useDashboardStats';
-import { useTreeData } from '../hooks/useTreeData';
 
 export const EcologicalDashboardPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
@@ -22,8 +20,6 @@ export const EcologicalDashboardPage = () => {
   // Fetch dashboard statistics with current filters
   const { stats, loading: statsLoading, error: statsError, refresh } = useDashboardStats(filters);
   
-  // Fetch tree data for export functionality
-  const { trees: treeData, loading: treesLoading } = useTreeData(filters);
 
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
@@ -45,17 +41,6 @@ export const EcologicalDashboardPage = () => {
     return `${num.toFixed(1)}%`;
   };
 
-  const handleExportStart = () => {
-    console.log('Export started');
-  };
-
-  const handleExportComplete = (format, recordCount) => {
-    console.log(`Export completed: ${format} with ${recordCount} records`);
-  };
-
-  const handleExportError = (error) => {
-    console.error('Export error:', error);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -93,13 +78,6 @@ export const EcologicalDashboardPage = () => {
                   <p className="text-gray-600 dark:text-gray-300">
                     Environmental impact, biodiversity tracking, and conservation metrics for sustainable forest management.
                   </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <ExportButtonComponent
-                    onExportStart={handleExportStart}
-                    onExportComplete={handleExportComplete}
-                    onExportError={handleExportError}
-                  />
                 </div>
               </div>
             </div>
@@ -292,7 +270,7 @@ export const EcologicalDashboardPage = () => {
             {/* Quick Navigation */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Related Analysis</h3>
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Link to="/dashboard" className="block">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">
                     <div className="flex items-center mb-3">

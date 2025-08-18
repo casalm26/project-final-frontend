@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { SurvivalRateChart, CO2AbsorptionChart } from '../components/charts';
 import ForestValueAppreciationChart from '../components/charts/ForestValueAppreciationChart';
 import { GlobalFilters } from '../components/filters';
-import { ExportButtonComponent } from '../components/ui/ExportButton';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { DashboardStatCard } from '../components/ui/DashboardStatCard';
@@ -11,7 +10,6 @@ import { EnhancedStatCard } from '../components/ui/EnhancedStatCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useDashboardStats } from '../hooks/useDashboardStats';
-import { useTreeData } from '../hooks/useTreeData';
 
 export const OverviewDashboardPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
@@ -20,8 +18,6 @@ export const OverviewDashboardPage = () => {
   // Fetch dashboard statistics with current filters
   const { stats, loading: statsLoading, error: statsError, refresh } = useDashboardStats(filters);
   
-  // Fetch tree data for export functionality
-  const { trees: treeData, loading: treesLoading } = useTreeData(filters);
 
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
@@ -74,17 +70,6 @@ export const OverviewDashboardPage = () => {
     return `${num.toFixed(1)}/${max}`;
   };
 
-  const handleExportStart = () => {
-    console.log('Export started');
-  };
-
-  const handleExportComplete = (format, recordCount) => {
-    console.log(`Export completed: ${format} with ${recordCount} records`);
-  };
-
-  const handleExportError = (error) => {
-    console.error('Export error:', error);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -105,13 +90,6 @@ export const OverviewDashboardPage = () => {
                   <p className="text-gray-600 dark:text-gray-300">
                     Monitor your forests with real-time insights. Navigate to specialized dashboards for detailed analysis.
                   </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <ExportButtonComponent
-                    onExportStart={handleExportStart}
-                    onExportComplete={handleExportComplete}
-                    onExportError={handleExportError}
-                  />
                 </div>
               </div>
             </div>
@@ -138,7 +116,7 @@ export const OverviewDashboardPage = () => {
               <>
                 {/* Core KPIs */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Core Metrics</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Core Metrics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <DashboardStatCard
                       icon={
@@ -186,7 +164,7 @@ export const OverviewDashboardPage = () => {
                 {/* Quick Financial Summary */}
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">💰 Financial Summary</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Financial Summary</h3>
                     <Link 
                       to="/dashboard/financial"
                       className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
@@ -223,7 +201,7 @@ export const OverviewDashboardPage = () => {
                 {/* Quick Ecological Summary */}
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">🌿 Ecological Summary</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ecological Summary</h3>
                     <Link 
                       to="/dashboard/ecological"
                       className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium text-sm"
@@ -259,7 +237,7 @@ export const OverviewDashboardPage = () => {
 
                 {/* Navigation Cards */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚀 Detailed Analysis</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detailed Analysis</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Link to="/dashboard/financial" className="block">
                       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600">
@@ -311,7 +289,7 @@ export const OverviewDashboardPage = () => {
 
             {/* Key Charts */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Key Performance Indicators</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Performance Indicators</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div className="col-span-1">
                   <SurvivalRateChart filters={filters} />
@@ -327,7 +305,7 @@ export const OverviewDashboardPage = () => {
 
             {/* Recent Activity Section Placeholder */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📋 Recent Activity</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                 <div className="text-center py-8">
                   <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -8,14 +8,12 @@ import MaintenanceCostAnalysisChart from '../components/charts/MaintenanceCostAn
 import SpeciesEconomicPerformanceChart from '../components/charts/SpeciesEconomicPerformanceChart';
 import GrowthPerformancePredictionsChart from '../components/charts/GrowthPerformancePredictionsChart';
 import { GlobalFilters } from '../components/filters';
-import { ExportButtonComponent } from '../components/ui/ExportButton';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { EnhancedStatCard } from '../components/ui/EnhancedStatCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useDashboardStats } from '../hooks/useDashboardStats';
-import { useTreeData } from '../hooks/useTreeData';
 
 export const FinancialDashboardPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
@@ -24,8 +22,6 @@ export const FinancialDashboardPage = () => {
   // Fetch dashboard statistics with current filters
   const { stats, loading: statsLoading, error: statsError, refresh } = useDashboardStats(filters);
   
-  // Fetch tree data for export functionality
-  const { trees: treeData, loading: treesLoading } = useTreeData(filters);
 
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
@@ -63,17 +59,6 @@ export const FinancialDashboardPage = () => {
     return formatCurrency(num, currency);
   };
 
-  const handleExportStart = () => {
-    console.log('Export started');
-  };
-
-  const handleExportComplete = (format, recordCount) => {
-    console.log(`Export completed: ${format} with ${recordCount} records`);
-  };
-
-  const handleExportError = (error) => {
-    console.error('Export error:', error);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -111,13 +96,6 @@ export const FinancialDashboardPage = () => {
                   <p className="text-gray-600 dark:text-gray-300">
                     Investment performance, revenue analysis, and financial risk assessment for your forest portfolio.
                   </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <ExportButtonComponent
-                    onExportStart={handleExportStart}
-                    onExportComplete={handleExportComplete}
-                    onExportError={handleExportError}
-                  />
                 </div>
               </div>
             </div>

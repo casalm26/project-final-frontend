@@ -12,7 +12,6 @@ import GrowthPerformancePredictionsChart from '../components/charts/GrowthPerfor
 import EcologicalBenefitsChart from '../components/charts/EcologicalBenefitsChart';
 import BiodiversityTrendsChart from '../components/charts/BiodiversityTrendsChart';
 import { GlobalFilters } from '../components/filters';
-import { ExportButtonComponent } from '../components/ui/ExportButton';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { DashboardStatCard } from '../components/ui/DashboardStatCard';
@@ -21,7 +20,6 @@ import { ForestOverviewSection } from '../components/ui/ForestOverviewSection';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useDashboardStats } from '../hooks/useDashboardStats';
-import { useTreeData } from '../hooks/useTreeData';
 
 
 export const DashboardPage = () => {
@@ -31,8 +29,6 @@ export const DashboardPage = () => {
   // Fetch dashboard statistics with current filters
   const { stats, loading: statsLoading, error: statsError, refresh } = useDashboardStats(filters);
   
-  // Fetch tree data for export functionality
-  const { trees: treeData, loading: treesLoading } = useTreeData(filters);
 
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
@@ -85,17 +81,6 @@ export const DashboardPage = () => {
     return `${num.toFixed(1)}/${max}`;
   };
 
-  const handleExportStart = () => {
-    console.log('Export started');
-  };
-
-  const handleExportComplete = (format, recordCount) => {
-    console.log(`Export completed: ${format} with ${recordCount} records`);
-  };
-
-  const handleExportError = (error) => {
-    console.error('Export error:', error);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -116,13 +101,6 @@ export const DashboardPage = () => {
                 <p className="text-gray-600 dark:text-gray-300">
                   Monitor your forests and track tree growth with real-time insights.
                 </p>
-              </div>
-              <div className="flex items-center space-x-4">
-                <ExportButtonComponent
-                  onExportStart={handleExportStart}
-                  onExportComplete={handleExportComplete}
-                  onExportError={handleExportError}
-                />
               </div>
             </div>
           </div>
@@ -193,7 +171,7 @@ export const DashboardPage = () => {
 
               {/* Investor Metrics */}
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Investor Metrics</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investor Metrics</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <EnhancedStatCard
                     icon={
@@ -297,7 +275,7 @@ export const DashboardPage = () => {
 
           {/* Original Charts Grid */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Core Analytics</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Core Analytics</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               <div className="col-span-1">
                 <EnhancedSurvivalRateChart filters={filters} />

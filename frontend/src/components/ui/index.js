@@ -88,7 +88,6 @@ export { InfoCard } from './InfoCard';
 export { FormField } from './FormField';
 export { HealthBadge } from './HealthBadge';
 export { MapPageHeader } from './MapPageHeader';
-export { MapPageHeaderSection } from './MapPageHeaderSection';
 export { MapSidebar } from './MapSidebar';
 export { Modal } from './Modal';
 export { PasswordInput } from './PasswordInput';

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ForestMap } from '../components/map/ForestMap';
 import { GlobalFilters } from '../components/filters';
-import { ExportButtonComponent } from '../components/ui/ExportButton';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { TreeDetailModal } from '../components/ui/TreeDetailModal';
@@ -70,17 +69,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
     fetchTrees();
   }, [filters]);
 
-  const handleExportStart = useCallback(() => {
-    console.log('Export started');
-  }, []);
-
-  const handleExportComplete = useCallback((format) => {
-    console.log(`Export completed: ${format}`);
-  }, []);
-
-  const handleExportError = useCallback((error) => {
-    console.error('Export error:', error);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -101,13 +89,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
                   <p className="text-gray-600 dark:text-gray-300">
                     Explore your forests and individual trees with interactive mapping.
                   </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <ExportButtonComponent
-                    onExportStart={handleExportStart}
-                    onExportComplete={handleExportComplete}
-                    onExportError={handleExportError}
-                  />
                 </div>
               </div>
             </div>
