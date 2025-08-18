@@ -226,22 +226,6 @@ export const FinancialDashboardPage = () => {
                 <div className="col-span-1">
                   <SpeciesEconomicPerformanceChart filters={filters} chartType="bar" />
                 </div>
-                <div className="col-span-1">
-                  <SpeciesEconomicPerformanceChart filters={filters} chartType="scatter" />
-                </div>
-              </div>
-            </div>
-
-            {/* Cost Management */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Cost Management</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="col-span-1">
-                  <MaintenanceCostAnalysisChart filters={filters} chartType="composed" />
-                </div>
-                <div className="col-span-1">
-                  <MaintenanceCostAnalysisChart filters={filters} chartType="pie" />
-                </div>
               </div>
             </div>
 
@@ -269,13 +253,7 @@ export const FinancialDashboardPage = () => {
                   <HealthStatusDistributionChart filters={filters} chartType="bar" />
                 </div>
                 <div className="col-span-1">
-                  <HealthStatusDistributionChart filters={filters} chartType="pie" />
-                </div>
-                <div className="col-span-1">
                   <EnvironmentalRiskMatrixChart filters={filters} chartType="bar" />
-                </div>
-                <div className="col-span-1">
-                  <EnvironmentalRiskMatrixChart filters={filters} chartType="scatter" />
                 </div>
               </div>
             </div>

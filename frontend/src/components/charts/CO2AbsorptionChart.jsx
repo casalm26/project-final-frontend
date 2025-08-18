@@ -5,11 +5,13 @@ import { useChartConfig } from '../../hooks/useChartConfig';
 import { useCO2AbsorptionData } from '../../hooks/useChartData';
 
 export const CO2AbsorptionChart = ({ filters = {} }) => {
-  const { data: apiData, loading, error } = useCO2AbsorptionData(filters);
+  // Force yearly grouping for this chart
+  const yearlyFilters = { ...filters, groupBy: 'year' };
+  const { data: apiData, loading, error } = useCO2AbsorptionData(yearlyFilters);
   
-  // Transform API data to chart format
+  // Transform API data to chart format - show years
   const data = apiData?.chartData?.map(item => ({
-    period: item.period,
+    year: item.period, // Year from period
     co2: item.totalCO2 || 0
   })) || [];
   const chartConfig = useChartConfig('bar');
@@ -18,7 +20,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
     return (
       <ChartContainer>
         <ChartHeader>
-          <ChartTitle>CO₂ Absorption Over Time</ChartTitle>
+          <ChartTitle>CO₂ Absorption by Year</ChartTitle>
         </ChartHeader>
         <div className="flex justify-center items-center h-72">
           <LoadingSpinner size="32px" text="Loading chart data..." />
@@ -31,7 +33,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
     return (
       <ChartContainer>
         <ChartHeader>
-          <ChartTitle>CO₂ Absorption Over Time</ChartTitle>
+          <ChartTitle>CO₂ Absorption by Year</ChartTitle>
         </ChartHeader>
         <div className="flex justify-center items-center h-72">
           <div className="text-center">
@@ -53,7 +55,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
         <BarChart data={data} margin={chartConfig.margin}>
           <CartesianGrid {...chartConfig.gridProps} />
           <XAxis 
-            dataKey="period" 
+            dataKey="year" 
             {...chartConfig.axisProps}
           />
           <YAxis 

@@ -246,13 +246,7 @@ export const EcologicalDashboardPage = () => {
                   <HealthStatusDistributionChart filters={filters} chartType="bar" />
                 </div>
                 <div className="col-span-1">
-                  <HealthStatusDistributionChart filters={filters} chartType="pie" />
-                </div>
-                <div className="col-span-1">
                   <EnvironmentalRiskMatrixChart filters={filters} chartType="bar" />
-                </div>
-                <div className="col-span-1">
-                  <EnvironmentalRiskMatrixChart filters={filters} chartType="scatter" />
                 </div>
               </div>
             </div>
@@ -274,15 +268,7 @@ export const EcologicalDashboardPage = () => {
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Conservation Impact Summary</h3>
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                      {formatNumber(stats?.manager?.biodiversity?.totalSpecies || 0)}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                      Species Protected
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                       {formatNumber(stats?.co2?.totalAbsorption || 0)} t
@@ -306,7 +292,7 @@ export const EcologicalDashboardPage = () => {
             {/* Quick Navigation */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Related Analysis</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
                 <Link to="/dashboard" className="block">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">
                     <div className="flex items-center mb-3">

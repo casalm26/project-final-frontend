@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
-import { SurvivalRateChart, AverageHeightChart, CO2AbsorptionChart } from '../components/charts';
-import ForestValueAppreciationChart from '../components/charts/ForestValueAppreciationChart';
+import { AverageHeightChart } from '../components/charts';
+import HistoricalCO2AbsorptionChart from '../components/charts/HistoricalCO2AbsorptionChart';
+import EnhancedSurvivalRateChart from '../components/charts/EnhancedSurvivalRateChart';
+import ForestHealthIndexChart from '../components/charts/ForestHealthIndexChart';
 import HealthStatusDistributionChart from '../components/charts/HealthStatusDistributionChart';
 import EnvironmentalRiskMatrixChart from '../components/charts/EnvironmentalRiskMatrixChart';
 import CarbonCreditRevenueChart from '../components/charts/CarbonCreditRevenueChart';
@@ -242,7 +244,7 @@ export const DashboardPage = () => {
 
               {/* Manager Metrics */}
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌿 Forest Management</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Management</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <EnhancedStatCard
                     icon={
@@ -298,23 +300,23 @@ export const DashboardPage = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Core Analytics</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               <div className="col-span-1">
-                <SurvivalRateChart filters={filters} />
+                <EnhancedSurvivalRateChart filters={filters} />
               </div>
               <div className="col-span-1 xl:col-span-2">
                 <AverageHeightChart filters={filters} />
               </div>
               <div className="col-span-1 lg:col-span-2 xl:col-span-3">
-                <CO2AbsorptionChart filters={filters} />
+                <HistoricalCO2AbsorptionChart filters={filters} />
               </div>
             </div>
           </div>
 
           {/* New Enhanced Charts */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 Financial & Investment Analytics</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial & Investment Analytics</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="col-span-1">
-                <ForestValueAppreciationChart filters={filters} />
+                <ForestHealthIndexChart forestId={filters?.forestId} dateRange={filters?.dateRange} />
               </div>
               <div className="col-span-1">
                 <HealthStatusDistributionChart filters={filters} chartType="pie" />
@@ -323,7 +325,7 @@ export const DashboardPage = () => {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌲 Forest Management & Risk Analysis</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Management & Risk Analysis</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="col-span-1">
                 <HealthStatusDistributionChart filters={filters} chartType="bar" />
@@ -336,7 +338,7 @@ export const DashboardPage = () => {
 
           {/* Revenue & Financial Performance */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 Revenue & Financial Performance</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue & Financial Performance</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="col-span-1">
                 <CarbonCreditRevenueChart filters={filters} chartType="line" />
@@ -355,7 +357,7 @@ export const DashboardPage = () => {
 
           {/* Growth & Performance Analysis */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Growth & Performance Analysis</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Growth & Performance Analysis</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="col-span-1 lg:col-span-2">
                 <GrowthPerformancePredictionsChart filters={filters} chartType="line" />
@@ -365,13 +367,13 @@ export const DashboardPage = () => {
               </div>
               <div className="col-span-1">
                 <GrowthPerformancePredictionsChart filters={filters} chartType="area" />
-              </div>
+              </div> 
             </div>
           </div>
 
           {/* Ecological Impact & Biodiversity */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌿 Ecological Impact & Biodiversity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ecological Impact & Biodiversity</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="col-span-1">
                 <EcologicalBenefitsChart filters={filters} chartType="radar" />

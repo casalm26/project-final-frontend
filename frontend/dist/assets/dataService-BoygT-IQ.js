@@ -1,1 +1,0 @@
-import{A as o}from"./index-bfSkSDqu.js";const s=new o,x={exportTreesCSV:(e={},t="trees_export.csv")=>s.downloadFile("/exports/trees/csv",e,t),exportTreesXLSX:(e={},t="trees_export.xlsx")=>s.downloadFile("/exports/trees/xlsx",e,t),exportForestAnalytics:(e={},t="forest_analytics.xlsx")=>s.downloadFile("/exports/forest-analytics",e,t)};export{x as e};

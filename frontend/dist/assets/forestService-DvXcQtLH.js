@@ -1,0 +1,1 @@
+import{A as o}from"./index-CJti3Ljs.js";const e=new o,f={getAll:(t={})=>e.get("/forests",t),getById:t=>e.get(`/forests/${t}`),getAnalytics:t=>e.get(`/forests/${t}/analytics`),create:t=>e.post("/forests",t),update:(t,s)=>e.put(`/forests/${t}`,s),delete:t=>e.delete(`/forests/${t}`)};export{f};

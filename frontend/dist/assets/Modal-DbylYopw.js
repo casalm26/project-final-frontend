@@ -1,11 +1,11 @@
-import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.documentElement.classList.contains("dark");return{containerBg:o?"#1f2937":"#ffffff",containerBorder:o?"#374151":"#e5e7eb",containerShadow:o?"0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2)":"0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",headerBg:o?"#374151":"#f9fafb",headerBorder:o?"#4b5563":"#e5e7eb",headerText:o?"#f9fafb":"#111827",cellText:o?"#e5e7eb":"#111827",cellBorder:o?"#4b5563":"#f3f4f6",cellHover:o?"#374151":"#f9fafb",cellHeaderText:o?"#d1d5db":"#374151",cellHeaderHover:o?"#4b5563":"#f3f4f6",mutedText:o?"#9ca3af":"#6b7280",sortIcon:o?"#6b7280":"#9ca3af"}},h=e.div`
+import{d as o,o as b,j as a}from"./index-CJti3Ljs.js";const r=()=>{const e=document.documentElement.classList.contains("dark");return{containerBg:e?"#1f2937":"#ffffff",containerBorder:e?"#374151":"#e5e7eb",containerShadow:e?"0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2)":"0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",headerBg:e?"#374151":"#f9fafb",headerBorder:e?"#4b5563":"#e5e7eb",headerText:e?"#f9fafb":"#111827",cellText:e?"#e5e7eb":"#111827",cellBorder:e?"#4b5563":"#f3f4f6",cellHover:e?"#374151":"#f9fafb",cellHeaderText:e?"#d1d5db":"#374151",cellHeaderHover:e?"#4b5563":"#f3f4f6",mutedText:e?"#9ca3af":"#6b7280",sortIcon:e?"#6b7280":"#9ca3af"}},$=o.div`
   background: ${()=>r().containerBg};
   border-radius: 0.75rem;
   box-shadow: ${()=>r().containerShadow};
   border: 1px solid ${()=>r().containerBorder};
   overflow: hidden;
   transition: background-color 0.2s ease, border-color 0.2s ease;
-`,k=e.div`
+`,v=o.div`
   background: ${()=>r().headerBg};
   padding: 1.5rem;
   border-bottom: 1px solid ${()=>r().headerBorder};
@@ -13,20 +13,20 @@ import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.doc
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.2s ease, border-color 0.2s ease;
-`,v=e.h3`
+`,M=o.h3`
   font-size: 1.125rem;
   font-weight: 600;
   color: ${()=>r().headerText};
   margin: 0;
   transition: color 0.2s ease;
-`,T=e.table`
+`,T=o.table`
   width: 100%;
   border-collapse: collapse;
-`,w=e.thead`
+`,w=o.thead`
   background: ${()=>r().headerBg};
   border-bottom: 1px solid ${()=>r().headerBorder};
   transition: background-color 0.2s ease, border-color 0.2s ease;
-`,j=e.tr`
+`,j=o.tr`
   border-bottom: 1px solid ${()=>r().cellBorder};
   transition: background-color 0.2s ease, border-color 0.2s ease;
   
@@ -37,7 +37,7 @@ import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.doc
   &:last-child {
     border-bottom: none;
   }
-`,B=e.th`
+`,B=o.th`
   padding: 0.75rem 1rem;
   text-align: left;
   font-size: 0.875rem;
@@ -50,23 +50,23 @@ import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.doc
   &:hover {
     background: ${()=>r().cellHeaderHover};
   }
-`,$=e.td`
+`,D=o.td`
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: ${()=>r().cellText};
   vertical-align: top;
   transition: color 0.2s ease;
-`,y=e.div`
+`,y=o.div`
   text-align: center;
   padding: 3rem;
   color: ${()=>r().mutedText};
   transition: color 0.2s ease;
-`,H=e.span`
+`,H=o.span`
   margin-left: 0.5rem;
   font-size: 0.75rem;
   color: ${()=>r().sortIcon};
   transition: color 0.2s ease;
-`,c=e.div`
+`,f=o.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -79,8 +79,8 @@ import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.doc
   z-index: 1000;
   padding: 1rem;
   outline: none;
-`,b=e.div`
-  background: white;
+`,g=o.div`
+  background: ${e=>e.$isDarkMode?"#1f2937":"white"};
   border-radius: 0.75rem;
   max-width: 800px;
   width: 100%;
@@ -89,37 +89,37 @@ import{d as e,j as t}from"./index-bfSkSDqu.js";const r=()=>{const o=document.doc
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
   outline: none;
-`,f=e.div`
+`,x=o.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid ${e=>e.$isDarkMode?"#374151":"#e5e7eb"};
+  background: ${e=>e.$isDarkMode?"#111827":"#f9fafb"};
   border-radius: 0.75rem 0.75rem 0 0;
-`,g=e.h2`
+`,m=o.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: ${e=>e.$isDarkMode?"#f9fafb":"#111827"};
   margin: 0;
-`,x=e.button`
+`,p=o.button`
   padding: 0.5rem;
   background: transparent;
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  color: #6b7280;
+  color: ${e=>e.$isDarkMode?"#9ca3af":"#6b7280"};
   transition: all 0.2s;
   
   &:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: ${e=>e.$isDarkMode?"#374151":"#f3f4f6"};
+    color: ${e=>e.$isDarkMode?"#f9fafb":"#111827"};
   }
   
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
   }
-`,m=e.div`
+`,u=o.div`
   padding: 1.5rem;
-`,p=()=>t.jsx("svg",{className:"w-6 h-6",fill:"none",viewBox:"0 0 24 24",stroke:"currentColor",children:t.jsx("path",{strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:2,d:"M6 18L18 6M6 6l12 12"})}),C=({isOpen:o,onClose:a,title:s,children:d,containerRef:l})=>{const i=n=>{n.target===n.currentTarget&&a()};return o?t.jsx(c,{onClick:i,role:"presentation",children:t.jsxs(b,{ref:l,role:"dialog","aria-modal":"true","aria-labelledby":"modal-title",tabIndex:"-1",children:[t.jsxs(f,{children:[t.jsx(g,{id:"modal-title",children:s}),t.jsx(x,{onClick:a,"aria-label":"Close modal",type:"button",children:t.jsx(p,{})})]}),t.jsx(m,{children:d})]})}):null};export{y as E,C as M,H as S,T,w as a,j as b,B as c,$ as d,h as e,k as f,v as g};
+`,h=()=>a.jsx("svg",{className:"w-6 h-6",fill:"none",viewBox:"0 0 24 24",stroke:"currentColor",children:a.jsx("path",{strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:2,d:"M6 18L18 6M6 6l12 12"})}),C=({isOpen:e,onClose:n,title:d,children:i,containerRef:l})=>{const{isDarkMode:t}=b(),c=s=>{s.target===s.currentTarget&&n()};return e?a.jsx(f,{onClick:c,role:"presentation",children:a.jsxs(g,{ref:l,role:"dialog","aria-modal":"true","aria-labelledby":"modal-title",tabIndex:"-1",$isDarkMode:t,children:[a.jsxs(x,{$isDarkMode:t,children:[a.jsx(m,{id:"modal-title",$isDarkMode:t,children:d}),a.jsx(p,{onClick:n,"aria-label":"Close modal",type:"button",$isDarkMode:t,children:a.jsx(h,{})})]}),a.jsx(u,{children:i})]})}):null};export{y as E,C as M,H as S,T,w as a,j as b,B as c,D as d,$ as e,v as f,M as g};
