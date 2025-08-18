@@ -14,11 +14,21 @@ export const ExportPage = () => {
   const [exportFormat, setExportFormat] = useState('csv');
   const [exportScope, setExportScope] = useState('filtered');
   const [includeOptions, setIncludeOptions] = useState({
+    // Basic Information
     basicInfo: true,
-    measurements: true,
     location: true,
     health: true,
+    measurements: true,
     images: false,
+    
+    // Advanced Data
+    genetics: false,
+    growthModel: false,
+    maintenance: false,
+    economicValue: false,
+    canopy: false,
+    ecologicalBenefits: false,
+    environmentalFactors: false,
     metadata: false
   });
   const [isExporting, setIsExporting] = useState(false);
@@ -54,21 +64,9 @@ export const ExportPage = () => {
         }
       }
 
-      const response = await exportAPI.exportTrees(exportParams);
+      // The downloadFile method in ApiClient handles the download automatically
+      await exportAPI.exportTrees(exportParams);
       
-      // Handle file download
-      const blob = new Blob([response], { 
-        type: exportFormat === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `trees_export_${new Date().toISOString().split('T')[0]}.${exportFormat}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
       showToast('Export completed successfully!', 'success');
     } catch (error) {
       console.error('Export failed:', error);
@@ -170,25 +168,60 @@ export const ExportPage = () => {
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Data Fields to Include
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries({
-                      basicInfo: 'Basic Information (ID, Name, Species)',
-                      measurements: 'Measurements (Height, Diameter)',
-                      location: 'Location (Coordinates, Forest)',
-                      health: 'Health Status',
-                      images: 'Image URLs',
-                      metadata: 'Metadata (Created/Updated dates)'
-                    }).map(([key, label]) => (
-                      <label key={key} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={includeOptions[key]}
-                          onChange={() => handleIncludeOptionChange(key)}
-                          className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-                        />
-                        <span className="ml-3 text-gray-700 dark:text-gray-300">{label}</span>
-                      </label>
-                    ))}
+                  
+                  {/* Basic Information */}
+                  <div className="mb-6">
+                    <h3 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+                      Basic Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Object.entries({
+                        basicInfo: 'Basic Info (ID, Species, Forest)',
+                        location: 'Location (Coordinates)',
+                        health: 'Health Status',
+                        measurements: 'Measurements (Height, Diameter, CO₂)',
+                        images: 'Image URLs'
+                      }).map(([key, label]) => (
+                        <label key={key} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={includeOptions[key]}
+                            onChange={() => handleIncludeOptionChange(key)}
+                            className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                          />
+                          <span className="ml-3 text-gray-700 dark:text-gray-300">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Advanced Data */}
+                  <div>
+                    <h3 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+                      Advanced Data
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Object.entries({
+                        genetics: 'Genetics (Seed Source, Cultivar, Diversity)',
+                        growthModel: 'Growth Model (Predictions, Rate, Index)',
+                        maintenance: 'Maintenance (Fertilization, Pruning, Damage)',
+                        economicValue: 'Economic Value (Timber, Carbon Credits)',
+                        canopy: 'Canopy (Area, Density, Condition)',
+                        ecologicalBenefits: 'Ecological Benefits (CO₂, Pollutants, Wildlife)',
+                        environmentalFactors: 'Environmental (Climate, Site, Position)',
+                        metadata: 'Metadata (Planting Method, Timestamps)'
+                      }).map(([key, label]) => (
+                        <label key={key} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={includeOptions[key]}
+                            onChange={() => handleIncludeOptionChange(key)}
+                            className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                          />
+                          <span className="ml-3 text-gray-700 dark:text-gray-300">{label}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

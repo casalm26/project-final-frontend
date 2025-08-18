@@ -10,6 +10,13 @@ export const exportAPI = {
     apiClient.downloadFile('/exports/trees/xlsx', params, filename),
   exportForestAnalytics: (params = {}, filename = 'forest_analytics.xlsx') => 
     apiClient.downloadFile('/exports/forest-analytics', params, filename),
+  // Unified export method that handles both CSV and XLSX
+  exportTrees: (params = {}) => {
+    const { format = 'csv', ...queryParams } = params;
+    const filename = `trees_export_${new Date().toISOString().split('T')[0]}.${format}`;
+    const endpoint = format === 'xlsx' ? '/exports/trees/xlsx' : '/exports/trees/csv';
+    return apiClient.downloadFile(endpoint, queryParams, filename);
+  }
 };
 
 // Upload API methods

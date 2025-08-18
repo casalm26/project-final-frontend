@@ -17,7 +17,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <aside className={`
-        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full lg:w-64 fixed lg:sticky top-0 h-screen overflow-y-auto z-50 lg:z-10 transform transition-transform duration-300 ease-in-out
+        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full lg:w-64 fixed lg:sticky top-0 lg:top-0 h-screen overflow-y-auto z-50 lg:z-10 transform transition-transform duration-300 ease-in-out lg:pt-12
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `} aria-label="Sidebar">
         <div className="p-6">
