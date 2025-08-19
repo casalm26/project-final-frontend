@@ -204,13 +204,7 @@ export const EcologicalDashboardPage = () => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ecological Impact</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="col-span-1">
-                  <EcologicalBenefitsChart filters={filters} chartType="radar" />
-                </div>
-                <div className="col-span-1">
                   <EcologicalBenefitsChart filters={filters} chartType="bar" />
-                </div>
-                <div className="col-span-1 lg:col-span-2">
-                  <EcologicalBenefitsChart filters={filters} chartType="area" />
                 </div>
               </div>
             </div>
