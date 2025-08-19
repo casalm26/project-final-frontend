@@ -1,4 +1,4 @@
-import{R as v,j as e,p as y,d as r,L as z,q as L}from"./index-DpfrmWgL.js";import{H as w}from"./TreeDetailModal-Cjn3fHnN.js";const C=v.forwardRef(({loading:o,loadingText:i="Loading...",children:n,...p},g)=>e.jsx(y,{ref:g,loading:o,...p,children:o?i:n}));C.displayName="LoadingButton";r.div`
+import{R as v,j as e,p as y,d as r,L as z,q as L}from"./index-DYslvVoE.js";import{H as w}from"./TreeDetailModal-CA07VyRT.js";const C=v.forwardRef(({loading:o,loadingText:i="Loading...",children:n,...p},g)=>e.jsx(y,{ref:g,loading:o,...p,children:o?i:n}));C.displayName="LoadingButton";r.div`
   position: relative;
   display: inline-block;
 `;r.button`

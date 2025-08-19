@@ -87,11 +87,11 @@ export const DashboardPage = () => {
       <DashboardHeader onToggleSidebar={toggleSidebar} />
 
       {/* Content Area with Sidebar */}
-      <div className="flex flex-1 lg:flex-row">
-        <DashboardSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+      {/* Sidebar */}
+      <DashboardSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 lg:ml-64">
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <div className="mb-8">
@@ -376,8 +376,7 @@ export const DashboardPage = () => {
 
           <ForestOverviewSection />
         </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }; 

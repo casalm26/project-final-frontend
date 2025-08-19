@@ -7,19 +7,41 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Sidebar Overlay */}
+      {/* Mobile/Tablet Overlay */}
       <div 
         className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Sidebar */}
       <aside className={`
-        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full lg:w-64 fixed lg:sticky top-0 lg:top-0 h-screen overflow-y-auto z-50 lg:z-10 transform transition-transform duration-300 ease-in-out lg:pt-12
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `} aria-label="Sidebar">
+        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
+        w-64 shrink-0
+        lg:fixed lg:top-16 lg:translate-x-0
+        fixed top-0 h-screen lg:h-[calc(100vh-4rem)]
+        overflow-y-auto
+        z-50 lg:z-0
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `} aria-label="Sidebar navigation">
+        
+        {/* Mobile/Tablet Close Button */}
+        <div className="lg:hidden sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Navigation</h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Close navigation menu"
+          >
+            <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
         <div className="p-6">
           <nav className="space-y-1" aria-label="Dashboard navigation">
             {/* Dashboards Section */}
@@ -30,6 +52,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
               <div className="space-y-1">
                 <Link
                   to="/dashboard"
+                  onClick={() => onClose && onClose()}
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     location.pathname === '/dashboard' 
                       ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30' 
@@ -44,6 +67,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
                 </Link>
                 <Link
                   to="/dashboard/financial"
+                  onClick={() => onClose && onClose()}
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     location.pathname === '/dashboard/financial' 
                       ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' 
@@ -58,6 +82,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
                 </Link>
                 <Link
                   to="/dashboard/ecological"
+                  onClick={() => onClose && onClose()}
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     location.pathname === '/dashboard/ecological' 
                       ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30' 
@@ -73,7 +98,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
               </div>
             </div>
             
-            {/* Other Navigation Section */}
+            {/* Tools Section */}
             <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-3 py-2">
                 Tools
@@ -81,6 +106,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
               <div className="space-y-1">
                 <Link
                   to="/map"
+                  onClick={() => onClose && onClose()}
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     location.pathname === '/map' 
                       ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700' 
@@ -96,6 +122,7 @@ export const DashboardSidebar = ({ isOpen, onClose }) => {
                 </Link>
                 <Link
                   to="/export"
+                  onClick={() => onClose && onClose()}
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     location.pathname === '/export' 
                       ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700' 
