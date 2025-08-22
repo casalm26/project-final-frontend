@@ -1,4 +1,20 @@
+import mongoose from 'mongoose';
 import { Tree, Forest } from '../models/index.js';
+
+/**
+ * Safely convert string ID to ObjectId
+ * @param {string} id - String ID to convert
+ * @returns {mongoose.Types.ObjectId|null} ObjectId or null if invalid
+ */
+const toObjectId = (id) => {
+  if (!id || typeof id !== 'string') return null;
+  try {
+    return new mongoose.Types.ObjectId(id.trim());
+  } catch (error) {
+    console.warn('Invalid ObjectId format in chart controller:', id);
+    return null;
+  }
+};
 
 // Get survival rate data over time for charts
 export const getSurvivalRateChart = async (req, res) => {
@@ -12,7 +28,10 @@ export const getSurvivalRateChart = async (req, res) => {
 
     // Build query conditions
     const matchConditions = {};
-    if (forestId) matchConditions.forestId = forestId;
+    if (forestId) {
+      const objectId = toObjectId(forestId);
+      if (objectId) matchConditions.forestId = objectId;
+    }
     if (startDate || endDate) {
       matchConditions.plantedDate = {};
       if (startDate) matchConditions.plantedDate.$gte = new Date(startDate);
@@ -105,7 +124,10 @@ export const getHeightGrowthChart = async (req, res) => {
 
     // Build query conditions
     const matchConditions = { isAlive: true };
-    if (forestId) matchConditions.forestId = forestId;
+    if (forestId) {
+      const objectId = toObjectId(forestId);
+      if (objectId) matchConditions.forestId = objectId;
+    }
     if (species) matchConditions.species = new RegExp(species, 'i');
 
     // Define grouping format
@@ -229,7 +251,10 @@ export const getCO2AbsorptionChart = async (req, res) => {
 
     // Build query conditions
     const matchConditions = { isAlive: true };
-    if (forestId) matchConditions.forestId = forestId;
+    if (forestId) {
+      const objectId = toObjectId(forestId);
+      if (objectId) matchConditions.forestId = objectId;
+    }
     if (species) matchConditions.species = new RegExp(species, 'i');
 
     // Add date range filter for planted dates (not measurement dates)
@@ -365,7 +390,10 @@ export const getHealthStatusChart = async (req, res) => {
 
     // Build query conditions
     const matchConditions = { isAlive: true };
-    if (forestId) matchConditions.forestId = forestId;
+    if (forestId) {
+      const objectId = toObjectId(forestId);
+      if (objectId) matchConditions.forestId = objectId;
+    }
 
     // Define grouping format
     const dateFormats = {

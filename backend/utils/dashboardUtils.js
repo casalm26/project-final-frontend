@@ -1,4 +1,20 @@
 // Dashboard utility functions for query building, aggregation, and calculations
+import mongoose from 'mongoose';
+
+/**
+ * Safely convert string ID to ObjectId
+ * @param {string} id - String ID to convert
+ * @returns {mongoose.Types.ObjectId|null} ObjectId or null if invalid
+ */
+const toObjectId = (id) => {
+  if (!id || typeof id !== 'string') return null;
+  try {
+    return new mongoose.Types.ObjectId(id.trim());
+  } catch (error) {
+    console.warn('Invalid ObjectId format:', id);
+    return null;
+  }
+};
 
 /**
  * Build query conditions for tree filtering
@@ -18,11 +34,19 @@ export const buildTreeQuery = (filters = {}) => {
   // Handle both single forestId and multiple forestIds
   if (forestIds) {
     // Multiple forests selected (comma-separated string)
-    const forestIdArray = forestIds.split(',').map(id => id.trim());
-    query.forestId = { $in: forestIdArray };
+    const forestIdArray = forestIds.split(',')
+      .map(id => toObjectId(id))
+      .filter(id => id !== null); // Remove invalid IDs
+    
+    if (forestIdArray.length > 0) {
+      query.forestId = { $in: forestIdArray };
+    }
   } else if (forestId) {
     // Single forest selected
-    query.forestId = forestId;
+    const objectId = toObjectId(forestId);
+    if (objectId) {
+      query.forestId = objectId;
+    }
   }
 
   if (species) {
@@ -56,7 +80,10 @@ export const buildForestQuery = (filters = {}) => {
   const query = { isActive: true };
 
   if (forestId) {
-    query._id = forestId;
+    const objectId = toObjectId(forestId);
+    if (objectId) {
+      query._id = objectId;
+    }
   }
 
   if (region) {
