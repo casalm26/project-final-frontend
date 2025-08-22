@@ -25,6 +25,11 @@ const TableHeader = styled.thead``;
 export const TreeMeasurementHistory = ({ measurementHistory }) => {
   const { isDarkMode } = useDarkMode();
   
+  // Sort measurements by date in descending order (most recent first)
+  const sortedMeasurements = [...measurementHistory].sort((a, b) => 
+    new Date(b.date) - new Date(a.date)
+  );
+  
   return (
     <Section>
       <SectionTitle $isDarkMode={isDarkMode}>Measurement History (Last 10 Entries)</SectionTitle>
@@ -38,7 +43,7 @@ export const TreeMeasurementHistory = ({ measurementHistory }) => {
           </TableRow>
         </TableHeader>
         <tbody>
-          {measurementHistory.slice(0, 10).map((measurement, index) => (
+          {sortedMeasurements.slice(0, 10).map((measurement, index) => (
             <TableRow key={index}>
               <TableCell>{formatDate(measurement.date)}</TableCell>
               <TableCell>{measurement.height}</TableCell>

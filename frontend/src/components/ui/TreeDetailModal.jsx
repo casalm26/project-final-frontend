@@ -1,14 +1,12 @@
 import styled from 'styled-components';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 import { useTreeMeasurements } from '../../hooks/useTreeMeasurements';
-import { useTreeShare } from '../../hooks/useTreeShare';
 import { useDarkMode } from '../../contexts/DarkModeContext';
 import { Modal } from './Modal';
 import { TreeBasicInfo } from './TreeBasicInfo';
 import { TreeLocationInfo } from './TreeLocationInfo';
 import { TreeMeasurementHistory } from './TreeMeasurementHistory';
 import { ImageGallery } from './ImageGallery';
-import { TreeActionButtons } from './TreeActionButtons';
 
 const InfoGrid = styled.div`
   display: grid;
@@ -42,7 +40,6 @@ export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
 
   const { isDarkMode } = useDarkMode();
   const measurementHistory = useTreeMeasurements(tree, isOpen);
-  const handleShare = useTreeShare(tree);
 
   if (!tree) return null;
 
@@ -64,8 +61,6 @@ export const TreeDetailModal = ({ tree, isOpen, onClose }) => {
         <SectionTitle $isDarkMode={isDarkMode}>Tree Images</SectionTitle>
         <ImageGallery />
       </Section>
-
-      <TreeActionButtons tree={tree} onShare={handleShare} />
     </Modal>
   );
 }; 

@@ -18,7 +18,6 @@ const FinancialDashboardPage = lazy(() => import('./pages/FinancialDashboardPage
 const EcologicalDashboardPage = lazy(() => import('./pages/EcologicalDashboardPage').then(module => ({ default: module.EcologicalDashboardPage })));
 const MapPage = lazy(() => import('./pages/MapPage').then(module => ({ default: module.MapPage })));
 const ExportPage = lazy(() => import('./pages/ExportPage').then(module => ({ default: module.ExportPage })));
-const TreeDetailPage = lazy(() => import('./pages/TreeDetailPage').then(module => ({ default: module.TreeDetailPage })));
 const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })));
 
 export const App = () => {
@@ -79,14 +78,6 @@ export const App = () => {
                     element={
                       <ProtectedRoute>
                         <main id="main-content" tabIndex="-1"><ExportPage /></main>
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/tree/:id" 
-                    element={
-                      <ProtectedRoute>
-                        <main id="main-content" tabIndex="-1"><TreeDetailPage /></main>
                       </ProtectedRoute>
                     } 
                   />
