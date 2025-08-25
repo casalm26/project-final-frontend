@@ -1,16 +1,23 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { treeAPI } from '../lib/api';
+import { transformFiltersForAPI } from '../utils/filterTransformer';
 
 export const useTreeData = (filters = {}) => {
   const [trees, setTrees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Memoize filters to prevent infinite re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.forestId,
-    filters?.startDate,
-    filters?.endDate,
+  // Transform filters to API format and memoize
+  const apiFilters = useMemo(() => {
+    const transformed = transformFiltersForAPI(filters);
+    // Preserve pagination params that aren't part of the transformation
+    if (filters.page) transformed.page = filters.page;
+    if (filters.limit) transformed.limit = filters.limit;
+    return transformed;
+  }, [
+    filters?.dateRange?.startDate,
+    filters?.dateRange?.endDate,
+    filters?.selectedForests,
     filters?.species,
     filters?.page,
     filters?.limit
@@ -21,7 +28,7 @@ export const useTreeData = (filters = {}) => {
       setLoading(true);
       setError(null);
       
-      const response = await treeAPI.getAll(memoizedFilters);
+      const response = await treeAPI.getAll(apiFilters);
       setTrees(response.data || []);
     } catch (err) {
       console.error('Error fetching tree data:', err);
@@ -29,7 +36,7 @@ export const useTreeData = (filters = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [memoizedFilters]);
+  }, [apiFilters]);
 
   useEffect(() => {
     fetchTrees();

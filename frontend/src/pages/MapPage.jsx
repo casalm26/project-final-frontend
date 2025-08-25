@@ -8,6 +8,7 @@ import { useMapFilters } from '../hooks/useMapFilters';
 import { useTreeSelection } from '../hooks/useTreeSelection';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { treeAPI } from '../lib/api';
+import { transformFiltersForAPI } from '../utils/filterTransformer';
 import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
   const { filters, handleFiltersChange } = useMapFilters();
@@ -21,17 +22,8 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
       setError(null);
       
       try {
-        // Build API query params from filters
-        const params = {};
-        
-        if (filters.selectedForests && filters.selectedForests.length > 0) {
-          params.forestIds = filters.selectedForests.join(',');
-        }
-        
-        if (filters.dateRange && filters.dateRange.startDate && filters.dateRange.endDate) {
-          params.startDate = filters.dateRange.startDate.toISOString();
-          params.endDate = filters.dateRange.endDate.toISOString();
-        }
+        // Transform filters to API format
+        const params = transformFiltersForAPI(filters);
         
         const response = await treeAPI.getAll(params);
         

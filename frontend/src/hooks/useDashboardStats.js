@@ -1,16 +1,19 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { dashboardAPI } from '../lib/api';
+import { transformFiltersForAPI } from '../utils/filterTransformer';
 
 export const useDashboardStats = (filters = {}) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Memoize filters to prevent infinite re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.forestId,
-    filters?.startDate,
-    filters?.endDate,
+  // Transform filters to API format and memoize
+  const apiFilters = useMemo(() => {
+    return transformFiltersForAPI(filters);
+  }, [
+    filters?.dateRange?.startDate,
+    filters?.dateRange?.endDate,
+    filters?.selectedForests,
     filters?.species
   ]);
 
@@ -19,7 +22,7 @@ export const useDashboardStats = (filters = {}) => {
       setLoading(true);
       setError(null);
       
-      const response = await dashboardAPI.getStats(memoizedFilters);
+      const response = await dashboardAPI.getStats(apiFilters);
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -27,7 +30,7 @@ export const useDashboardStats = (filters = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [memoizedFilters]);
+  }, [apiFilters]);
 
   // Fetch data when filters change
   useEffect(() => {

@@ -5,6 +5,7 @@ import { GlobalFilters } from '../components/filters';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useToast } from '../contexts/ToastContext';
 import { exportAPI } from '../lib/api';
+import { transformFiltersForAPI } from '../utils/filterTransformer';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 export const ExportPage = () => {
@@ -55,13 +56,8 @@ export const ExportPage = () => {
 
       // Add filters if using filtered scope
       if (exportScope === 'filtered') {
-        if (filters.dateRange?.startDate && filters.dateRange?.endDate) {
-          exportParams.startDate = filters.dateRange.startDate.toISOString();
-          exportParams.endDate = filters.dateRange.endDate.toISOString();
-        }
-        if (filters.selectedForests?.length > 0) {
-          exportParams.forestIds = filters.selectedForests.join(',');
-        }
+        const apiFilters = transformFiltersForAPI(filters);
+        Object.assign(exportParams, apiFilters);
       }
 
       // The downloadFile method in ApiClient handles the download automatically

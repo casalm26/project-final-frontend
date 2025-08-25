@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { chartAPI } from '../lib/api';
+import { transformFiltersForAPI } from '../utils/filterTransformer';
 
 // Generic hook for chart data fetching
 const useChartData = (apiMethod, filters = {}) => {
@@ -7,11 +8,13 @@ const useChartData = (apiMethod, filters = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Memoize filters to prevent infinite re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.forestId,
-    filters?.startDate,
-    filters?.endDate,
+  // Transform filters to API format and memoize
+  const apiFilters = useMemo(() => {
+    return transformFiltersForAPI(filters);
+  }, [
+    filters?.dateRange?.startDate,
+    filters?.dateRange?.endDate,
+    filters?.selectedForests,
     filters?.species
   ]);
 
@@ -20,7 +23,7 @@ const useChartData = (apiMethod, filters = {}) => {
       setLoading(true);
       setError(null);
       
-      const response = await apiMethod(memoizedFilters);
+      const response = await apiMethod(apiFilters);
       setData(response.data);
     } catch (err) {
       console.error('Error fetching chart data:', err);
@@ -28,7 +31,7 @@ const useChartData = (apiMethod, filters = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [apiMethod, memoizedFilters]);
+  }, [apiMethod, apiFilters]);
 
   useEffect(() => {
     fetchData();
