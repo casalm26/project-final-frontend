@@ -294,6 +294,7 @@ export const getEnhancedDashboardStats = async (req, res) => {
         },
         co2: {
           totalAbsorbed: totalCO2Absorption,
+          totalAbsorption: totalCO2Absorption, // Frontend expects this field name
           annualAbsorption: totalCO2Absorption
         },
         // Enhanced data structure for compatibility
