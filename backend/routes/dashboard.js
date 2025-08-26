@@ -10,6 +10,9 @@ import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Test endpoint without authentication (temporary)
+router.get('/test-enhanced-stats', getEnhancedDashboardStats);
+
 // All dashboard routes require authentication
 router.use(authenticateToken);
 
