@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Tree, Forest } from '../models/index.js';
+import { buildTreeQuery } from '../utils/dashboardUtils.js';
 
 /**
  * Safely convert string ID to ObjectId
@@ -16,27 +17,30 @@ const toObjectId = (id) => {
   }
 };
 
+/**
+ * Build filter conditions for charts with multi-forest support
+ * @param {Object} query - Request query parameters
+ * @returns {Object} Filter conditions
+ */
+const buildChartFilters = (query) => {
+  return {
+    forestId: query.forestId,
+    forestIds: query.forestIds,
+    startDate: query.startDate,
+    endDate: query.endDate,
+    species: query.species,
+    isAlive: query.isAlive
+  };
+};
+
 // Get survival rate data over time for charts
 export const getSurvivalRateChart = async (req, res) => {
   try {
-    const {
-      forestId,
-      startDate,
-      endDate,
-      groupBy = 'month' // day, week, month, year
-    } = req.query;
-
-    // Build query conditions
-    const matchConditions = {};
-    if (forestId) {
-      const objectId = toObjectId(forestId);
-      if (objectId) matchConditions.forestId = objectId;
-    }
-    if (startDate || endDate) {
-      matchConditions.plantedDate = {};
-      if (startDate) matchConditions.plantedDate.$gte = new Date(startDate);
-      if (endDate) matchConditions.plantedDate.$lte = new Date(endDate);
-    }
+    const { groupBy = 'month' } = req.query; // day, week, month, year
+    
+    // Build filter conditions using utility function
+    const filters = buildChartFilters(req.query);
+    const matchConditions = buildTreeQuery(filters);
 
     // Define grouping format based on groupBy parameter
     const dateFormats = {
@@ -114,21 +118,14 @@ export const getSurvivalRateChart = async (req, res) => {
 // Get average height growth over time
 export const getHeightGrowthChart = async (req, res) => {
   try {
-    const {
-      forestId,
-      startDate,
-      endDate,
-      groupBy = 'month',
-      species
-    } = req.query;
-
-    // Build query conditions
-    const matchConditions = { isAlive: true };
-    if (forestId) {
-      const objectId = toObjectId(forestId);
-      if (objectId) matchConditions.forestId = objectId;
-    }
-    if (species) matchConditions.species = new RegExp(species, 'i');
+    const { groupBy = 'month' } = req.query;
+    
+    // Build filter conditions using utility function
+    const filters = buildChartFilters(req.query);
+    const matchConditions = buildTreeQuery(filters);
+    
+    // Ensure we only get alive trees for height growth
+    matchConditions.isAlive = true;
 
     // Define grouping format
     const dateFormats = {
@@ -143,8 +140,8 @@ export const getHeightGrowthChart = async (req, res) => {
       { $unwind: '$measurements' },
       {
         $match: {
-          ...(startDate && { 'measurements.measuredAt': { $gte: new Date(startDate) } }),
-          ...(endDate && { 'measurements.measuredAt': { $lte: new Date(endDate) } })
+          ...(filters.startDate && { 'measurements.measuredAt': { $gte: new Date(filters.startDate) } }),
+          ...(filters.endDate && { 'measurements.measuredAt': { $lte: new Date(filters.endDate) } })
         }
       },
       {
@@ -220,12 +217,7 @@ export const getHeightGrowthChart = async (req, res) => {
         chartData,
         groupBy,
         totalDataPoints: chartData.length,
-        filters: {
-          forestId,
-          species,
-          startDate,
-          endDate
-        }
+        filters
       }
     });
   } catch (error) {
@@ -241,28 +233,14 @@ export const getHeightGrowthChart = async (req, res) => {
 // Get CO2 absorption trends over time (based on planted dates for historical trends)
 export const getCO2AbsorptionChart = async (req, res) => {
   try {
-    const {
-      forestId,
-      startDate,
-      endDate,
-      groupBy = 'year',
-      species
-    } = req.query;
-
-    // Build query conditions
-    const matchConditions = { isAlive: true };
-    if (forestId) {
-      const objectId = toObjectId(forestId);
-      if (objectId) matchConditions.forestId = objectId;
-    }
-    if (species) matchConditions.species = new RegExp(species, 'i');
-
-    // Add date range filter for planted dates (not measurement dates)
-    if (startDate || endDate) {
-      matchConditions.plantedDate = {};
-      if (startDate) matchConditions.plantedDate.$gte = new Date(startDate);
-      if (endDate) matchConditions.plantedDate.$lte = new Date(endDate);
-    }
+    const { groupBy = 'year' } = req.query;
+    
+    // Build filter conditions using utility function
+    const filters = buildChartFilters(req.query);
+    const matchConditions = buildTreeQuery(filters);
+    
+    // Ensure we only get alive trees for CO2 absorption
+    matchConditions.isAlive = true;
 
     // Define grouping format
     const dateFormats = {
@@ -360,12 +338,7 @@ export const getCO2AbsorptionChart = async (req, res) => {
           totalTrees: co2Data.reduce((sum, item) => sum + item.treeCount, 0),
           avgCO2PerPeriod: Math.round((cumulativeCO2 / co2Data.length) * 100) / 100
         },
-        filters: {
-          forestId,
-          species,
-          startDate,
-          endDate
-        }
+        filters
       }
     });
   } catch (error) {
@@ -381,19 +354,14 @@ export const getCO2AbsorptionChart = async (req, res) => {
 // Get health status trends over time
 export const getHealthStatusChart = async (req, res) => {
   try {
-    const {
-      forestId,
-      startDate,
-      endDate,
-      groupBy = 'month'
-    } = req.query;
-
-    // Build query conditions
-    const matchConditions = { isAlive: true };
-    if (forestId) {
-      const objectId = toObjectId(forestId);
-      if (objectId) matchConditions.forestId = objectId;
-    }
+    const { groupBy = 'month' } = req.query;
+    
+    // Build filter conditions using utility function
+    const filters = buildChartFilters(req.query);
+    const matchConditions = buildTreeQuery(filters);
+    
+    // Ensure we only get alive trees for health status
+    matchConditions.isAlive = true;
 
     // Define grouping format
     const dateFormats = {
@@ -409,8 +377,8 @@ export const getHealthStatusChart = async (req, res) => {
       {
         $match: {
           'measurements.healthStatus': { $exists: true, $ne: null },
-          ...(startDate && { 'measurements.measuredAt': { $gte: new Date(startDate) } }),
-          ...(endDate && { 'measurements.measuredAt': { $lte: new Date(endDate) } })
+          ...(filters.startDate && { 'measurements.measuredAt': { $gte: new Date(filters.startDate) } }),
+          ...(filters.endDate && { 'measurements.measuredAt': { $lte: new Date(filters.endDate) } })
         }
       },
       {
@@ -456,11 +424,7 @@ export const getHealthStatusChart = async (req, res) => {
         chartData: healthData,
         groupBy,
         totalDataPoints: healthData.length,
-        filters: {
-          forestId,
-          startDate,
-          endDate
-        }
+        filters
       }
     });
   } catch (error) {
@@ -500,11 +464,7 @@ export const getCombinedChartData = async (req, res) => {
         co2Absorption: co2Data.data,
         healthStatus: healthData.data,
         groupBy,
-        filters: {
-          forestId,
-          startDate,
-          endDate
-        },
+        filters,
         generatedAt: new Date().toISOString()
       }
     });

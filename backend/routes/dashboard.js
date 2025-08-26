@@ -2,7 +2,8 @@ import express from 'express';
 import {
   getDashboardStats,
   getQuickStats,
-  getForestComparison
+  getForestComparison,
+  getEnhancedDashboardStats
 } from '../controllers/dashboardController.js';
 import { authenticateToken } from '../middleware/auth.js';
 // import { dataLimiter } from '../middleware/rateLimiter.js';
@@ -184,5 +185,77 @@ router.get('/quick-stats', getQuickStats);
  *                         format: float
  */
 router.get('/forest-comparison', getForestComparison);
+
+/**
+ * @swagger
+ * /dashboard/enhanced-stats:
+ *   get:
+ *     summary: Get enhanced dashboard statistics with simulated financial and ecological data
+ *     tags: [Dashboard]
+ *     parameters:
+ *       - in: query
+ *         name: forestId
+ *         schema:
+ *           type: string
+ *         description: Filter by specific forest ID
+ *       - in: query
+ *         name: forestIds
+ *         schema:
+ *           type: string
+ *         description: Filter by multiple forest IDs (comma-separated)
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: species
+ *         schema:
+ *           type: string
+ *         description: Filter by tree species
+ *       - in: query
+ *         name: isAlive
+ *         schema:
+ *           type: boolean
+ *         description: Filter by tree alive status
+ *     responses:
+ *       200:
+ *         description: Enhanced dashboard statistics with simulations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     basic:
+ *                       type: object
+ *                       properties:
+ *                         totalTrees:
+ *                           type: integer
+ *                         aliveTrees:
+ *                           type: integer
+ *                         survivalRate:
+ *                           type: number
+ *                           format: float
+ *                     investor:
+ *                       type: object
+ *                       description: Simulated financial metrics
+ *                     ecological:
+ *                       type: object
+ *                       description: Simulated ecological metrics
+ */
+router.get('/enhanced-stats', getEnhancedDashboardStats);
 
 export default router;

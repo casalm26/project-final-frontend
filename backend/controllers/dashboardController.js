@@ -35,15 +35,18 @@ import {
   formatQuickStatsResponse,
   formatForestComparisonResponse 
 } from '../utils/dataFormatters.js';
+import { generateDashboardSimulation } from '../utils/simulationEngine.js';
 
 // Get comprehensive dashboard statistics
 export const getDashboardStats = async (req, res) => {
   try {
     const filters = {
       forestId: req.query.forestId,
+      forestIds: req.query.forestIds, // Support multi-forest filtering
       startDate: req.query.startDate,
       endDate: req.query.endDate,
-      species: req.query.species
+      species: req.query.species,
+      isAlive: req.query.isAlive
     };
 
     console.log('🔍 Dashboard stats request with filters:', filters);
@@ -93,48 +96,25 @@ export const getDashboardStats = async (req, res) => {
       createdAt: { $gte: thirtyDaysAgo }
     });
 
-    // Execute aggregation pipelines in parallel
+    // Execute aggregation pipelines in parallel alongside simulation data
     const [
       speciesDistribution,
       heightStats,
       co2Stats,
       healthDistribution,
       forestStats,
-      // Investor metrics
-      portfolioValue,
-      roiStats,
-      carbonCredits,
-      timberValue,
-      maintenanceBudget,
-      // Manager metrics
-      biodiversityIndex,
-      treesAtRisk,
-      fireRisk,
-      speciesDiversity,
-      soilHealth,
-      infrastructureCondition
+      simulationData
     ] = await Promise.all([
       Tree.aggregate(getSpeciesDistributionPipeline(treeQuery)),
       Tree.aggregate(getHeightStatsPipeline(treeQuery)),
       Tree.aggregate(getCO2StatsPipeline(treeQuery)),
       Tree.aggregate(getHealthDistributionPipeline(treeQuery)),
       Forest.aggregate(getForestStatsPipeline(forestQuery)),
-      // Investor metrics
-      Forest.aggregate(getPortfolioValuePipeline(forestQuery)),
-      Forest.aggregate(getROIStatsPipeline(forestQuery)),
-      Forest.aggregate(getCarbonCreditsPipeline(forestQuery)),
-      Tree.aggregate(getTimberValuePipeline(treeQuery)),
-      Forest.aggregate(getMaintenanceBudgetPipeline(forestQuery)),
-      // Manager metrics
-      Forest.aggregate(getBiodiversityIndexPipeline(forestQuery)),
-      Tree.aggregate(getTreesAtRiskPipeline(treeQuery)),
-      Forest.aggregate(getFireRiskPipeline(forestQuery)),
-      Forest.aggregate(getSpeciesDiversityPipeline(forestQuery)),
-      Forest.aggregate(getSoilHealthPipeline(forestQuery)),
-      Forest.aggregate(getInfrastructureConditionPipeline(forestQuery))
+      // Generate simulation data using mathematical models
+      generateDashboardSimulation(filters)
     ]);
 
-    // Prepare raw data for formatting
+    // Prepare raw data for formatting (combines real data with simulations)
     const rawData = {
       totalTrees,
       aliveTrees,
@@ -146,19 +126,10 @@ export const getDashboardStats = async (req, res) => {
       co2Stats,
       healthDistribution,
       forestStats,
-      // Investor metrics
-      portfolioValue,
-      roiStats,
-      carbonCredits,
-      timberValue,
-      maintenanceBudget,
-      // Manager metrics
-      biodiversityIndex,
-      treesAtRisk,
-      fireRisk,
-      speciesDiversity,
-      soilHealth,
-      infrastructureCondition
+      // Enhanced metrics from simulation engine
+      investor: simulationData.investor,
+      ecological: simulationData.ecological,
+      simulationSummary: simulationData.summary
     };
 
     // Format and send response
@@ -173,7 +144,14 @@ export const getDashboardStats = async (req, res) => {
 // Get quick stats for dashboard cards
 export const getQuickStats = async (req, res) => {
   try {
-    const filters = { forestId: req.query.forestId };
+    const filters = {
+      forestId: req.query.forestId,
+      forestIds: req.query.forestIds, // Support multi-forest filtering
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      species: req.query.species,
+      isAlive: req.query.isAlive
+    };
     const treeQuery = buildTreeQuery(filters);
 
     // Get basic counts
@@ -225,5 +203,60 @@ export const getForestComparison = async (req, res) => {
 
   } catch (error) {
     handleDashboardError(res, error, 'Failed to fetch forest comparison data');
+  }
+};
+
+// Get enhanced dashboard statistics with simulated financial/ecological data
+export const getEnhancedDashboardStats = async (req, res) => {
+  try {
+    const filters = {
+      forestId: req.query.forestId,
+      forestIds: req.query.forestIds,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      species: req.query.species,
+      isAlive: req.query.isAlive
+    };
+
+    console.log('🔍 Enhanced dashboard stats request with filters:', filters);
+
+    // Generate simulation data
+    const simulationData = await generateDashboardSimulation(filters);
+
+    // Get basic counts for verification
+    const treeQuery = buildTreeQuery(filters);
+    const [totalTrees, aliveTrees] = await Promise.all([
+      Tree.countDocuments(treeQuery),
+      Tree.countDocuments({ ...treeQuery, isAlive: true })
+    ]);
+
+    // Calculate survival rate
+    const survivalRate = totalTrees > 0 ? (aliveTrees / totalTrees) * 100 : 0;
+
+    // Combine real counts with simulation data
+    const response = {
+      success: true,
+      data: {
+        // Basic real data
+        basic: {
+          totalTrees,
+          aliveTrees,
+          survivalRate: Math.round(survivalRate * 100) / 100,
+          totalForests: simulationData.summary.totalForests
+        },
+        // Simulated financial metrics
+        investor: simulationData.investor,
+        // Simulated ecological metrics
+        ecological: simulationData.ecological,
+        // Metadata
+        filters,
+        lastUpdated: simulationData.summary.lastUpdated
+      }
+    };
+
+    res.json(response);
+
+  } catch (error) {
+    handleDashboardError(res, error, 'Failed to fetch enhanced dashboard statistics');
   }
 };
