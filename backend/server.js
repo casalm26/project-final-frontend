@@ -71,6 +71,12 @@ mongoose.connection.on('disconnected', () => {
 
 const port = process.env.PORT || 8080;
 const app = express();
+
+// Configure trust proxy for production deployment (Render, Heroku, etc.)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 const server = createServer(app);
 
 // Define allowed origins for CORS

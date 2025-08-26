@@ -10,6 +10,7 @@
  * - Environmental factors
  */
 
+import mongoose from 'mongoose';
 import { Tree, Forest } from '../models/index.js';
 
 /**
@@ -411,14 +412,12 @@ export const generateDashboardSimulation = async (filters = {}) => {
         .filter(id => id.length === 24); // Valid ObjectId length
       
       if (forestIdArray.length > 0) {
-        const mongoose = await import('mongoose');
-        const objectIds = forestIdArray.map(id => new mongoose.default.Types.ObjectId(id));
+        const objectIds = forestIdArray.map(id => new mongoose.Types.ObjectId(id));
         treeQuery.forestId = { $in: objectIds };
         forestQuery._id = { $in: objectIds };
       }
     } else if (filters.forestId) {
-      const mongoose = await import('mongoose');
-      const objectId = new mongoose.default.Types.ObjectId(filters.forestId);
+      const objectId = new mongoose.Types.ObjectId(filters.forestId);
       treeQuery.forestId = objectId;
       forestQuery._id = objectId;
     }

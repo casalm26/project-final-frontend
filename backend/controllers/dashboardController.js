@@ -220,8 +220,31 @@ export const getEnhancedDashboardStats = async (req, res) => {
 
     console.log('🔍 Enhanced dashboard stats request with filters:', filters);
 
-    // Generate simulation data
-    const simulationData = await generateDashboardSimulation(filters);
+    // Generate simulation data with error handling
+    let simulationData;
+    try {
+      simulationData = await generateDashboardSimulation(filters);
+      console.log('✅ Simulation data generated successfully');
+    } catch (simulationError) {
+      console.error('❌ Simulation generation failed:', simulationError);
+      // Fallback to empty simulation structure
+      simulationData = {
+        investor: {
+          portfolio: { totalCurrentValue: 0, forestCount: 0, treeCount: 0, averageValue: 0 },
+          timber: { totalValue: 0, averageValuePerTree: 0 },
+          carbonCredits: { totalAvailable: 0, totalSold: 0, averagePrice: 0, totalRevenue: 0 },
+          roi: { averageROI: 0, minROI: 0, maxROI: 0 },
+          maintenance: { totalBudget: 0, totalSpent: 0, utilization: 0 }
+        },
+        ecological: {
+          biodiversity: { speciesCount: 0, shannonIndex: 0, dominantSpecies: [] },
+          environmental: { carbonSequestration: { annualTons: 0, lifetimeStorage: 0 } },
+          riskAssessment: { treesAtRisk: 0, riskPercentage: 0, mainRiskFactors: [] },
+          forestHealth: { overallScore: 0, aliveTrees: 0, totalTrees: 0 }
+        },
+        summary: { totalTrees: 0, totalForests: 0, aliveTrees: 0, filters, lastUpdated: new Date().toISOString() }
+      };
+    }
 
     // Get basic counts for verification
     const treeQuery = buildTreeQuery(filters);
