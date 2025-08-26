@@ -17,14 +17,7 @@ const getCachedDashboardStats = (cacheKey) => {
     if (!cached) return null;
     
     const { data, timestamp } = JSON.parse(cached);
-    const now = Date.now();
-    
-    if (now - timestamp > DASHBOARD_CACHE_TTL) {
-      sessionStorage.removeItem(cacheKey);
-      return null;
-    }
-    
-    return data;
+    return { data, timestamp, isExpired: Date.now() - timestamp > DASHBOARD_CACHE_TTL };
   } catch (error) {
     console.warn('Dashboard cache read error:', error);
     return null;
@@ -43,9 +36,10 @@ const setCachedDashboardStats = (cacheKey, data) => {
   }
 };
 
-export const useDashboardStats = (filters = {}) => {
+export const useOptimisticDashboardStats = (filters = {}) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
   const [error, setError] = useState(null);
 
   // Transform filters to API format and memoize
@@ -58,29 +52,36 @@ export const useDashboardStats = (filters = {}) => {
     filters?.species
   ]);
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (showStaleData = true) => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Generate cache key
       const cacheKey = getDashboardCacheKey(apiFilters);
+      const cached = getCachedDashboardStats(cacheKey);
       
-      // Try to get cached data first
-      const cachedData = getCachedDashboardStats(cacheKey);
-      if (cachedData) {
-        setStats(cachedData);
+      // If we have cached data, show it immediately (optimistic loading)
+      if (cached && showStaleData) {
+        setStats(cached.data);
         setLoading(false);
-        return;
+        setIsStale(cached.isExpired);
+        
+        // If data is fresh, don't fetch again
+        if (!cached.isExpired) {
+          setError(null);
+          return;
+        }
+      } else {
+        setLoading(true);
       }
       
-      // Fetch fresh data if not in cache
+      setError(null);
+      
+      // Fetch fresh data in background
       const response = await dashboardAPI.getEnhancedStats(apiFilters);
       const responseData = response.data;
       
-      // Cache the fresh data
+      // Cache and update state
       setCachedDashboardStats(cacheKey, responseData);
       setStats(responseData);
+      setIsStale(false);
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
       setError(err.message || 'Failed to fetch dashboard statistics');
@@ -91,16 +92,17 @@ export const useDashboardStats = (filters = {}) => {
 
   // Fetch data when filters change
   useEffect(() => {
-    fetchStats();
+    fetchStats(true);
   }, [fetchStats]);
 
   const refresh = useCallback(() => {
-    fetchStats();
+    fetchStats(false); // Force fresh fetch without showing stale data
   }, [fetchStats]);
 
   return {
     stats,
     loading,
+    isStale,
     error,
     refresh
   };

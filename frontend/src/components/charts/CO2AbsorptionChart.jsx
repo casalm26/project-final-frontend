@@ -1,22 +1,33 @@
+import React, { memo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartHeader, ChartTitle, ChartTooltip } from '../ui/ChartComponents';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { useChartConfig } from '../../hooks/useChartConfig';
 import { useCO2AbsorptionData } from '../../hooks/useChartData';
 
-export const CO2AbsorptionChart = ({ filters = {} }) => {
+const CO2AbsorptionChartComponent = ({ filters = {}, dashboardData = null }) => {
   // Force yearly grouping for this chart
   const yearlyFilters = { ...filters, groupBy: 'year' };
-  const { data: apiData, loading, error } = useCO2AbsorptionData(yearlyFilters);
+  const { data: apiData, loading, error } = useCO2AbsorptionData(
+    dashboardData ? {} : yearlyFilters,
+    { skip: !!dashboardData }
+  );
   
-  // Transform API data to chart format - show years
-  const data = apiData?.chartData?.map(item => ({
-    year: item.period, // Year from period
-    co2: item.totalCO2 || 0
+  // Use dashboard data first, then API data
+  const chartData = dashboardData?.charts?.co2Absorption || apiData;
+  
+  // Transform data to chart format - show quarters/periods
+  const data = chartData?.chartData?.map(item => ({
+    year: item.period, // Period from data
+    co2: item.totalAbsorption || 0
   })) || [];
   const chartConfig = useChartConfig('bar');
 
-  if (loading) {
+  // If using dashboard data, no loading state needed
+  const isLoading = dashboardData ? false : loading;
+  const hasError = dashboardData ? false : error;
+
+  if (isLoading) {
     return (
       <ChartContainer>
         <ChartHeader>
@@ -29,7 +40,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
     );
   }
 
-  if (error) {
+  if (hasError) {
     return (
       <ChartContainer>
         <ChartHeader>
@@ -38,7 +49,7 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
         <div className="flex justify-center items-center h-72">
           <div className="text-center">
             <p className="text-red-600 mb-2">Error loading chart data</p>
-            <p className="text-sm text-gray-500">{error}</p>
+            <p className="text-sm text-gray-500">{hasError}</p>
           </div>
         </div>
       </ChartContainer>
@@ -73,3 +84,6 @@ export const CO2AbsorptionChart = ({ filters = {} }) => {
     </ChartContainer>
   );
 }; 
+
+// Memoize component to prevent unnecessary re-renders
+export const CO2AbsorptionChart = memo(CO2AbsorptionChartComponent);

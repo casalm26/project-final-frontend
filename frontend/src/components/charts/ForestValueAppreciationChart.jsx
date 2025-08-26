@@ -4,12 +4,19 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 import { useState, useEffect } from 'react';
 import { dashboardAPI } from '../../lib/api';
 
-export const ForestValueAppreciationChart = ({ filters = {} }) => {
+export const ForestValueAppreciationChart = ({ filters = {}, dashboardData = null }) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!dashboardData);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // If dashboard data is provided, use it directly
+    if (dashboardData?.charts?.forestValue) {
+      setData(dashboardData.charts.forestValue.chartData);
+      setLoading(false);
+      return;
+    }
+
     const fetchValueData = async () => {
       try {
         setLoading(true);
@@ -58,8 +65,10 @@ export const ForestValueAppreciationChart = ({ filters = {} }) => {
       }
     };
 
-    fetchValueData();
-  }, [filters]);
+    if (!dashboardData) {
+      fetchValueData();
+    }
+  }, [filters, dashboardData]);
 
   const formatCurrency = (value) => {
     if (!value) return '0';

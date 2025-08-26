@@ -1,3 +1,4 @@
+import React, { memo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartContainer, ChartHeader, ChartTitle, ChartTooltip, ChartPercentageDisplay, ChartLegend } from '../ui/ChartComponents';
 import LoadingSpinner from '../ui/LoadingSpinner';
@@ -5,13 +6,24 @@ import { useChartConfig } from '../../hooks/useChartConfig';
 import { useSurvivalRateData } from '../../hooks/useChartData';
 
 
-export const SurvivalRateChart = ({ filters = {} }) => {
-  const { data: apiData, loading, error } = useSurvivalRateData(filters);
+const SurvivalRateChartComponent = ({ filters = {}, dashboardData = null }) => {
+  // Use dashboard data if available, otherwise fetch from API
+  const { data: apiData, loading, error } = useSurvivalRateData(
+    dashboardData ? {} : filters, // Skip API call if we have dashboard data
+    { skip: !!dashboardData }
+  );
   
-  // Calculate survival rate from API data or use default
-  const survivalRate = apiData?.chartData?.length > 0 
-    ? apiData.chartData[apiData.chartData.length - 1]?.survivalRate || 0
+  // Use dashboard data first, then API data
+  const rawChartData = dashboardData?.charts?.survivalRate || apiData;
+  
+  // Calculate survival rate from available data
+  const survivalRate = rawChartData?.chartData?.length > 0 
+    ? rawChartData.chartData[rawChartData.chartData.length - 1]?.survivalRate || 0
     : 0;
+    
+  // If using dashboard data, no loading state needed
+  const isLoading = dashboardData ? false : loading;
+  const hasError = dashboardData ? false : error;
   
   const data = {
     survived: survivalRate,
@@ -23,7 +35,7 @@ export const SurvivalRateChart = ({ filters = {} }) => {
     { name: 'Lost', value: data.lost, color: '#ef4444' }
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <ChartContainer>
         <ChartHeader>
@@ -36,7 +48,7 @@ export const SurvivalRateChart = ({ filters = {} }) => {
     );
   }
 
-  if (error) {
+  if (hasError) {
     return (
       <ChartContainer>
         <ChartHeader>
@@ -45,7 +57,7 @@ export const SurvivalRateChart = ({ filters = {} }) => {
         <div className="flex justify-center items-center h-48">
           <div className="text-center">
             <p className="text-red-600 mb-2">Error loading chart data</p>
-            <p className="text-sm text-gray-500">{error}</p>
+            <p className="text-sm text-gray-500">{hasError}</p>
           </div>
         </div>
       </ChartContainer>
@@ -83,3 +95,6 @@ export const SurvivalRateChart = ({ filters = {} }) => {
     </ChartContainer>
   );
 }; 
+
+// Memoize component to prevent unnecessary re-renders
+export const SurvivalRateChart = memo(SurvivalRateChartComponent);

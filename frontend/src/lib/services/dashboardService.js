@@ -5,6 +5,7 @@ const apiClient = new ApiClient();
 // Dashboard API methods
 export const dashboardAPI = {
   getStats: (params = {}) => apiClient.get('/dashboard/stats', params),
+  getEnhancedStats: (params = {}) => apiClient.get('/dashboard/enhanced-stats', params),
 };
 
 // Chart API methods
