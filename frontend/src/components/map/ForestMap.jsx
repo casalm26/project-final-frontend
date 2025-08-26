@@ -36,7 +36,7 @@ export const ForestMap = ({
   loading = false,
   error = null
 }) => {
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(5);
   const [selectedTree, setSelectedTree] = useState(null);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(null);
@@ -131,7 +131,7 @@ export const ForestMap = ({
       <MapContainerStyled>
         <MapContainer
           center={[59.3293, 18.0686]}
-          zoom={13}
+          zoom={5}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
