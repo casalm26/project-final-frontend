@@ -1,0 +1,244 @@
+/* Typography System for Nanwa Frontend */
+/* Consistent heading scales and text styles */
+
+@layer base {
+  /* Heading system with responsive scaling */
+  .heading-1 {
+    @apply text-4xl md:text-5xl font-bold leading-tight tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-3xl md:text-4xl font-bold leading-tight tracking-tight;
+  }
+
+  .heading-3 {
+    @apply text-2xl md:text-3xl font-semibold leading-snug;
+  }
+
+  .heading-4 {
+    @apply text-xl md:text-2xl font-semibold leading-snug;
+  }
+
+  .heading-5 {
+    @apply text-lg md:text-xl font-semibold leading-normal;
+  }
+
+  .heading-6 {
+    @apply text-base md:text-lg font-semibold leading-normal;
+  }
+
+  /* Body text variants */
+  .body-lg {
+    @apply text-lg leading-relaxed;
+  }
+
+  .body-base {
+    @apply text-base leading-normal;
+  }
+
+  .body-sm {
+    @apply text-sm leading-normal;
+  }
+
+  .body-xs {
+    @apply text-xs leading-normal;
+  }
+
+  /* Text with semantic colors */
+  .text-muted {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .text-subtle {
+    @apply text-gray-500 dark:text-gray-500;
+  }
+
+  .text-primary {
+    @apply text-primary-600 dark:text-primary-400;
+  }
+
+  .text-secondary {
+    @apply text-secondary-600 dark:text-secondary-400;
+  }
+
+  .text-success {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .text-warning {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+
+  .text-error {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .text-strong {
+    @apply text-gray-900 dark:text-gray-100 font-semibold;
+  }
+}
+
+@layer components {
+  /* Display text for hero sections */
+  .display-xl {
+    @apply text-5xl md:text-6xl font-extrabold leading-none tracking-tight;
+  }
+
+  .display-lg {
+    @apply text-4xl md:text-5xl font-extrabold leading-none tracking-tight;
+  }
+
+  .display-md {
+    @apply text-3xl md:text-4xl font-bold leading-tight tracking-tight;
+  }
+
+  .display-sm {
+    @apply text-2xl md:text-3xl font-bold leading-tight;
+  }
+
+  /* Caption and overline text */
+  .caption {
+    @apply text-xs uppercase tracking-wide font-medium text-gray-500 dark:text-gray-400;
+  }
+
+  .overline {
+    @apply text-sm uppercase tracking-wider font-semibold text-gray-700 dark:text-gray-300;
+  }
+
+  /* Link styles */
+  .link-primary {
+    @apply text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline underline-offset-2 transition-colors;
+  }
+
+  .link-subtle {
+    @apply text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 underline underline-offset-2 transition-colors;
+  }
+
+  .link-bare {
+    @apply text-current hover:text-primary-600 dark:hover:text-primary-400 transition-colors;
+  }
+
+  /* Code and monospace text */
+  .code-inline {
+    @apply font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded border;
+  }
+
+  .code-block {
+    @apply font-mono text-sm bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border overflow-x-auto;
+  }
+
+  /* List styles */
+  .list-styled {
+    @apply space-y-2;
+  }
+
+  .list-styled ul {
+    @apply list-disc list-inside space-y-1;
+  }
+
+  .list-styled ol {
+    @apply list-decimal list-inside space-y-1;
+  }
+
+  .list-styled li {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* Prose styles for content areas */
+  .prose-content {
+    @apply max-w-none;
+  }
+
+  .prose-content h1 {
+    @apply heading-1 mb-4 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content h2 {
+    @apply heading-2 mb-3 mt-6 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content h3 {
+    @apply heading-3 mb-2 mt-5 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content h4 {
+    @apply heading-4 mb-2 mt-4 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content h5 {
+    @apply heading-5 mb-2 mt-3 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content h6 {
+    @apply heading-6 mb-2 mt-3 text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content p {
+    @apply body-base mb-4 text-gray-700 dark:text-gray-300;
+  }
+
+  .prose-content a {
+    @apply link-primary;
+  }
+
+  .prose-content strong {
+    @apply font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  .prose-content em {
+    @apply italic;
+  }
+
+  .prose-content ul, .prose-content ol {
+    @apply mb-4 pl-6;
+  }
+
+  .prose-content li {
+    @apply mb-2 text-gray-700 dark:text-gray-300;
+  }
+
+  .prose-content blockquote {
+    @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 mb-4;
+  }
+
+  .prose-content code {
+    @apply code-inline;
+  }
+
+  .prose-content pre {
+    @apply code-block;
+  }
+
+  /* Utility classes for text truncation */
+  .truncate-1 {
+    @apply truncate;
+  }
+
+  .truncate-2 {
+    @apply overflow-hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .truncate-3 {
+    @apply overflow-hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  /* Text alignment utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Focus-visible styles for text elements */
+  .text-focusable {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 rounded-sm;
+  }
+}
