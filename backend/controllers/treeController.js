@@ -29,8 +29,6 @@ export const getTrees = async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
-    if (forestIds) console.log('API call with forestIds:', forestIds);
-
     // Build query conditions using utility
     const queryConditions = buildTreeQuery({ forestId, forestIds, species, isAlive, startDate, endDate });
     
