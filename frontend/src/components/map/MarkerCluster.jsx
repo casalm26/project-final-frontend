@@ -10,7 +10,7 @@ const MarkerCluster = ({ trees, onTreeClick, zoom }) => {
   useEffect(() => {
     if (!map || !trees.length) return;
     
-    // Clear prior marker layers that we created (cluster groups or layer groups)
+    // Clear prior marker layers (cluster groups and layer groups)
     map.eachLayer(layer => {
       if (layer instanceof L.MarkerClusterGroup || layer instanceof L.LayerGroup) {
         map.removeLayer(layer);

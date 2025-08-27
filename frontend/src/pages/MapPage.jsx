@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { ForestMap } from '../components/map/ForestMap';
-import { GlobalFilters } from '../components/filters';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { TreeDetailModal } from '../components/ui/TreeDetailModal';
-import { useMapFilters } from '../hooks/useMapFilters';
 import { useTreeSelection } from '../hooks/useTreeSelection';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { treeAPI } from '../lib/api';
-import { transformFiltersForAPI } from '../utils/filterTransformer';
 import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
-  const { filters, handleFiltersChange } = useMapFilters();
   const { selectedTree, isModalOpen, handleTreeSelect, handleCloseTreeDetail } = useTreeSelection();
   const [trees, setTrees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,10 +18,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
       setError(null);
       
       try {
-        // Transform filters to API format
-        const params = transformFiltersForAPI(filters);
-        
-        const response = await treeAPI.getAll(params);
+        const response = await treeAPI.getAll();
         
         // The API returns { success: true, data: { trees: [...], pagination: {...} } }
         // Handle different possible response structures
@@ -38,14 +31,21 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
           treesData = response;
         }
         
-        // Transform the data to include lat/lng from location if needed
-        const transformedTrees = treesData.map(tree => ({
-          ...tree,
-          lat: tree.location?.coordinates?.[1] || tree.lat || 59.3293,
-          lng: tree.location?.coordinates?.[0] || tree.lng || 18.0686,
-          name: tree.treeId || tree.name || `Tree ${tree._id}`,
-          health: tree.health || 'healthy'
-        }));
+        // Transform the data and filter out trees without valid coordinates
+        const transformedTrees = treesData
+          .map(tree => {
+            // GeoJSON format: [longitude, latitude]
+            const hasValidLocation = tree.location?.coordinates?.length === 2;
+            
+            return {
+              ...tree,
+              lat: hasValidLocation ? tree.location.coordinates[1] : null,
+              lng: hasValidLocation ? tree.location.coordinates[0] : null,
+              name: tree.treeId || tree.name || `Tree ${tree._id}`,
+              health: tree.health || tree.measurements?.[0]?.healthStatus || 'unknown'
+            };
+          })
+          .filter(tree => tree.lat !== null && tree.lng !== null); // Only include trees with valid coordinates
         
         setTrees(transformedTrees);
       } catch (err) {
@@ -59,7 +59,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
     };
     
     fetchTrees();
-  }, [filters]);
+  }, []); // Run once on mount, no dependency on filters
 
 
   return (
@@ -84,8 +84,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
               </div>
             </div>
 
-            {/* Global Filters */}
-            <GlobalFilters onFiltersChange={handleFiltersChange} />
 
             {/* Tree Detail Modal */}
             <TreeDetailModal
@@ -103,7 +101,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
               <ForestMap 
                 trees={trees}
                 onTreeSelect={handleTreeSelect}
-                filters={filters}
                 loading={loading}
                 error={error}
               />

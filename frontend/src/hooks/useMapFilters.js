@@ -5,8 +5,6 @@ export const useMapFilters = () => {
 
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
-    // TODO: Update map data based on filters
-    console.log('Map filters changed:', newFilters);
   }, []);
 
   const resetFilters = useCallback(() => {

@@ -26,7 +26,6 @@ L.Icon.Default.mergeOptions({
 export const ForestMap = ({ 
   trees = [],
   onTreeSelect,
-  filters = {},
   loading = false,
   error = null
 }) => {
