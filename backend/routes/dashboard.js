@@ -1,8 +1,6 @@
 import express from 'express';
 import {
   getDashboardStats,
-  getQuickStats,
-  getForestComparison,
   getEnhancedDashboardStats
 } from '../controllers/dashboardController.js';
 import { authenticateToken } from '../middleware/auth.js';
@@ -10,8 +8,6 @@ import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Test endpoint without authentication (temporary)
-router.get('/test-enhanced-stats', getEnhancedDashboardStats);
 
 // All dashboard routes require authentication
 router.use(authenticateToken);
@@ -110,84 +106,6 @@ router.use(authenticateToken);
  */
 router.get('/stats', getDashboardStats);
 
-/**
- * @swagger
- * /dashboard/quick-stats:
- *   get:
- *     summary: Get quick dashboard statistics for widgets
- *     tags: [Dashboard]
- *     responses:
- *       200:
- *         description: Quick stats retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     totalTrees:
- *                       type: integer
- *                     totalForests:
- *                       type: integer
- *                     totalUsers:
- *                       type: integer
- *                     survivalRate:
- *                       type: number
- *                       format: float
- */
-router.get('/quick-stats', getQuickStats);
-
-/**
- * @swagger
- * /dashboard/forest-comparison:
- *   get:
- *     summary: Get forest comparison data
- *     tags: [Dashboard]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Limit number of forests to compare
- *     responses:
- *       200:
- *         description: Forest comparison data retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                       name:
- *                         type: string
- *                       treeCount:
- *                         type: integer
- *                       survivalRate:
- *                         type: number
- *                         format: float
- *                       avgHeight:
- *                         type: number
- *                         format: float
- *                       area:
- *                         type: number
- *                         format: float
- */
-router.get('/forest-comparison', getForestComparison);
 
 /**
  * @swagger

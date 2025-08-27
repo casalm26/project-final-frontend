@@ -1,5 +1,0 @@
-# This file ensures the uploads directory is tracked by git
-# Upload directories:
-# - uploads/trees/ - Processed tree images
-# - uploads/thumbnails/ - Generated thumbnails
-# - uploads/temp/ - Temporary upload processing

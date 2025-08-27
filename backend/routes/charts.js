@@ -2,9 +2,7 @@ import express from 'express';
 import {
   getSurvivalRateChart,
   getHeightGrowthChart,
-  getCO2AbsorptionChart,
-  getHealthStatusChart,
-  getCombinedChartData
+  getCO2AbsorptionChart
 } from '../controllers/chartController.js';
 import { authenticateToken } from '../middleware/auth.js';
 // import { dataLimiter } from '../middleware/rateLimiter.js';
@@ -170,79 +168,5 @@ router.get('/height-growth', getHeightGrowthChart);
  */
 router.get('/co2-absorption', getCO2AbsorptionChart);
 
-/**
- * @swagger
- * /charts/health-status:
- *   get:
- *     summary: Get tree health status distribution chart data
- *     tags: [Charts]
- *     parameters:
- *       - in: query
- *         name: forestId
- *         schema:
- *           type: string
- *         description: Filter by specific forest ID
- *       - in: query
- *         name: groupBy
- *         schema:
- *           type: string
- *           enum: [day, week, month, year]
- *           default: month
- *     responses:
- *       200:
- *         description: Health status distribution chart data
- */
-router.get('/health-status', getHealthStatusChart);
-
-/**
- * @swagger
- * /charts/combined:
- *   get:
- *     summary: Get combined chart data for dashboard
- *     tags: [Charts]
- *     description: Returns all chart data types in a single response for dashboard widgets
- *     parameters:
- *       - in: query
- *         name: forestId
- *         schema:
- *           type: string
- *         description: Filter by specific forest ID
- *       - in: query
- *         name: groupBy
- *         schema:
- *           type: string
- *           enum: [day, week, month, year]
- *           default: month
- *     responses:
- *       200:
- *         description: Combined chart data for all chart types
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     survivalRate:
- *                       type: object
- *                       description: Survival rate chart data
- *                     heightGrowth:
- *                       type: object
- *                       description: Height growth chart data
- *                     co2Absorption:
- *                       type: object
- *                       description: CO2 absorption chart data
- *                     healthStatus:
- *                       type: object
- *                       description: Health status chart data
- *                     generatedAt:
- *                       type: string
- *                       format: date-time
- */
-router.get('/combined', getCombinedChartData);
 
 export default router;
