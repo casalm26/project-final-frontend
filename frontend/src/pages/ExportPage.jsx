@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { GlobalFilters } from '../components/filters';
@@ -9,7 +10,7 @@ import { transformFiltersForAPI } from '../utils/filterTransformer';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 export const ExportPage = () => {
-  const { sidebarOpen, toggleSidebar } = useSidebarState();
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
   const { showToast } = useToast();
   const [filters, setFilters] = useState({});
   const [exportFormat, setExportFormat] = useState('csv');
@@ -93,20 +94,42 @@ export const ExportPage = () => {
   const { includeCount, recordEstimate } = getExportPreview();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <DashboardHeader onMenuClick={toggleSidebar} />
-      
-      <div className="flex">
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => toggleSidebar(false)} />
-        
-        <main className="flex-1 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <DashboardHeader onToggleSidebar={toggleSidebar} />
+
+      {/* Sidebar */}
+      <DashboardSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-6 lg:p-8 lg:ml-64">
           <div className="max-w-7xl mx-auto">
-            {/* Page Header */}
+            {/* Header Section */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Data Export</h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Export your tree data in various formats with customizable options
-              </p>
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <nav className="flex mb-2" aria-label="Breadcrumb">
+                    <ol className="flex items-center space-x-4">
+                      <li>
+                        <Link to="/dashboard" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                          Overview
+                        </Link>
+                      </li>
+                      <li>
+                        <svg className="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                          <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+                        </svg>
+                      </li>
+                      <li>
+                        <span className="text-gray-900 dark:text-white font-medium">Data Export</span>
+                      </li>
+                    </ol>
+                  </nav>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Data Export</h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Export your tree data in various formats with customizable options
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Export Configuration */}
@@ -326,7 +349,6 @@ export const ExportPage = () => {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 };

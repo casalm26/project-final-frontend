@@ -94,10 +94,10 @@ export const DashboardPage = () => {
       <main className="flex-1 p-4 md:p-6 lg:p-8 lg:ml-64">
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to Nanwa</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to Nanwa</h2>
                 <p className="text-gray-600 dark:text-gray-300">
                   Monitor your forests and track tree growth with real-time insights.
                 </p>
@@ -126,7 +126,7 @@ export const DashboardPage = () => {
           ) : (
             <>
               {/* Core Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 mb-6 md:mb-8">
                 <DashboardStatCard
                   icon={
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,9 +170,9 @@ export const DashboardPage = () => {
               </div>
 
               {/* Investor Metrics */}
-              <div className="mb-8">
+              <div className="mb-6 md:mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investor Metrics</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                   <EnhancedStatCard
                     icon={
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,9 +221,9 @@ export const DashboardPage = () => {
               </div>
 
               {/* Manager Metrics */}
-              <div className="mb-8">
+              <div className="mb-6 md:mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Management</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                   <EnhancedStatCard
                     icon={
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,101 +274,101 @@ export const DashboardPage = () => {
           )}
 
           {/* Original Charts Grid */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Core Analytics</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <EnhancedSurvivalRateChart filters={filters} />
               </div>
-              <div className="col-span-1 xl:col-span-2">
+              <div className="col-span-1 xl:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
                 <AverageHeightChart filters={filters} />
               </div>
-              <div className="col-span-1 lg:col-span-2 xl:col-span-3">
+              <div className="col-span-1 md:col-span-2 xl:col-span-3 h-[260px] sm:h-[300px] md:h-[360px]">
                 <HistoricalCO2AbsorptionChart filters={filters} />
               </div>
             </div>
           </div>
 
           {/* New Enhanced Charts */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial & Investment Analytics</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <ForestHealthIndexChart forestId={filters?.forestId} dateRange={filters?.dateRange} />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <HealthStatusDistributionChart filters={filters} chartType="pie" />
               </div>
             </div>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Management & Risk Analysis</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <HealthStatusDistributionChart filters={filters} chartType="bar" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <EnvironmentalRiskMatrixChart filters={filters} chartType="bar" />
               </div>
             </div>
           </div>
 
           {/* Revenue & Financial Performance */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue & Financial Performance</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <CarbonCreditRevenueChart filters={filters} chartType="line" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <MaintenanceCostAnalysisChart filters={filters} chartType="composed" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <SpeciesEconomicPerformanceChart filters={filters} chartType="bar" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <MaintenanceCostAnalysisChart filters={filters} chartType="pie" />
               </div>
             </div>
           </div>
 
           {/* Growth & Performance Analysis */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Growth & Performance Analysis</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="col-span-1 lg:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
                 <GrowthPerformancePredictionsChart filters={filters} chartType="line" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <SpeciesEconomicPerformanceChart filters={filters} chartType="scatter" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <GrowthPerformancePredictionsChart filters={filters} chartType="area" />
               </div> 
             </div>
           </div>
 
           {/* Ecological Impact & Biodiversity */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ecological Impact & Biodiversity</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <EcologicalBenefitsChart filters={filters} chartType="radar" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <BiodiversityTrendsChart filters={filters} chartType="line" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <EcologicalBenefitsChart filters={filters} chartType="bar" />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
                 <BiodiversityTrendsChart filters={filters} chartType="area" />
               </div>
-              <div className="col-span-1 lg:col-span-2">
+              <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
                 <EcologicalBenefitsChart filters={filters} chartType="area" />
               </div>
-              <div className="col-span-1 lg:col-span-2">
+              <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
                 <BiodiversityTrendsChart filters={filters} chartType="composed" />
               </div>
             </div>
