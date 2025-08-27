@@ -18,6 +18,7 @@ export const getTrees = async (req, res) => {
   try {
     const {
       forestId,
+      forestIds,
       species,
       isAlive,
       startDate,
@@ -29,7 +30,7 @@ export const getTrees = async (req, res) => {
     } = req.query;
 
     // Build query conditions using utility
-    const queryConditions = buildTreeQuery({ forestId, species, isAlive, startDate, endDate });
+    const queryConditions = buildTreeQuery({ forestId, forestIds, species, isAlive, startDate, endDate });
     
     // Build pagination options using utility
     const { skip, sort } = buildPaginationOptions({ page, limit, sortBy, sortOrder });
