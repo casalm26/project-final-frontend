@@ -9,7 +9,6 @@ export {
   dashboardAPI,
   chartAPI,
   exportAPI,
-  uploadAPI,
 } from './services/index.js';
 
 // Create singleton instance for direct client access

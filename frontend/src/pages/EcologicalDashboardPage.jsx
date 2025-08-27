@@ -43,7 +43,7 @@ export const EcologicalDashboardPage = () => {
       <main className="flex-1 p-4 md:p-6 lg:p-8 lg:ml-64">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <nav className="flex mb-2" aria-label="Breadcrumb">
@@ -63,7 +63,7 @@ export const EcologicalDashboardPage = () => {
                       </li>
                     </ol>
                   </nav>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Ecological Dashboard</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Ecological Dashboard</h2>
                   <p className="text-gray-600 dark:text-gray-300">
                     Environmental impact, biodiversity tracking, and conservation metrics for sustainable forest management.
                   </p>
@@ -90,9 +90,9 @@ export const EcologicalDashboardPage = () => {
                 </button>
               </div>
             ) : (
-              <div className="mb-6 md:mb-8">
+              <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Forest Health Metrics</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <EnhancedStatCard
                     icon={
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,16 +109,16 @@ export const EcologicalDashboardPage = () => {
             )}
 
             {/* Biodiversity Analysis */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Biodiversity Analysis</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-                <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="col-span-1">
                   <BiodiversityTrendsChart filters={filters} chartType="line" />
                 </div>
-                <div className="col-span-1 h-[260px] sm:h-[300px] md:h-[360px]">
+                <div className="col-span-1">
                   <BiodiversityTrendsChart filters={filters} chartType="area" />
                 </div>
-                <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
+                <div className="col-span-1 lg:col-span-2">
                   <BiodiversityTrendsChart filters={filters} chartType="composed" />
                 </div>
               </div>

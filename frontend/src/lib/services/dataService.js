@@ -19,8 +19,4 @@ export const exportAPI = {
   }
 };
 
-// Upload API methods
-export const uploadAPI = {
-  uploadTreeImages: (formData) => apiClient.uploadFile('/uploads/tree-images', formData),
-};
 

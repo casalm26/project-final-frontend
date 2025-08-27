@@ -71,7 +71,7 @@ export const FinancialDashboardPage = () => {
       <main className="flex-1 p-4 md:p-6 lg:p-8 lg:ml-64">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <nav className="flex mb-2" aria-label="Breadcrumb">
@@ -91,7 +91,7 @@ export const FinancialDashboardPage = () => {
                       </li>
                     </ol>
                   </nav>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Financial Dashboard</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Financial Dashboard</h2>
                   <p className="text-gray-600 dark:text-gray-300">
                     Investment performance, revenue analysis, and financial risk assessment for your forest portfolio.
                   </p>
@@ -120,9 +120,9 @@ export const FinancialDashboardPage = () => {
             ) : (
               <>
                 {/* Investment Metrics */}
-                <div className="mb-6 md:mb-8">
+                <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investment Performance</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <EnhancedStatCard
                       icon={
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,35 +173,35 @@ export const FinancialDashboardPage = () => {
             )}
 
             {/* Revenue Analysis */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue Analysis</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-                <div className="h-[260px] sm:h-[300px] md:h-[360px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                   <SpeciesEconomicPerformanceChart filters={filters} chartType="bar" />
                 </div>
-                <div className="h-[260px] sm:h-[300px] md:h-[360px]">
+                <div>
                   <HealthStatusDistributionChart filters={filters} chartType="bar" />
                 </div>
               </div>
             </div>
 
             {/* Growth & Returns */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Growth & Returns</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-                <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="col-span-1 lg:col-span-2">
                   <GrowthPerformancePredictionsChart filters={filters} chartType="line" />
                 </div>
-                <div className="col-span-1 md:col-span-2 h-[260px] sm:h-[300px] md:h-[360px]">
+                <div className="col-span-1 lg:col-span-2">
                   <GrowthPerformancePredictionsChart filters={filters} chartType="area" />
                 </div>
               </div>
             </div>
 
             {/* Risk Assessment */}
-            <div className="mb-6 md:mb-8">
+            <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Financial Risk Assessment</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
               </div>
             </div>
