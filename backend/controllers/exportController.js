@@ -1,4 +1,3 @@
-import { validationResult } from 'express-validator';
 import { Tree, Forest } from '../models/index.js';
 import XLSX from 'xlsx';
 import {
@@ -154,7 +153,7 @@ export const exportTreesXLSX = async (req, res) => {
 };
 
 
-// Export forest analytics data
+// Export forest analytics data (not being used at the moment)
 export const exportForestAnalytics = async (req, res) => {
   try {
     const { format = 'xlsx' } = req.query;
