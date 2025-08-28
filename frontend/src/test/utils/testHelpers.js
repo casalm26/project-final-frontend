@@ -5,26 +5,24 @@
 
 import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '../../contexts/AuthContext';
 import { ToastProvider } from '../../contexts/ToastContext';
 import { DarkModeProvider } from '../../contexts/DarkModeContext';
 
 /**
  * Custom render function with common providers
  * Wraps components with necessary context providers for testing
+ * Note: Authentication now uses Zustand store, no provider needed
  */
 export const renderWithProviders = (component, options = {}) => {
   const { initialEntries = ['/'] } = options;
   
   const Wrapper = ({ children }) => (
     <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <DarkModeProvider>
-            {children}
-          </DarkModeProvider>
-        </ToastProvider>
-      </AuthProvider>
+      <ToastProvider>
+        <DarkModeProvider>
+          {children}
+        </DarkModeProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 

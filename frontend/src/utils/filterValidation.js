@@ -111,3 +111,18 @@ export const createDefaultFilters = () => ({
   },
   selectedForests: []
 });
+
+/**
+ * Creates default filter values in store format
+ * @returns {Object} Default filter configuration for store
+ */
+export const createDefaultStoreFilters = () => ({
+  dateRange: { start: null, end: null },
+  forests: [],
+  regions: [],
+  species: [],
+  status: 'all',
+  soilCondition: '',
+  sunlightExposure: '',
+  search: ''
+});

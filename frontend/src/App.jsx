@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { ToastNotifications } from './components/ui/Toast';
@@ -31,8 +30,7 @@ export const App = () => {
       >
         <DarkModeProvider>
           <ToastProvider>
-            <AuthProvider>
-              <KeepAliveProvider>
+            <KeepAliveProvider>
                 <Suspense fallback={<LoadingSpinner fullscreen text="Loading page..." />}>
                 {/* Skip link for keyboard users */}
                 <a href="#main-content" className="skip-link">Skip to content</a>
@@ -86,7 +84,6 @@ export const App = () => {
                 </Suspense>
                 <ToastNotifications />
               </KeepAliveProvider>
-            </AuthProvider>
           </ToastProvider>
         </DarkModeProvider>
       </Router>

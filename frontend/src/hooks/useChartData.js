@@ -53,8 +53,16 @@ const useChartData = (apiMethod, filters = {}, options = {}) => {
 
   // Transform filters to API format and memoize
   const apiFilters = useMemo(() => {
+    // If filters already look like API format, use them directly
+    if (filters && ('startDate' in filters || 'endDate' in filters || 'forestIds' in filters)) {
+      return filters;
+    }
+    // Otherwise transform from legacy format
     return transformFiltersForAPI(filters);
   }, [
+    filters?.startDate,
+    filters?.endDate,
+    filters?.forestIds,
     filters?.dateRange?.startDate,
     filters?.dateRange?.endDate,
     filters?.selectedForests,

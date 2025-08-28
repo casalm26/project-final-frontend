@@ -44,11 +44,22 @@ export const useOptimisticDashboardStats = (filters = {}) => {
 
   // Transform filters to API format and memoize
   const apiFilters = useMemo(() => {
-    return transformFiltersForAPI(filters);
+    if (!filters) return {};
+    
+    // Convert new filter format to legacy format for transformFiltersForAPI
+    const legacyFilters = {
+      dateRange: {
+        startDate: filters.dateRange?.start,
+        endDate: filters.dateRange?.end
+      },
+      selectedForests: filters.forests || [],
+      species: filters.species || []
+    };
+    return transformFiltersForAPI(legacyFilters);
   }, [
-    filters?.dateRange?.startDate,
-    filters?.dateRange?.endDate,
-    filters?.selectedForests,
+    filters?.dateRange?.start,
+    filters?.dateRange?.end,
+    filters?.forests,
     filters?.species
   ]);
 

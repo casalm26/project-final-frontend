@@ -1,4 +1,4 @@
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { useLocation, Link } from 'react-router-dom';
 
 export const DashboardSidebar = ({ isOpen, onClose }) => {

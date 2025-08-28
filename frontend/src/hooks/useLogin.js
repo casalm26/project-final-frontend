@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from './useAuth';
 import { useColdStartDetection } from './useColdStartDetection';
 
 export const useLogin = () => {
@@ -56,4 +56,4 @@ export const useLogin = () => {
   };
 };
 
-// TODO: Consider moving authentication state to Zustand store for better state management across components
+// Authentication now uses Zustand store for better state management

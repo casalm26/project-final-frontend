@@ -1,4 +1,4 @@
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { DarkModeToggle } from './DarkModeToggle';
 
 export const DashboardHeader = ({ onToggleSidebar }) => {

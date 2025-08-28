@@ -1,4 +1,4 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from './useAuth';
 
 /**
  * Custom hook for protected route logic

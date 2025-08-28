@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../lib/api';
+import { useAuth } from './useAuth';
+import { authAPI } from '../lib/api';
 import { KEEP_ALIVE_CONFIG } from '../constants/keepAliveConstants';
 
 export const useKeepAlive = () => {
@@ -19,7 +19,7 @@ export const useKeepAlive = () => {
     const performKeepAlive = async () => {
       try {
         // Make a lightweight request to keep the server warm using existing API client
-        await api.auth.getProfile();
+        await authAPI.getProfile();
         console.log('Keep-alive ping successful');
       } catch (error) {
         // Silently fail - this is just a keep-alive, not critical
@@ -44,7 +44,7 @@ export const useKeepAlive = () => {
     if (!user || !isEnabled) return false;
 
     try {
-      await api.auth.getProfile();
+      await authAPI.getProfile();
       return true;
     } catch (error) {
       console.log('Manual keep-alive failed:', error.message);

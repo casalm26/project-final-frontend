@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { SurvivalRateChart, CO2AbsorptionChart } from '../components/charts';
 import ForestValueAppreciationChart from '../components/charts/ForestValueAppreciationChart';
@@ -10,17 +10,31 @@ import { EnhancedStatCard } from '../components/ui/EnhancedStatCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useOptimisticDashboardStats } from '../hooks/useOptimisticDashboardStats';
+import { useFiltersStore } from '../lib/stores/filtersStore';
 
 export const OverviewDashboardPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
-  const [filters, setFilters] = useState({});
+  
+  // Get filters from centralized store
+  const filtersStore = useFiltersStore();
+  const filters = filtersStore.filters || {
+    dateRange: { start: null, end: null },
+    forests: [],
+    regions: [],
+    species: [],
+    status: 'all',
+    soilCondition: '',
+    sunlightExposure: '',
+    search: ''
+  };
   
   // Fetch dashboard statistics with current filters (optimistic loading)
   const { stats, loading: statsLoading, error: statsError, isStale, refresh } = useOptimisticDashboardStats(filters);
-  
 
+  // Optional: Handle filter changes (though not needed since store is global)
   const handleFiltersChange = useCallback((newFilters) => {
-    setFilters(newFilters);
+    // The GlobalFilters component already updates the store
+    // This callback is kept for compatibility but is essentially a no-op
   }, []);
 
   // Helper functions for formatting data
@@ -302,13 +316,13 @@ export const OverviewDashboardPage = () => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Performance Indicators</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div className="col-span-1">
-                  <SurvivalRateChart filters={filters} dashboardData={stats} />
+                  <SurvivalRateChart filters={filtersStore.getApiParams()} dashboardData={stats} />
                 </div>
                 <div className="col-span-1">
-                  <ForestValueAppreciationChart filters={filters} dashboardData={stats} />
+                  <ForestValueAppreciationChart filters={filtersStore.getApiParams()} dashboardData={stats} />
                 </div>
                 <div className="col-span-1 xl:col-span-1">
-                  <CO2AbsorptionChart filters={filters} dashboardData={stats} />
+                  <CO2AbsorptionChart filters={filtersStore.getApiParams()} dashboardData={stats} />
                 </div>
               </div>
             </div>
