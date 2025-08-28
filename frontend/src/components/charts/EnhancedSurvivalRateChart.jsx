@@ -141,7 +141,7 @@ const EnhancedSurvivalRateChart = ({ filters = {} }) => {
           `${import.meta.env.VITE_API_URL}/charts/survival-rate?${params}`,
           {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json'
             }
           }

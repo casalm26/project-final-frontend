@@ -264,8 +264,24 @@ export const OverviewDashboardPage = () => {
                   </div>
                 </div>
 
-                {/* Navigation Cards */}
-                <div className="mb-8">
+            {/* Key Charts */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Performance Indicators</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="col-span-1">
+                  <SurvivalRateChart filters={filtersStore.getApiParams()} dashboardData={stats} />
+                </div>
+                <div className="col-span-1">
+                  <ForestValueAppreciationChart filters={filtersStore.getApiParams()} dashboardData={stats} />
+                </div>
+                <div className="col-span-1 xl:col-span-1">
+                  <CO2AbsorptionChart filters={filtersStore.getApiParams()} dashboardData={stats} />
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Cards */}
+            <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detailed Analysis</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Link to="/dashboard/financial" className="block">
@@ -315,22 +331,6 @@ export const OverviewDashboardPage = () => {
                 </div>
               </>
             )}
-
-            {/* Key Charts */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Performance Indicators</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div className="col-span-1">
-                  <SurvivalRateChart filters={filtersStore.getApiParams()} dashboardData={stats} />
-                </div>
-                <div className="col-span-1">
-                  <ForestValueAppreciationChart filters={filtersStore.getApiParams()} dashboardData={stats} />
-                </div>
-                <div className="col-span-1 xl:col-span-1">
-                  <CO2AbsorptionChart filters={filtersStore.getApiParams()} dashboardData={stats} />
-                </div>
-              </div>
-            </div>
 
             {/* Recent Activity Section Placeholder */}
             <div className="mb-8">
