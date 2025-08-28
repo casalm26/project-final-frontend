@@ -143,8 +143,12 @@ export const ForestValueAppreciationChart = ({ filters = {}, dashboardData = nul
     );
   }
 
+  const currentValue = data[data.length - 1]?.currentValue || 0;
+  const initialValue = data[0]?.acquisitionCost || 0;
+  const appreciation = currentValue - initialValue;
+  
   return (
-    <ChartContainer>
+    <ChartContainer role="img" aria-label={`Forest Value Appreciation chart showing ${formatCurrency(appreciation)} appreciation from ${formatCurrency(initialValue)} to ${formatCurrency(currentValue)}`}>
       <ChartHeader>
         <ChartTitle>Forest Value Appreciation</ChartTitle>
       </ChartHeader>

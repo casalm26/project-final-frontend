@@ -269,6 +269,7 @@ export const GlobalFilters = ({ onFiltersChange, initialFilters = {} }) => {
           <button 
             onClick={handleClearAll}
             className={`px-4 py-2 bg-red-500 text-white border-0 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-red-600 focus:outline-none focus:ring-3 focus:ring-blue-200 ${!isCollapsed && activeFilters.length > 0 ? 'visible pointer-events-auto' : 'invisible pointer-events-none'}`}
+            aria-label="Clear all active filters"
           >
             Clear All
           </button>

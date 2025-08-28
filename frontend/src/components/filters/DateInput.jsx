@@ -12,10 +12,13 @@ export const DateInput = ({
   maxDate, 
   placeholderText 
 }) => {
+  const inputId = `date-input-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  
   return (
     <DateInputWrapper>
-      <DateLabel>{label}</DateLabel>
+      <DateLabel htmlFor={inputId}>{label}</DateLabel>
       <StyledDatePicker
+        id={inputId}
         selected={selected}
         onChange={onChange}
         selectsStart={selectsStart}
@@ -26,6 +29,7 @@ export const DateInput = ({
         maxDate={maxDate}
         dateFormat="MMM dd, yyyy"
         placeholderText={placeholderText}
+        aria-label={label}
       />
     </DateInputWrapper>
   );

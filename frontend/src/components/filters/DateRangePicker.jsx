@@ -24,7 +24,7 @@ export const DateRangePicker = ({ onDateChange, initialStartDate, initialEndDate
     <FilterContainer>
       <FilterHeader>
         <FilterTitle>Date Range</FilterTitle>
-        <ResetButton onClick={handleReset}>
+        <ResetButton onClick={handleReset} aria-label="Reset date range filter">
           Reset
         </ResetButton>
       </FilterHeader>

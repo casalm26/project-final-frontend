@@ -65,7 +65,7 @@ const SurvivalRateChartComponent = ({ filters = {}, dashboardData = null }) => {
   }
 
   return (
-    <ChartContainer>
+    <ChartContainer role="img" aria-label={`Tree Survival Rate chart showing ${data.survived.toFixed(1)}% survival rate`}>
       <ChartHeader>
         <ChartTitle>Tree Survival Rate</ChartTitle>
       </ChartHeader>

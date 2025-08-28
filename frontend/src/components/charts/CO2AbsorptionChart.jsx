@@ -56,8 +56,10 @@ const CO2AbsorptionChartComponent = ({ filters = {}, dashboardData = null }) => 
     );
   }
 
+  const totalCO2 = data.reduce((sum, item) => sum + item.co2, 0);
+  
   return (
-    <ChartContainer>
+    <ChartContainer role="img" aria-label={`CO₂ Absorption chart showing ${totalCO2.toFixed(1)} total tons absorbed over ${data.length} years`}>
       <ChartHeader>
         <ChartTitle>CO₂ Absorption Over Time</ChartTitle>
       </ChartHeader>
