@@ -1,6 +1,6 @@
 import React from 'react';
 import { StandardSpinner } from './StandardSpinner';
-import { cn } from '@utils/cn';
+import { cn } from '@/lib/utils';
 
 export const StandardLoadingSpinner = ({ 
   text = 'Loading...', 

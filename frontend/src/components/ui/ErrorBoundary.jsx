@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { ErrorCard, ErrorTitle, ErrorMessage, ErrorDetails } from './ErrorCard';
 import { ErrorActions } from './ErrorActions';
 import { useErrorReporting } from '../../hooks/useErrorReporting';
-import { formatDateTimeForAPI } from '@utils/dateUtils';
+import { formatDateTimeForAPI } from '@/utils/dateUtils';
 
 const ErrorContainer = ({ children, className, ...props }) => {
   return (

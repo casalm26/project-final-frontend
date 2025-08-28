@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Table, TableRow, TableHeaderCell, TableCell } from './Table';
 import { HealthBadge } from './HealthBadge';
 import { useDarkMode } from '../../contexts/DarkModeContext';
-import { formatDate } from '@utils/dateUtils';
+import { formatDate } from '@/utils/dateUtils';
 
 const Section = styled.div`
   margin-bottom: 2rem;

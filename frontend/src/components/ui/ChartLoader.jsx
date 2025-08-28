@@ -1,7 +1,7 @@
 import React from 'react';
 import { StandardLoadingSpinner } from './StandardLoadingSpinner';
 import { SkeletonChart } from './SkeletonLoader';
-import { cn } from '@utils/cn';
+import { cn } from '@/lib/utils';
 
 export const ChartLoader = ({ 
   variant = 'spinner', // 'spinner', 'skeleton'

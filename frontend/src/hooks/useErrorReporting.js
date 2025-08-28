@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { formatDateTimeForAPI } from '@utils/dateUtils';
+import { formatDateTimeForAPI } from '@/utils/dateUtils';
 
 export const useErrorReporting = () => {
   const reportError = useCallback((error, errorInfo) => {

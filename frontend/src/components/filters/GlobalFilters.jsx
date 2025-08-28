@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { DateRangePicker } from './DateRangePicker';
 import { ForestSelector } from './ForestSelector';
 import { FilterErrors } from './FilterErrors';
-import { formatDateForInput } from '@utils/dateUtils';
-import { validateFilters, createDefaultFilters } from '@utils/filterValidation';
+import { formatDateForInput } from '@/utils/dateUtils';
+import { validateFilters, createDefaultFilters } from '@/utils/filterValidation';
 import { useFiltersStore } from '../../lib/stores/filtersStore';
 
 

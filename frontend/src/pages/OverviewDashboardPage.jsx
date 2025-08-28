@@ -16,9 +16,9 @@ import { useFiltersStore } from '../lib/stores/filtersStore';
 export const OverviewDashboardPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
   
-  // Get filters from centralized store
+  // Get filters from centralized store with safe defaults
   const filtersStore = useFiltersStore();
-  const filters = filtersStore.filters || {
+  const defaultFilters = {
     dateRange: { start: null, end: null },
     forests: [],
     regions: [],
@@ -28,6 +28,12 @@ export const OverviewDashboardPage = () => {
     sunlightExposure: '',
     search: ''
   };
+  
+  const filters = filtersStore.filters ? {
+    ...defaultFilters,
+    ...filtersStore.filters,
+    dateRange: filtersStore.filters.dateRange || defaultFilters.dateRange
+  } : defaultFilters;
   
   // Fetch dashboard statistics with current filters (optimistic loading)
   const { stats, loading: statsLoading, error: statsError, isStale, refresh } = useOptimisticDashboardStats(filters);

@@ -46,14 +46,22 @@ export const useOptimisticDashboardStats = (filters = {}) => {
   const apiFilters = useMemo(() => {
     if (!filters) return {};
     
+    // Ensure dateRange has a default structure
+    const safeFilters = {
+      ...filters,
+      dateRange: filters.dateRange || { start: null, end: null },
+      forests: filters.forests || [],
+      species: filters.species || []
+    };
+    
     // Convert new filter format to legacy format for transformFiltersForAPI
     const legacyFilters = {
       dateRange: {
-        startDate: filters.dateRange?.start,
-        endDate: filters.dateRange?.end
+        startDate: safeFilters.dateRange.start,
+        endDate: safeFilters.dateRange.end
       },
-      selectedForests: filters.forests || [],
-      species: filters.species || []
+      selectedForests: safeFilters.forests,
+      species: safeFilters.species
     };
     return transformFiltersForAPI(legacyFilters);
   }, [

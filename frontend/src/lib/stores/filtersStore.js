@@ -16,9 +16,19 @@ export const useFiltersStore = create(
           search: ''
         },
         
-        setFilters: (newFilters) => set((state) => ({
-          filters: { ...state.filters, ...newFilters }
-        })),
+        setFilters: (newFilters) => set((state) => {
+          // Ensure we maintain the structure for dateRange
+          const updatedFilters = { ...state.filters, ...newFilters };
+          if (updatedFilters.dateRange && typeof updatedFilters.dateRange === 'object') {
+            updatedFilters.dateRange = {
+              start: updatedFilters.dateRange.start || null,
+              end: updatedFilters.dateRange.end || null
+            };
+          } else if (!updatedFilters.dateRange) {
+            updatedFilters.dateRange = { start: null, end: null };
+          }
+          return { filters: updatedFilters };
+        }),
         
         clearFilters: () => set({
           filters: {
@@ -125,7 +135,30 @@ export const useFiltersStore = create(
       }),
       {
         name: 'filters-storage',
-        partialize: (state) => ({ filters: state.filters })
+        partialize: (state) => ({ filters: state.filters }),
+        onRehydrateStorage: () => (state) => {
+          // Ensure the rehydrated state has the correct structure
+          if (state && state.filters) {
+            if (!state.filters.dateRange || typeof state.filters.dateRange !== 'object') {
+              state.filters.dateRange = { start: null, end: null };
+            } else {
+              // Ensure dateRange has both start and end properties
+              state.filters.dateRange = {
+                start: state.filters.dateRange.start || null,
+                end: state.filters.dateRange.end || null
+              };
+            }
+            // Ensure arrays exist
+            state.filters.forests = state.filters.forests || [];
+            state.filters.regions = state.filters.regions || [];
+            state.filters.species = state.filters.species || [];
+            // Ensure strings exist
+            state.filters.status = state.filters.status || 'all';
+            state.filters.soilCondition = state.filters.soilCondition || '';
+            state.filters.sunlightExposure = state.filters.sunlightExposure || '';
+            state.filters.search = state.filters.search || '';
+          }
+        }
       }
     ),
     { name: 'filters-store' }
