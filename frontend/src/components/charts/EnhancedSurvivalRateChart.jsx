@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { ChartLoader } from '../ui/ChartLoader';
 
 const ChartContainer = styled.div`
   background: white;
@@ -202,22 +203,19 @@ const EnhancedSurvivalRateChart = ({ filters = {} }) => {
   };
 
   if (loading) {
-    return (
-      <ChartContainer>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <p>Loading survival rate data...</p>
-        </div>
-      </ChartContainer>
-    );
+    return <ChartLoader title="Tree Survival Rate" variant="skeleton" />;
   }
 
   if (error) {
     return (
-      <ChartContainer>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <p style={{ color: '#ef4444' }}>Error: {error}</p>
+      <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Tree Survival Rate
+        </h3>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <p className="text-red-500 dark:text-red-400">Error: {error}</p>
         </div>
-      </ChartContainer>
+      </div>
     );
   }
 

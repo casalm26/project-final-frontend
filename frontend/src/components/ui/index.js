@@ -13,8 +13,21 @@ export {
   ChartPercentageDisplay,
   ChartLegend 
 } from './ChartComponents';
+// Legacy loading components (to be deprecated)
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { Spinner } from './Spinner';
+
+// Standardized loading components (use these going forward)
+export { StandardSpinner } from './StandardSpinner';
+export { StandardLoadingSpinner } from './StandardLoadingSpinner';
+export { ChartLoader } from './ChartLoader';
+export { 
+  Skeleton, 
+  SkeletonCard, 
+  SkeletonChart, 
+  SkeletonTable, 
+  SkeletonDashboard 
+} from './SkeletonLoader';
 export { DarkModeToggle } from './DarkModeToggle';
 export { SunIcon } from './SunIcon';
 export { MoonIcon } from './MoonIcon';

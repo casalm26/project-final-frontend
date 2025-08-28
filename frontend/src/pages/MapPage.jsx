@@ -6,7 +6,9 @@ import { TreeDetailModal } from '../components/ui/TreeDetailModal';
 import { useTreeSelection } from '../hooks/useTreeSelection';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { treeAPI } from '../lib/api';
-import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPage = () => {
+import { StandardLoadingSpinner } from '../components/ui/StandardLoadingSpinner';
+
+export const MapPage = () => {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebarState();
   const { selectedTree, isModalOpen, handleTreeSelect, handleCloseTreeDetail } = useTreeSelection();
   const [trees, setTrees] = useState([]);
@@ -94,9 +96,12 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';export const MapPag
 
             {/* Map */}
             {loading ? (
-              <div className="flex justify-center items-center h-96 bg-white dark:bg-gray-800 rounded-lg shadow">
-                <LoadingSpinner text="Loading trees..." />
-              </div>
+              <StandardLoadingSpinner 
+                text="Loading forest map data..." 
+                variant="card"
+                className="h-96"
+                size="lg"
+              />
             ) : (
               <ForestMap 
                 trees={trees}

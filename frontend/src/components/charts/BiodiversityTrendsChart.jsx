@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Bar, Area, AreaChart } from 'recharts';
 import { ChartContainer, ChartHeader, ChartTitle } from '../ui/ChartComponents';
-import LoadingSpinner from '../ui/LoadingSpinner';
+import { ChartLoader } from '../ui/ChartLoader';
 import { useState, useEffect } from 'react';
 import { dashboardAPI } from '../../lib/api';
 
@@ -237,16 +237,7 @@ export const BiodiversityTrendsChart = ({ filters = {}, chartType = 'line' }) =>
   };
 
   if (loading) {
-    return (
-      <ChartContainer>
-        <ChartHeader>
-          <ChartTitle>Biodiversity Trends</ChartTitle>
-        </ChartHeader>
-        <div className="flex justify-center items-center h-72">
-          <LoadingSpinner size="32px" text="Loading biodiversity data..." />
-        </div>
-      </ChartContainer>
-    );
+    return <ChartLoader title="Biodiversity Trends" variant="skeleton" />;
   }
 
   if (error) {

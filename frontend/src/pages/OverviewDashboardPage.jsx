@@ -7,7 +7,8 @@ import { DashboardHeader } from '../components/ui/DashboardHeader';
 import { DashboardSidebar } from '../components/ui/DashboardSidebar';
 import { DashboardStatCard } from '../components/ui/DashboardStatCard';
 import { EnhancedStatCard } from '../components/ui/EnhancedStatCard';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { StandardLoadingSpinner } from '../components/ui/StandardLoadingSpinner';
+import { SkeletonDashboard } from '../components/ui/SkeletonLoader';
 import { useSidebarState } from '../hooks/useSidebarState';
 import { useOptimisticDashboardStats } from '../hooks/useOptimisticDashboardStats';
 import { useFiltersStore } from '../lib/stores/filtersStore';
@@ -123,9 +124,7 @@ export const OverviewDashboardPage = () => {
 
             {/* Stats Cards */}
             {statsLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <LoadingSpinner text="Loading dashboard overview..." />
-              </div>
+              <SkeletonDashboard />
             ) : statsError ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
                 <p className="text-red-600">Error loading dashboard statistics: {statsError}</p>
