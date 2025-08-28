@@ -119,14 +119,14 @@ const useChartData = (apiMethod, filters = {}, options = {}) => {
 };
 
 // Specific hooks for each chart type
-export const useSurvivalRateData = (filters = {}) => {
-  return useChartData(chartAPI.getSurvivalRate, filters);
+export const useSurvivalRateData = (filters = {}, options = {}) => {
+  return useChartData(chartAPI.getSurvivalRate, filters, options);
 };
 
-export const useHeightGrowthData = (filters = {}) => {
-  return useChartData(chartAPI.getHeightGrowth, filters);
+export const useHeightGrowthData = (filters = {}, options = {}) => {
+  return useChartData(chartAPI.getHeightGrowth, filters, options);
 };
 
-export const useCO2AbsorptionData = (filters = {}) => {
-  return useChartData(chartAPI.getCO2Absorption, filters);
+export const useCO2AbsorptionData = (filters = {}, options = {}) => {
+  return useChartData(chartAPI.getCO2Absorption, filters, options);
 };
