@@ -8,3 +8,4 @@ Built with React and modern web technologies, Nanwa offers interactive maps, det
 
 [Live Demo](https://nanwa.netlify.app/)
 [Live API](https://project-final-frontend-4bia.onrender.com)
+Login credentials on the login page!
