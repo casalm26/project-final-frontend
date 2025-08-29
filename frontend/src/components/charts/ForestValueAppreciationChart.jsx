@@ -174,6 +174,7 @@ export const ForestValueAppreciationChart = ({ filters = {}, dashboardData = nul
             strokeWidth={2}
             name="Acquisition Cost"
             dot={{ r: 4 }}
+            aria-hidden="true"
           />
           <Line 
             type="monotone" 
@@ -182,6 +183,7 @@ export const ForestValueAppreciationChart = ({ filters = {}, dashboardData = nul
             strokeWidth={2}
             name="Current Value"
             dot={{ r: 4 }}
+            aria-hidden="true"
           />
         </LineChart>
       </ResponsiveContainer>

@@ -44,7 +44,7 @@ export const PercentageDisplay = styled.div`
 export const PercentageValue = styled.div`
   font-size: 2.5rem;
   font-weight: 700;
-  color: #10b981;
+  color: #16a34a;
   line-height: 1;
 `;
 

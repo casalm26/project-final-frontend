@@ -82,6 +82,7 @@ const SurvivalRateChartComponent = ({ filters = {}, dashboardData = null }) => {
             outerRadius={chartConfig.outerRadius}
             paddingAngle={chartConfig.paddingAngle}
             dataKey="value"
+            aria-hidden="true"
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />

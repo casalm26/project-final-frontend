@@ -80,6 +80,7 @@ const CO2AbsorptionChartComponent = ({ filters = {}, dashboardData = null }) => 
             dataKey="co2" 
             fill="#8b5cf6"
             radius={chartConfig.radius}
+            aria-hidden="true"
           />
         </BarChart>
       </ResponsiveContainer>

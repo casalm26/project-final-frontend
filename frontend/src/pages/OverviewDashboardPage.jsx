@@ -233,7 +233,7 @@ export const OverviewDashboardPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ecological Summary</h3>
                     <Link 
                       to="/dashboard/ecological"
-                      className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium text-sm"
+                      className="text-green-700 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium text-sm"
                     >
                       View Full Ecological Dashboard →
                     </Link>
@@ -275,7 +275,7 @@ export const OverviewDashboardPage = () => {
                   <ForestValueAppreciationChart filters={filtersStore.getApiParams()} dashboardData={stats} />
                 </div>
                 <div className="col-span-1 xl:col-span-1">
-                  <CO2AbsorptionChart filters={filtersStore.getApiParams()} dashboardData={stats} />
+                  {/* <CO2AbsorptionChart filters={filtersStore.getApiParams()} dashboardData={stats} /> */}
                 </div>
               </div>
             </div>
@@ -310,7 +310,7 @@ export const OverviewDashboardPage = () => {
                       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600">
                         <div className="flex items-center mb-4">
                           <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg mr-4">
-                            <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-6 w-6 text-green-700 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                           </div>
@@ -319,7 +319,7 @@ export const OverviewDashboardPage = () => {
                         <p className="text-gray-600 dark:text-gray-300 mb-4">
                           Comprehensive environmental impact analysis including biodiversity trends, ecological benefits, and conservation metrics.
                         </p>
-                        <div className="flex items-center text-green-600 dark:text-green-400 font-medium">
+                        <div className="flex items-center text-green-700 dark:text-green-400 font-medium">
                           View Ecological Analytics
                           <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
