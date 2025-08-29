@@ -1,13 +1,10 @@
-# Final Project
+# Nanwa - Forestry Management Platform
 
-Replace this readme with your own information about your project.
+A comprehensive forestry management platform providing real-time tree monitoring, data analytics, and environmental impact tracking. The application enables forest managers to monitor tree health, track growth patterns, analyze carbon absorption, and manage forestry investments through an intuitive dashboard interface.
 
-Start by briefly describing the assignment in a sentence or two. Keep it short and to the point.
-
-## The problem
-
-Describe how you approached to problem, and what tools and techniques you used to solve it. How did you plan? What technologies did you use? If you had more time, what would be next?
+Built with React and modern web technologies, Nanwa offers interactive maps, detailed analytics charts, and comprehensive data export capabilities for sustainable forest management.
 
 ## View it live
 
-Every project should be deployed somewhere. Be sure to include the link to the deployed project so that the viewer can click around and see what it's all about.
+[Live Demo](https://nanwa.netlify.app/)
+[Live API](https://project-final-frontend-4bia.onrender.com)
