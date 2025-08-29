@@ -1,4 +1,4 @@
-# Nanwa - Forestry Management Platform
+# Nanwa - Forestry
 
 A comprehensive forestry management platform providing real-time tree monitoring, data analytics, and environmental impact tracking. The application enables forest managers to monitor tree health, track growth patterns, analyze carbon absorption, and manage forestry investments through an intuitive dashboard interface.
 
