@@ -60,7 +60,7 @@ export const ToastNotifications = () => {
   const { toasts, removeToast } = useToast();
 
   return (
-    <ToastContainer aria-live="polite" aria-label="Notifications">
+    <ToastContainer role="region" aria-live="polite" aria-label="Notifications">
       {toasts.map((toast) => (
         <Toast 
           key={toast.id} 
